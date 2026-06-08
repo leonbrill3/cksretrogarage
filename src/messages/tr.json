@@ -1,0 +1,286 @@
+{
+  "meta": {
+    "titleDefault": "CK Retro Garage — Koleksiyoner Otomobil Tedariki",
+    "description": "30 yılı aşkın süredir Cem Köse, dünyanın dört bir yanındaki seçkin sahipler için olağanüstü otomobilleri bulup inceliyor ve teslim ediyor. Aradığınız otomobili bize anlatın."
+  },
+  "nav": {
+    "collection": "Koleksiyon",
+    "process": "Sürecimiz",
+    "storage": "Muhafaza",
+    "about": "Hakkımızda",
+    "contact": "İletişim",
+    "cta": "Aracımı Buldur"
+  },
+  "footer": {
+    "blurb": "Olağanüstü otomobiller için özel bir tedarik kuruluşu. Her otomobil, otuz yıllık uzmanlıkla bulunur, incelenir ve teslim edilir.",
+    "explore": "Keşfet",
+    "regions": "Dünya Geneli",
+    "custody": "Collection Suites güvencesiyle güvenli muhafaza",
+    "rights": "Tüm hakları saklıdır.",
+    "privacy": "Gizlilik"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Koleksiyoner Tedariki",
+      "title": "Başkalarının bulamadığı otomobilleri buluyoruz.",
+      "subtitle": "Dünyanın dört bir yanındaki seçkin sahipler için olağanüstü otomobilleri bulma, inceleme ve teslim etme alanında otuz yıllık deneyim.",
+      "ctaPrimary": "Aracımı Buldur",
+      "ctaSecondary": "Koleksiyonu İncele"
+    },
+    "stats": {
+      "years": "Yıllık uzmanlık",
+      "countries": "Hizmet verilen ülke",
+      "divisions": "Küresel birim",
+      "inspected": "Bizzat incelenen"
+    },
+    "founder": {
+      "eyebrow": "Kurucu",
+      "title": "Her ayrıntısı incelenmiş. Her otomobil olağanüstü.",
+      "p1": "Otuz yılı aşkın süredir Cem Köse, itibarını tek bir ilke üzerine inşa etti: asla taviz vermemek. Bir otomobilin koleksiyonumuzda yer almasına izin vermeden önce; mekanik, kozmetik ve tarihsel her yönünü bizzat inceler.",
+      "p2": "Müşterilerimizin mutlak bir güvenle satın almasını sağlayan, işte bu ayrıntıya olan tutku ve kıtalar boyunca kanıtlanmış başarı geçmişidir.",
+      "role": "Kurucu ve Baş Eksper",
+      "imageAlt": "CK Retro Garage koleksiyonundan olağanüstü bir otomobil",
+      "link": "Ekibimizle tanışın"
+    },
+    "pillars": {
+      "sourcing": {
+        "title": "Buluruz",
+        "body": "Aradığınız otomobil ne olursa olsun — belirli bir model, nadir bir donanım ya da hep istediğiniz bir efsane — onlarca yılda kurulmuş küresel ağımız aracılığıyla onu buluruz."
+      },
+      "inspection": {
+        "title": "İnceleriz",
+        "body": "Cem her otomobili en ince ayrıntısına kadar bizzat inceler: motor, gövde, geçmiş ve menşe. Hiçbir şey güvene bırakılmaz; her şey doğrulanır."
+      },
+      "custody": {
+        "title": "Koruruz",
+        "body": "Her otomobil, iş ortağımız Collection Suites'te iklim kontrollü ve güvenli muhafaza altında tutulur — korunmuş, bakımlı ve hazır."
+      }
+    },
+    "collection": {
+      "eyebrow": "Yakın Zamanda Edinilenler",
+      "title": "Koleksiyondan bir seçki.",
+      "viewAll": "Tüm Otomobilleri Gör"
+    },
+    "custody": {
+      "eyebrow": "Güvenli Muhafaza",
+      "title": "Collection Suites'te dünya standartlarında muhafaza.",
+      "body": "Otomobillerimiz iklim kontrollü ve tam güvenlikli bir tesiste saklanır, korunur ve bakımı yapılır — sunduğumuzun gerçek, özenle bakılmış ve görmeye hazır olduğunun kanıtı.",
+      "cta": "Muhafazayı Keşfet",
+      "imageAlt": "Güvenli iklim kontrollü depolama tesisi",
+      "tapSound": "Ses için dokunun"
+    },
+    "cta": {
+      "title": "Aradığınız otomobili bize anlatın.",
+      "body": "Her marka, her dönem, dünyanın her yerinde. Taleplerinizi paylaşın, aramaya başlayalım.",
+      "button": "Tedarik Talebi Başlat"
+    }
+  },
+  "collection": {
+    "metaTitle": "Koleksiyon",
+    "eyebrow": "Koleksiyon",
+    "title": "Bulup edindiğimiz otomobiller.",
+    "intro": "Bulduğumuz, incelediğimiz ve doğru sahipleriyle buluşturduğumuz olağanüstü otomobillerden bir seçki — her aramada koruduğumuz standardın bir yansıması.",
+    "note": "Gösterilen otomobiller geçmiş edinimlerin örnekleridir. Belirli bir otomobil için sipariş vermek üzere bir tedarik talebi başlatın."
+  },
+  "car": {
+    "back": "Koleksiyona Dön",
+    "category": {
+      "grand-touring": "Grand Touring",
+      "sports": "Spor",
+      "rally": "Ralli",
+      "collector": "Koleksiyonluk"
+    },
+    "priceLabel": "Durum",
+    "priceValue": "Talep Üzerine",
+    "inquire": "Bilgi Al",
+    "aboutHeading": "Bu otomobil hakkında",
+    "inspectionHeading": "Neleri inceledik",
+    "similarTitle": "Buna benzer bir otomobil mi arıyorsunuz?",
+    "similarBody": "Tam istediğiniz özelliklerde benzer bir örnek bulabiliriz.",
+    "similarCta": "Benzer Bir Otomobil Buldur",
+    "inMotion": "Hareket Halinde",
+    "filmEyebrow": "Film",
+    "filmTitle": "Tüm sesiyle izleyin.",
+    "watchFilm": "Filmi İzle"
+  },
+  "process": {
+    "metaTitle": "Sürecimiz",
+    "eyebrow": "Sürecimiz",
+    "title": "Nasıl buluruz, doğrularız ve teslim ederiz.",
+    "intro": "Otuz yılda olgunlaşmış titiz ve şeffaf bir süreç — dünyanın neresinde olursanız olun tam bir güvenle satın almanız için tasarlandı.",
+    "quote": "Satın aldığım her otomobilin her ayrıntısını kontrol ederim. Kendi koleksiyonum için yeterince iyi değilse, müşterim için de yeterince iyi değildir.",
+    "quoteRole": "Kurucu ve Baş Eksper",
+    "steps": {
+      "brief": {
+        "title": "Talep",
+        "body": "Sizi dinleriz. Tam olarak ne aradığınızı anlatırsınız — model, donanım, durum, bütçe — ve aramayı birlikte tanımlarız."
+      },
+      "search": {
+        "title": "Arama",
+        "body": "Hiç kamuya ilan edilmemiş otomobiller dahil, en iyi adayları bulmak için onlarca yılda kurulmuş küresel ağımızdan yararlanırız."
+      },
+      "inspect": {
+        "title": "İnceleme",
+        "body": "Cem her yönünü en ince ayrıntısına kadar bizzat inceler — motor, gövde, elektronik, kozmetik. Hiçbir şey varsayılmaz."
+      },
+      "verify": {
+        "title": "Doğrulama",
+        "body": "Menşe, servis geçmişi, eşleşen numaralar ve belgeler, tek bir öneride bulunmadan önce doğrulanır."
+      },
+      "custody": {
+        "title": "Muhafaza",
+        "body": "Otomobiliniz, teslimata kadar tam korumalı ve bakımlı şekilde Collection Suites'te iklim kontrollü depolamada güvence altına alınır."
+      },
+      "deliver": {
+        "title": "Teslimat",
+        "body": "Lojistiği, ihracatı ve ithalatı dünya genelinde yönetiriz — otomobilinizi, neredeyseniz oraya, güvenle kapınıza teslim ederiz."
+      }
+    },
+    "ctaTitle": "Aramaya başlamaya hazır mısınız?",
+    "ctaButton": "Aracımı Buldur"
+  },
+  "about": {
+    "metaTitle": "Hakkımızda",
+    "eyebrow": "CK Retro Garage Hakkında",
+    "title": "Dünya genelinde güvenilen özel bir tedarik kuruluşu.",
+    "intro": "Bir insanın olağanüstü otomobillere olan tutkusu etrafında kurulmuş, küçük ve adanmış bir ekibiz — ve Amerika kıtası, Avrupa ile Türkiye'deki müşterilere hizmet eden küresel bir yapı.",
+    "founderEyebrow": "Kurucu",
+    "founderP1": "Cem Köse, otuz yılı aşkın süredir dünyanın en kaliteli otomobillerini buluyor. Bir tutku olarak başlayan şey, olağanüstü otomobillerin tedariki, incelenmesi ve doğrulanmasında eşsiz bir uzmanlığa dönüştü.",
+    "founderP2": "Yöntemi tavizsizdir. Her otomobilin her yönünü kendisi inceler, her ayrıntısını kontrol eder — çünkü adı ve müşterilerinin güveni buna bağlıdır.",
+    "founderP3": "CK Retro Garage'ın üzerine inşa edildiği temel, işte bu standart ve kıtalar boyunca kanıtlanmış başarı geçmişidir.",
+    "teamEyebrow": "Liderlik",
+    "teamTitle": "Küresel bir ekip.",
+    "teamIntro": "Her pazarda tek bir standart — böylece nerede olursanız olun, dilinizi konuşan ve bölgenizi tanıyan birine sahip olursunuz.",
+    "roles": {
+      "founder": "Kurucu ve Baş Eksper"
+    },
+    "bios": {
+      "founder": "30 yılı aşkın süredir dünyanın en kaliteli otomobillerini bulma, inceleme ve teslim etme deneyimi. Her otomobilin her ayrıntısını bizzat kontrol eder.",
+      "andres": "Latin Amerika bölümümüzü yönetir; Arjantin, Uruguay, Peru, Kolombiya, Panama, Meksika ve İsviçre’deki müşterilere hizmet verir.",
+      "cenk": "ABD, Türkiye ve Hollanda bölümümüzü yönetir."
+    },
+    "photoNote": "Gösterilen görseller, şirketin bulup edindiği otomobilleri temsil etmektedir.",
+    "ctaTitle": "Bizimle çalışın.",
+    "ctaButton": "Aracımı Buldur",
+    "ceoLabel": "CEO"
+  },
+  "storage": {
+    "metaTitle": "Muhafaza ve Depolama",
+    "eyebrow": "Muhafaza ve Depolama",
+    "title": "Korunmuş, bakımlı ve hazır.",
+    "intro": "Muhafaza ettiğimiz her otomobil, iklim kontrollü ve tam güvenlikli bir tesiste tutulur — yaptığımız her şeyin ardındaki kalitenin ve özenin kanıtı.",
+    "imageAlt": "Güvenli iklim kontrollü otomobil deposu",
+    "features": {
+      "climate": {
+        "title": "İklim Kontrollü",
+        "body": "Boya, deri, lastik ve mekanik aksamı en iyi durumunda korumak için sıcaklık ve nem hassasiyetle yönetilir."
+      },
+      "security": {
+        "title": "Tam Güvenlikli",
+        "body": "7/24 izlenen, erişim kontrollü depolama, her otomobilin en yüksek standartta korunmasını sağlar."
+      },
+      "maintenance": {
+        "title": "Etkin Bakım",
+        "body": "Otomobiller, kusursuz çalışır durumda kalmaları için çalıştırılır ve bakımları yapılır; her an görülmeye veya teslim edilmeye hazırdır."
+      },
+      "access": {
+        "title": "Özel Gösterim",
+        "body": "Müşteriler, randevuyla, gizli ve profesyonel bir ortamda otomobillerini bizzat inceleyebilirler."
+      }
+    },
+    "partnerEyebrow": "Muhafaza Ortağımız",
+    "partnerTitle": "Collection Suites iş birliğiyle.",
+    "partnerBody": "Otomobillerimiz, olağanüstü otomobillerin bakımı ve depolanması için uzmanlaşmış bir tesis olan Collection Suites'te muhafaza edilir.",
+    "ctaTitle": "Bir sonraki otomobilinizi sipariş edin.",
+    "ctaButton": "Aracımı Buldur"
+  },
+  "source": {
+    "metaTitle": "Aracımı Buldur",
+    "eyebrow": "Tedarik Talebi",
+    "title": "Aradığınız otomobili bize anlatın.",
+    "intro": "Her marka, her dönem, dünyanın her yerinde. Taleplerinizi paylaşın, Cem ve ekibi aramaya bizzat başlasın.",
+    "assurances": {
+      "confidential": {
+        "title": "Gizli ve Mahrem",
+        "body": "Her talep tam bir gizlilikle ele alınır. Bilgileriniz asla paylaşılmaz."
+      },
+      "global": {
+        "title": "Dünya Genelinde Tedarik",
+        "body": "Amerika kıtası, Avrupa ve ötesinde onlarca yılda kurulmuş bir ağ — hiç kamuya ilan edilmemiş otomobiller dahil."
+      },
+      "inspected": {
+        "title": "Bizzat İncelenmiş",
+        "body": "Önerdiğimiz her otomobil, size ulaşmadan önce en ince ayrıntısına kadar incelenir."
+      }
+    },
+    "fields": {
+      "name": "Ad Soyad",
+      "email": "E-posta",
+      "phone": "Telefon / WhatsApp",
+      "country": "Ülke",
+      "car": "Aradığınız otomobil",
+      "budget": "Bütçe (isteğe bağlı)",
+      "details": "Ayrıntılar ve donanım"
+    },
+    "ph": {
+      "name": "Adınız",
+      "email": "you@email.com",
+      "phone": "+1 …",
+      "country": "Ülkeniz",
+      "car": "örn. Ferrari 308 GTSi, 1980–1985",
+      "budget": "örn. USD 120,000",
+      "details": "Tercih edilen renk, donanım, durum, zaman planı…"
+    },
+    "consent": "Talebimle ilgili benimle iletişime geçilmesini kabul ediyor ve gizlilik politikasını onaylıyorum.",
+    "errorMsg": "Bir sorun oluştu. Lütfen tekrar deneyin veya bize doğrudan e-posta gönderin.",
+    "sending": "Gönderiliyor…",
+    "submit": "Talebi Gönder",
+    "successTitle": "Talebiniz alındı.",
+    "successBody": "Teşekkür ederiz. Ekibimizin doğru üyesi çok yakında sizinle bizzat iletişime geçecektir."
+  },
+  "contact": {
+    "metaTitle": "İletişim",
+    "eyebrow": "İletişim",
+    "title": "Ekibimizle görüşün.",
+    "intro": "Nerede olursanız olun, pazarınızı bilen size özel bir irtibat kişiniz var. Doğrudan ulaşın ya da bir tedarik talebi başlatın.",
+    "orSource": "Aradığınız otomobili biliyor musunuz? Doğrudan geçip taleplerinizi bize gönderin.",
+    "sourceCta": "Aracımı Buldur"
+  },
+  "privacy": {
+    "title": "Gizlilik Politikası",
+    "intro": "Bu politika, CK Retro Garage'ın bilgilerinizi nasıl topladığını ve kullandığını açıklar. Lütfen yayına almadan önce hukuk danışmanınızla birlikte gözden geçirin.",
+    "sections": {
+      "collect": {
+        "title": "Topladığımız bilgiler",
+        "body": "Size yanıt verebilmemiz için formlarımız aracılığıyla sağladığınız bilgileri — adınız, e-postanız, telefon numaranız, ülkeniz ve talebinizin ayrıntıları gibi — toplarız."
+      },
+      "use": {
+        "title": "Bilgilerinizi nasıl kullanırız",
+        "body": "Bilgileriniz yalnızca talebinize yanıt vermek, sizin adınıza otomobil bulmak ve hizmetlerimiz hakkında sizinle iletişim kurmak için kullanılır."
+      },
+      "share": {
+        "title": "Paylaşım",
+        "body": "Verilerinizi satmıyoruz. Bunları yalnızca ekibimiz içinde ve talebinizi yerine getirmek için gerektiğinde güvenilir iş ortaklarımızla paylaşırız."
+      },
+      "rights": {
+        "title": "Haklarınız",
+        "body": "AB'de, İsviçre'de veya geçerli başka bir yargı bölgesinde bulunuyorsanız, kişisel verilerinize erişme, bunları düzeltme veya silme talebinde bulunma hakkına her zaman sahipsiniz."
+      },
+      "contact": {
+        "title": "İletişim",
+        "body": "Her türlü gizlilik talebi için bize contact@cksretrogarage.com adresinden ulaşabilirsiniz."
+      }
+    },
+    "disclaimer": "Bu, yer tutucu bir metindir ve hukuki tavsiye niteliği taşımaz. GDPR ve İsviçre mevzuatına uyum için nihai gizlilik politikanızı ve çerez bildiriminizi nitelikli bir avukata hazırlatın."
+  },
+  "contacts": {
+    "andres": {
+      "label": "Latin Amerika ve İsviçre",
+      "scope": "Arjantin, Uruguay, Peru, Kolombiya, Panama, Meksika ve İsviçre"
+    },
+    "cenk": {
+      "label": "ABD, Türkiye ve Hollanda",
+      "scope": "Amerika Birleşik Devletleri, Türkiye ve Hollanda"
+    }
+  }
+}

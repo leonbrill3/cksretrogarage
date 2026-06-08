@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-ink-900 text-bone antialiased;
+  font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
+@layer components {
+  .container-site {
+    @apply mx-auto w-full max-w-site px-6 md:px-10;
+  }
+
+  .eyebrow {
+    @apply text-[11px] uppercase tracking-label text-brass font-medium;
+  }
+
+  .h-display {
+    @apply font-serif font-medium leading-[1.05] tracking-[-0.01em];
+  }
+
+  .link-underline {
+    @apply relative inline-block after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-oxblood px-7 py-3.5 text-[12px] font-medium uppercase tracking-label text-bone transition-colors duration-300 hover:bg-oxblood-light;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 border border-bone/25 px-7 py-3.5 text-[12px] font-medium uppercase tracking-label text-bone transition-colors duration-300 hover:border-bone/70;
+  }
+
+  .hairline {
+    @apply border-bone/10;
+  }
+}
+
+/* Reveal-on-scroll, progressive enhancement */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}

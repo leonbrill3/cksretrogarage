@@ -1,0 +1,286 @@
+{
+  "meta": {
+    "titleDefault": "CK Retro Garage — Acquisities voor de Kenner",
+    "description": "Al meer dan 30 jaar zoekt, keurt en levert Cem Köse uitzonderlijke auto's voor veeleisende eigenaren wereldwijd. Vertel ons welke auto u zoekt."
+  },
+  "nav": {
+    "collection": "Collectie",
+    "process": "Onze Werkwijze",
+    "storage": "Bewaring",
+    "about": "Over ons",
+    "contact": "Contact",
+    "cta": "Vind Mijn Auto"
+  },
+  "footer": {
+    "blurb": "Een privé-acquisitiehuis voor uitzonderlijke automobielen. Elke auto gezocht, gekeurd en geleverd met drie decennia aan expertise.",
+    "explore": "Ontdek",
+    "regions": "Wereldwijd",
+    "custody": "Veilige bewaring door Collection Suites",
+    "rights": "Alle rechten voorbehouden.",
+    "privacy": "Privacy"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Acquisities voor de Kenner",
+      "title": "Wij vinden de auto's die anderen niet vinden.",
+      "subtitle": "Drie decennia van zoeken, keuren en leveren van uitzonderlijke automobielen voor veeleisende eigenaren over de hele wereld.",
+      "ctaPrimary": "Vind Mijn Auto",
+      "ctaSecondary": "Bekijk de Collectie"
+    },
+    "stats": {
+      "years": "Jaar ervaring",
+      "countries": "Landen bediend",
+      "divisions": "Wereldwijde divisies",
+      "inspected": "Persoonlijk gekeurd"
+    },
+    "founder": {
+      "eyebrow": "De Oprichter",
+      "title": "Elke centimeter gekeurd. Elke auto uitzonderlijk.",
+      "p1": "Al meer dan dertig jaar bouwt Cem Köse zijn reputatie op één enkel principe: nooit concessies doen. Hij keurt persoonlijk elk aspect van elke auto — mechanisch, cosmetisch en historisch — voordat deze een plaats in onze collectie verdient.",
+      "p2": "Het is deze obsessie voor detail, gecombineerd met een bewezen staat van dienst over continenten heen, die onze cliënten in staat stelt te kopen met absoluut vertrouwen.",
+      "role": "Oprichter & Hoofdkeurmeester",
+      "imageAlt": "Een uitzonderlijke auto uit de collectie van CK Retro Garage",
+      "link": "Maak kennis met het team"
+    },
+    "pillars": {
+      "sourcing": {
+        "title": "Wij Zoeken",
+        "body": "Welke auto u ook zoekt — een specifiek model, een zeldzame specificatie, een icoon dat u altijd al wenste — wij vinden hem via een wereldwijd netwerk dat in decennia is opgebouwd."
+      },
+      "inspection": {
+        "title": "Wij Keuren",
+        "body": "Cem onderzoekt persoonlijk elke auto tot in de laatste centimeter: motor, structuur, historie en herkomst. Niets wordt op vertrouwen aangenomen; alles wordt geverifieerd."
+      },
+      "custody": {
+        "title": "Wij Beschermen",
+        "body": "Elke auto wordt bewaard in een klimaatbeheerste, beveiligde omgeving bij onze partners van Collection Suites — beschermd, onderhouden en gereed."
+      }
+    },
+    "collection": {
+      "eyebrow": "Recent Verworven",
+      "title": "Een selectie uit de collectie.",
+      "viewAll": "Bekijk Alle Auto's"
+    },
+    "custody": {
+      "eyebrow": "Veilige Bewaring",
+      "title": "Bewaard in bewaring van wereldklasse bij Collection Suites.",
+      "body": "Onze auto's worden opgeslagen, beschermd en onderhouden in een klimaatbeheerste, volledig beveiligde faciliteit — het bewijs dat wat wij bieden echt is, met zorg behandeld, en gereed om te bezichtigen.",
+      "cta": "Ontdek de Bewaring",
+      "imageAlt": "Beveiligde, klimaatbeheerste opslagfaciliteit",
+      "tapSound": "Tik voor geluid"
+    },
+    "cta": {
+      "title": "Vertel ons welke auto u zoekt.",
+      "body": "Elk merk, elk tijdperk, waar ook ter wereld. Deel uw wensen en wij starten de zoektocht.",
+      "button": "Start een Zoekopdracht"
+    }
+  },
+  "collection": {
+    "metaTitle": "De Collectie",
+    "eyebrow": "De Collectie",
+    "title": "Auto's die wij hebben gezocht en verworven.",
+    "intro": "Een selectie van uitzonderlijke automobielen die wij hebben gevonden, gekeurd en bij de juiste eigenaren hebben geplaatst — representatief voor de standaard die wij bij elke zoektocht hanteren.",
+    "note": "De getoonde auto's zijn voorbeelden van eerdere acquisities. Om een specifieke auto te laten zoeken, start u een zoekopdracht."
+  },
+  "car": {
+    "back": "Terug naar de Collectie",
+    "category": {
+      "grand-touring": "Grand Touring",
+      "sports": "Sport",
+      "rally": "Rally",
+      "collector": "Verzamelaar"
+    },
+    "priceLabel": "Beschikbaarheid",
+    "priceValue": "Op Aanvraag",
+    "inquire": "Informeren",
+    "aboutHeading": "Over deze auto",
+    "inspectionHeading": "Wat wij hebben gekeurd",
+    "similarTitle": "Op zoek naar een soortgelijke?",
+    "similarBody": "Wij kunnen een vergelijkbaar exemplaar zoeken, geheel naar uw specificatie.",
+    "similarCta": "Vind een Soortgelijke Auto",
+    "inMotion": "In Beweging",
+    "filmEyebrow": "De Film",
+    "filmTitle": "Zie hem in volle glorie.",
+    "watchFilm": "Bekijk de Film"
+  },
+  "process": {
+    "metaTitle": "Onze Werkwijze",
+    "eyebrow": "Onze Werkwijze",
+    "title": "Hoe wij vinden, beoordelen en leveren.",
+    "intro": "Een rigoureus, transparant proces dat in dertig jaar is verfijnd — zo opgezet dat u met volledig vertrouwen koopt, waar ter wereld u zich ook bevindt.",
+    "quote": "Ik controleer elke centimeter van elke auto die ik koop. Als hij niet goed genoeg is voor mijn eigen collectie, dan is hij niet goed genoeg voor mijn cliënt.",
+    "quoteRole": "Oprichter & Hoofdkeurmeester",
+    "steps": {
+      "brief": {
+        "title": "De Briefing",
+        "body": "Wij luisteren. U vertelt ons precies wat u zoekt — model, specificatie, conditie, budget — en samen bepalen wij de zoektocht."
+      },
+      "search": {
+        "title": "De Zoektocht",
+        "body": "Wij putten uit een wereldwijd netwerk dat in decennia is opgebouwd om de allerbeste kandidaten te vinden, waaronder auto's die nooit publiekelijk worden aangeboden."
+      },
+      "inspect": {
+        "title": "De Keuring",
+        "body": "Cem keurt persoonlijk elk aspect — motor, structuur, elektronica, cosmetiek — tot in de laatste centimeter. Er wordt niets aangenomen."
+      },
+      "verify": {
+        "title": "De Verificatie",
+        "body": "Herkomst, onderhoudshistorie, matching numbers en documentatie worden geauthenticeerd voordat ook maar één aanbeveling wordt gedaan."
+      },
+      "custody": {
+        "title": "De Bewaring",
+        "body": "Uw auto wordt veilig opgeslagen in klimaatbeheerste bewaring bij Collection Suites, volledig beschermd en onderhouden tot aan de levering."
+      },
+      "deliver": {
+        "title": "De Levering",
+        "body": "Wij verzorgen de logistiek, export en import wereldwijd — en leveren uw auto veilig bij u thuis, waar u ook bent."
+      }
+    },
+    "ctaTitle": "Klaar om de zoektocht te beginnen?",
+    "ctaButton": "Vind Mijn Auto"
+  },
+  "about": {
+    "metaTitle": "Over ons",
+    "eyebrow": "Over CK Retro Garage",
+    "title": "Een privé-acquisitiehuis, wereldwijd vertrouwd.",
+    "intro": "Wij zijn een klein, toegewijd team rondom de obsessie van één man voor uitzonderlijke auto's — met een wereldwijde structuur om cliënten in Amerika, Europa en Türkiye te bedienen.",
+    "founderEyebrow": "De Oprichter",
+    "founderP1": "Cem Köse heeft meer dan dertig jaar besteed aan het vinden van de hoogwaardigste auto's ter wereld. Wat begon als een passie, groeide uit tot een ongeëvenaarde expertise in het zoeken, keuren en authenticeren van uitzonderlijke automobielen.",
+    "founderP2": "Zijn methode kent geen compromissen. Hij keurt elk aspect van elke auto zelf en controleert elke centimeter — omdat zijn naam, en het vertrouwen van zijn cliënten, daarvan afhangt.",
+    "founderP3": "Die standaard, en een bewezen staat van dienst over continenten heen, vormt het fundament waarop CK Retro Garage is gebouwd.",
+    "teamEyebrow": "Leiderschap",
+    "teamTitle": "Een wereldwijd team.",
+    "teamIntro": "Eén standaard in elke markt — zodat u, waar u ook bent, iemand heeft die uw taal spreekt en uw regio kent.",
+    "roles": {
+      "founder": "Oprichter & Hoofdkeurmeester"
+    },
+    "bios": {
+      "founder": "Meer dan 30 jaar ervaring in het vinden, keuren en leveren van de hoogwaardigste auto's ter wereld. Hij controleert elke centimeter van elke auto persoonlijk.",
+      "andres": "Leidt onze divisie voor Latijns-Amerika en bedient klanten in Argentinië, Uruguay, Peru, Colombia, Panama, Mexico en Zwitserland.",
+      "cenk": "Leidt onze divisie voor de VS, Turkije en Nederland."
+    },
+    "photoNote": "Het getoonde beeldmateriaal toont auto's die door het bedrijf zijn gezocht en verworven.",
+    "ctaTitle": "Werk met ons samen.",
+    "ctaButton": "Vind Mijn Auto",
+    "ceoLabel": "CEO"
+  },
+  "storage": {
+    "metaTitle": "Bewaring & Opslag",
+    "eyebrow": "Bewaring & Opslag",
+    "title": "Beschermd, onderhouden en gereed.",
+    "intro": "Elke auto die wij in bewaring hebben, wordt bewaard in een klimaatbeheerste, volledig beveiligde faciliteit — het bewijs van de kwaliteit en zorg achter alles wat wij doen.",
+    "imageAlt": "Beveiligde, klimaatbeheerste auto-opslag",
+    "features": {
+      "climate": {
+        "title": "Klimaatbeheerst",
+        "body": "Temperatuur en luchtvochtigheid worden nauwkeurig geregeld om lak, leder, rubber en mechaniek in optimale conditie te behouden."
+      },
+      "security": {
+        "title": "Volledig Beveiligd",
+        "body": "Opslag met 24/7-bewaking en toegangscontrole zorgt ervoor dat elke auto naar de hoogste standaard wordt beschermd."
+      },
+      "maintenance": {
+        "title": "Actief Onderhouden",
+        "body": "Auto's worden regelmatig bewogen en onderhouden zodat zij in perfecte staat blijven, klaar om op elk moment te bezichtigen of te leveren."
+      },
+      "access": {
+        "title": "Privébezichtiging",
+        "body": "Cliënten zijn van harte welkom om hun auto op afspraak persoonlijk te inspecteren, in een discrete en professionele omgeving."
+      }
+    },
+    "partnerEyebrow": "Onze Bewaringspartner",
+    "partnerTitle": "In samenwerking met Collection Suites.",
+    "partnerBody": "Onze auto's worden bewaard bij Collection Suites, een gespecialiseerde faciliteit voor de verzorging en opslag van uitzonderlijke automobielen.",
+    "ctaTitle": "Geef uw volgende auto in opdracht.",
+    "ctaButton": "Vind Mijn Auto"
+  },
+  "source": {
+    "metaTitle": "Vind Mijn Auto",
+    "eyebrow": "Zoekopdracht",
+    "title": "Vertel ons welke auto u zoekt.",
+    "intro": "Elk merk, elk tijdperk, waar ook ter wereld. Deel uw wensen en Cem en het team starten persoonlijk de zoektocht.",
+    "assurances": {
+      "confidential": {
+        "title": "Discreet & Vertrouwelijk",
+        "body": "Elke aanvraag wordt met volledige discretie behandeld. Uw gegevens worden nooit gedeeld."
+      },
+      "global": {
+        "title": "Wereldwijd Gezocht",
+        "body": "Een netwerk dat in decennia is opgebouwd in Amerika, Europa en daarbuiten — inclusief auto's die nooit publiekelijk worden aangeboden."
+      },
+      "inspected": {
+        "title": "Persoonlijk Gekeurd",
+        "body": "Elke auto die wij aanbevelen, wordt tot in de laatste centimeter gekeurd voordat hij u bereikt."
+      }
+    },
+    "fields": {
+      "name": "Volledige naam",
+      "email": "E-mail",
+      "phone": "Telefoon / WhatsApp",
+      "country": "Land",
+      "car": "Auto die u zoekt",
+      "budget": "Budget (optioneel)",
+      "details": "Details & specificatie"
+    },
+    "ph": {
+      "name": "Uw naam",
+      "email": "you@email.com",
+      "phone": "+1 …",
+      "country": "Uw land",
+      "car": "bijv. Ferrari 308 GTSi, 1980–1985",
+      "budget": "bijv. USD 120,000",
+      "details": "Gewenste kleur, specificatie, conditie, tijdsbestek…"
+    },
+    "consent": "Ik ga ermee akkoord te worden benaderd over mijn aanvraag en accepteer het privacybeleid.",
+    "errorMsg": "Er is iets misgegaan. Probeer het opnieuw of mail ons rechtstreeks.",
+    "sending": "Verzenden…",
+    "submit": "Aanvraag Versturen",
+    "successTitle": "Aanvraag ontvangen.",
+    "successBody": "Hartelijk dank. Het juiste lid van ons team neemt zeer binnenkort persoonlijk contact met u op."
+  },
+  "contact": {
+    "metaTitle": "Contact",
+    "eyebrow": "Contact",
+    "title": "Spreek met ons team.",
+    "intro": "Waar u ook bent, u heeft een toegewijd aanspreekpunt dat uw markt kent. Neem rechtstreeks contact op, of start een zoekopdracht.",
+    "orSource": "Weet u welke auto u zoekt? Sla deze stap over en stuur ons uw wensen rechtstreeks.",
+    "sourceCta": "Vind Mijn Auto"
+  },
+  "privacy": {
+    "title": "Privacybeleid",
+    "intro": "Dit beleid licht toe hoe CK Retro Garage uw gegevens verzamelt en gebruikt. Laat het vóór de lancering beoordelen door uw juridisch adviseur.",
+    "sections": {
+      "collect": {
+        "title": "Gegevens die wij verzamelen",
+        "body": "Wij verzamelen de gegevens die u via onze formulieren verstrekt — zoals uw naam, e-mailadres, telefoonnummer, land en de details van uw aanvraag — zodat wij u kunnen antwoorden."
+      },
+      "use": {
+        "title": "Hoe wij deze gebruiken",
+        "body": "Uw gegevens worden uitsluitend gebruikt om uw aanvraag te beantwoorden, auto's namens u te zoeken en met u te communiceren over onze diensten."
+      },
+      "share": {
+        "title": "Delen",
+        "body": "Wij verkopen uw gegevens niet. Wij delen deze uitsluitend binnen ons team en met vertrouwde partners, voor zover nodig om uw aanvraag uit te voeren."
+      },
+      "rights": {
+        "title": "Uw rechten",
+        "body": "Indien u zich in de EU, Zwitserland of een andere toepasselijke jurisdictie bevindt, kunt u te allen tijde verzoeken om inzage in, correctie van of verwijdering van uw persoonsgegevens."
+      },
+      "contact": {
+        "title": "Contact",
+        "body": "Voor elk privacyverzoek kunt u contact met ons opnemen via contact@cksretrogarage.com."
+      }
+    },
+    "disclaimer": "Dit is voorbeeldtekst en geen juridisch advies. Laat uw definitieve privacybeleid en cookieverklaring opstellen door een gekwalificeerd jurist, conform de AVG en de Zwitserse wetgeving."
+  },
+  "contacts": {
+    "andres": {
+      "label": "Latijns-Amerika & Zwitserland",
+      "scope": "Argentinië, Uruguay, Peru, Colombia, Panama, Mexico & Zwitserland"
+    },
+    "cenk": {
+      "label": "VS, Turkije & Nederland",
+      "scope": "Verenigde Staten, Turkije & Nederland"
+    }
+  }
+}

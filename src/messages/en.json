@@ -1,0 +1,286 @@
+{
+  "meta": {
+    "titleDefault": "CK Retro Garage — Connoisseur Car Acquisitions",
+    "description": "For over 30 years, Cem Köse has sourced, inspected and delivered exceptional cars to discerning owners worldwide. Tell us the car you want."
+  },
+  "nav": {
+    "collection": "Collection",
+    "process": "Our Process",
+    "storage": "Custody",
+    "about": "About",
+    "contact": "Contact",
+    "cta": "Source My Car"
+  },
+  "footer": {
+    "blurb": "A private acquisition house for exceptional automobiles. Every car sourced, inspected and delivered with three decades of expertise.",
+    "explore": "Explore",
+    "regions": "Worldwide",
+    "custody": "Secure custody by Collection Suites",
+    "rights": "All rights reserved.",
+    "privacy": "Privacy"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Connoisseur Acquisitions",
+      "title": "Finding the cars others can't.",
+      "subtitle": "Three decades of sourcing, inspecting and delivering exceptional automobiles for discerning owners across the world.",
+      "ctaPrimary": "Source My Car",
+      "ctaSecondary": "View the Collection"
+    },
+    "stats": {
+      "years": "Years of expertise",
+      "countries": "Countries served",
+      "divisions": "Global divisions",
+      "inspected": "Personally inspected"
+    },
+    "founder": {
+      "eyebrow": "The Founder",
+      "title": "Every inch inspected. Every car exceptional.",
+      "p1": "For more than thirty years, Cem Köse has built a reputation on a single principle: never compromise. He personally inspects every aspect of every car — mechanical, cosmetic and historical — before it earns a place in our collection.",
+      "p2": "It is this obsession with detail, and a proven track record across continents, that lets our clients buy with absolute confidence.",
+      "role": "Founder & Master Inspector",
+      "imageAlt": "An exceptional car from the CK Retro Garage collection",
+      "link": "Meet the team"
+    },
+    "pillars": {
+      "sourcing": {
+        "title": "We Source",
+        "body": "Whatever car you are looking for — a specific model, a rare specification, an icon you have always wanted — we find it through a global network built over decades."
+      },
+      "inspection": {
+        "title": "We Inspect",
+        "body": "Cem personally examines every car to the last inch: engine, structure, history and provenance. Nothing is taken on trust; everything is verified."
+      },
+      "custody": {
+        "title": "We Safeguard",
+        "body": "Every car is held in climate-controlled, secure custody with our partners at Collection Suites — protected, maintained and ready."
+      }
+    },
+    "collection": {
+      "eyebrow": "Recently Acquired",
+      "title": "A selection from the collection.",
+      "viewAll": "View All Cars"
+    },
+    "custody": {
+      "eyebrow": "Secure Custody",
+      "title": "Held in world-class custody at Collection Suites.",
+      "body": "Our cars are stored, protected and maintained in a climate-controlled, fully secured facility — proof that what we offer is real, cared for, and ready to view.",
+      "cta": "Explore Custody",
+      "imageAlt": "Secure climate-controlled storage facility",
+      "tapSound": "Tap for sound"
+    },
+    "cta": {
+      "title": "Tell us the car you want.",
+      "body": "Any make, any era, anywhere in the world. Share your brief and we will begin the search.",
+      "button": "Start a Sourcing Request"
+    }
+  },
+  "collection": {
+    "metaTitle": "The Collection",
+    "eyebrow": "The Collection",
+    "title": "Cars we have sourced and acquired.",
+    "intro": "A selection of exceptional automobiles we have found, inspected and placed with the right owners — representative of the standard we hold on every search.",
+    "note": "Cars shown are examples of past acquisitions. To commission a specific car, start a sourcing request."
+  },
+  "car": {
+    "back": "Back to Collection",
+    "category": {
+      "grand-touring": "Grand Touring",
+      "sports": "Sports",
+      "rally": "Rally",
+      "collector": "Collector"
+    },
+    "priceLabel": "Availability",
+    "priceValue": "On Request",
+    "inquire": "Inquire",
+    "aboutHeading": "About this car",
+    "inspectionHeading": "What we inspected",
+    "similarTitle": "Looking for one like this?",
+    "similarBody": "We can source a comparable example to your exact specification.",
+    "similarCta": "Source a Similar Car",
+    "inMotion": "In Motion",
+    "filmEyebrow": "The Film",
+    "filmTitle": "See it in full voice.",
+    "watchFilm": "Watch the Film"
+  },
+  "process": {
+    "metaTitle": "Our Process",
+    "eyebrow": "Our Process",
+    "title": "How we find, vet and deliver.",
+    "intro": "A rigorous, transparent process refined over thirty years — designed so that you buy with total confidence, no matter where in the world you are.",
+    "quote": "I check every inch of every car I buy. If it is not good enough for my own collection, it is not good enough for my client.",
+    "quoteRole": "Founder & Master Inspector",
+    "steps": {
+      "brief": {
+        "title": "The Brief",
+        "body": "We listen. You tell us exactly what you are looking for — model, specification, condition, budget — and we define the search together."
+      },
+      "search": {
+        "title": "The Search",
+        "body": "We draw on a global network built over decades to locate the very best candidates, including cars never publicly advertised."
+      },
+      "inspect": {
+        "title": "The Inspection",
+        "body": "Cem personally inspects every aspect — engine, structure, electronics, cosmetics — to the last inch. Nothing is assumed."
+      },
+      "verify": {
+        "title": "The Verification",
+        "body": "Provenance, service history, matching numbers and documentation are authenticated before a single recommendation is made."
+      },
+      "custody": {
+        "title": "The Custody",
+        "body": "Your car is secured in climate-controlled storage at Collection Suites, fully protected and maintained until delivery."
+      },
+      "deliver": {
+        "title": "The Delivery",
+        "body": "We handle logistics, export and import worldwide — delivering your car safely to your door, wherever you are."
+      }
+    },
+    "ctaTitle": "Ready to begin the search?",
+    "ctaButton": "Source My Car"
+  },
+  "about": {
+    "metaTitle": "About",
+    "eyebrow": "About CK Retro Garage",
+    "title": "A private acquisition house, trusted worldwide.",
+    "intro": "We are a small, dedicated team built around one man's obsession with exceptional cars — and a global structure to serve clients across the Americas, Europe and Türkiye.",
+    "founderEyebrow": "The Founder",
+    "founderP1": "Cem Köse has spent over thirty years finding the finest quality cars in the world. What began as a passion became an unrivalled expertise in sourcing, inspecting and authenticating exceptional automobiles.",
+    "founderP2": "His method is uncompromising. He inspects every aspect of every car himself, checking every inch — because his name, and his clients' trust, depends on it.",
+    "founderP3": "That standard, and a proven track record across continents, is the foundation on which CK Retro Garage is built.",
+    "teamEyebrow": "Leadership",
+    "teamTitle": "A global team.",
+    "teamIntro": "One standard across every market — so that wherever you are, you have someone who speaks your language and knows your region.",
+    "roles": {
+      "founder": "Founder & Master Inspector"
+    },
+    "bios": {
+      "founder": "Over 30 years finding, inspecting and delivering the best quality cars in the world. He checks every inch of every car personally.",
+      "andres": "Leads our Latin America division, serving clients across Argentina, Uruguay, Peru, Colombia, Panama, Mexico and Switzerland.",
+      "cenk": "Leads our division for the USA, Türkiye and the Netherlands."
+    },
+    "photoNote": "Imagery shown represents cars sourced and acquired by the company.",
+    "ctaTitle": "Work with us.",
+    "ctaButton": "Source My Car",
+    "ceoLabel": "CEO"
+  },
+  "storage": {
+    "metaTitle": "Custody & Storage",
+    "eyebrow": "Custody & Storage",
+    "title": "Protected, maintained, and ready.",
+    "intro": "Every car we hold is kept in a climate-controlled, fully secured facility — proof of the quality and care behind everything we do.",
+    "imageAlt": "Secure climate-controlled car storage",
+    "features": {
+      "climate": {
+        "title": "Climate Controlled",
+        "body": "Temperature and humidity are precisely managed to preserve paint, leather, rubber and mechanicals in their finest condition."
+      },
+      "security": {
+        "title": "Fully Secured",
+        "body": "24/7 monitored, access-controlled storage ensures every car is protected to the highest standard."
+      },
+      "maintenance": {
+        "title": "Actively Maintained",
+        "body": "Cars are exercised and maintained so they remain in perfect running order, ready to view or deliver at any time."
+      },
+      "access": {
+        "title": "Private Viewing",
+        "body": "Clients are welcome to inspect their car in person, by appointment, in a discreet and professional setting."
+      }
+    },
+    "partnerEyebrow": "Our Custody Partner",
+    "partnerTitle": "In partnership with Collection Suites.",
+    "partnerBody": "Our cars are held at Collection Suites, a specialist facility for the care and storage of exceptional automobiles.",
+    "ctaTitle": "Commission your next car.",
+    "ctaButton": "Source My Car"
+  },
+  "source": {
+    "metaTitle": "Source My Car",
+    "eyebrow": "Sourcing Request",
+    "title": "Tell us the car you want.",
+    "intro": "Any make, any era, anywhere in the world. Share your brief and Cem and the team will begin the search personally.",
+    "assurances": {
+      "confidential": {
+        "title": "Discreet & Confidential",
+        "body": "Every enquiry is handled with complete discretion. Your details are never shared."
+      },
+      "global": {
+        "title": "Sourced Worldwide",
+        "body": "A network built over decades across the Americas, Europe and beyond — including cars never publicly listed."
+      },
+      "inspected": {
+        "title": "Personally Inspected",
+        "body": "Every car we recommend is inspected to the last inch before it reaches you."
+      }
+    },
+    "fields": {
+      "name": "Full Name",
+      "email": "Email",
+      "phone": "Phone / WhatsApp",
+      "country": "Country",
+      "car": "Car you are looking for",
+      "budget": "Budget (optional)",
+      "details": "Details & specification"
+    },
+    "ph": {
+      "name": "Your name",
+      "email": "you@email.com",
+      "phone": "+1 …",
+      "country": "Your country",
+      "car": "e.g. Ferrari 308 GTSi, 1980–1985",
+      "budget": "e.g. USD 120,000",
+      "details": "Preferred colour, specification, condition, timeline…"
+    },
+    "consent": "I agree to be contacted about my request and accept the privacy policy.",
+    "errorMsg": "Something went wrong. Please try again or email us directly.",
+    "sending": "Sending…",
+    "submit": "Submit Request",
+    "successTitle": "Request received.",
+    "successBody": "Thank you. The right member of our team will be in touch personally, very soon."
+  },
+  "contact": {
+    "metaTitle": "Contact",
+    "eyebrow": "Contact",
+    "title": "Speak with our team.",
+    "intro": "Wherever you are, you have a dedicated contact who knows your market. Reach out directly, or start a sourcing request.",
+    "orSource": "Know the car you want? Skip ahead and send us your brief directly.",
+    "sourceCta": "Source My Car"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "intro": "This policy explains how CK Retro Garage collects and uses your information. Please review it with your legal adviser before launch.",
+    "sections": {
+      "collect": {
+        "title": "Information we collect",
+        "body": "We collect the details you provide through our forms — such as your name, email, phone number, country and the details of your request — so that we can respond to you."
+      },
+      "use": {
+        "title": "How we use it",
+        "body": "Your information is used solely to respond to your enquiry, source cars on your behalf, and communicate with you about our services."
+      },
+      "share": {
+        "title": "Sharing",
+        "body": "We do not sell your data. We share it only within our team and trusted partners as needed to fulfil your request."
+      },
+      "rights": {
+        "title": "Your rights",
+        "body": "If you are in the EU, Switzerland or another applicable jurisdiction, you may request access to, correction of, or deletion of your personal data at any time."
+      },
+      "contact": {
+        "title": "Contact",
+        "body": "For any privacy request, contact us at contact@cksretrogarage.com."
+      }
+    },
+    "disclaimer": "This is placeholder text and not legal advice. Have a qualified lawyer prepare your final privacy policy and cookie notice for GDPR and Swiss compliance."
+  },
+  "contacts": {
+    "andres": {
+      "label": "Latin America & Switzerland",
+      "scope": "Argentina, Uruguay, Peru, Colombia, Panama, Mexico & Switzerland"
+    },
+    "cenk": {
+      "label": "USA, Türkiye & Netherlands",
+      "scope": "United States, Türkiye & Netherlands"
+    }
+  }
+}

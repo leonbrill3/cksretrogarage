@@ -1,0 +1,286 @@
+{
+  "meta": {
+    "titleDefault": "CK Retro Garage — Akquisition für Kenner-Automobile",
+    "description": "Seit über 30 Jahren beschafft, prüft und liefert Cem Köse aussergewöhnliche Automobile an anspruchsvolle Besitzer weltweit. Nennen Sie uns das Fahrzeug, das Sie suchen."
+  },
+  "nav": {
+    "collection": "Kollektion",
+    "process": "Unser Vorgehen",
+    "storage": "Verwahrung",
+    "about": "Über uns",
+    "contact": "Kontakt",
+    "cta": "Fahrzeug finden lassen"
+  },
+  "footer": {
+    "blurb": "Ein privates Akquisitionshaus für aussergewöhnliche Automobile. Jedes Fahrzeug beschafft, geprüft und geliefert mit drei Jahrzehnten Erfahrung.",
+    "explore": "Entdecken",
+    "regions": "Weltweit",
+    "custody": "Sichere Verwahrung durch Collection Suites",
+    "rights": "Alle Rechte vorbehalten.",
+    "privacy": "Datenschutz"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Akquisition für Kenner",
+      "title": "Wir finden die Fahrzeuge, die andere nicht finden.",
+      "subtitle": "Drei Jahrzehnte Erfahrung im Beschaffen, Prüfen und Liefern aussergewöhnlicher Automobile für anspruchsvolle Besitzer auf der ganzen Welt.",
+      "ctaPrimary": "Fahrzeug finden lassen",
+      "ctaSecondary": "Kollektion ansehen"
+    },
+    "stats": {
+      "years": "Jahre Erfahrung",
+      "countries": "Betreute Länder",
+      "divisions": "Globale Niederlassungen",
+      "inspected": "Persönlich geprüft"
+    },
+    "founder": {
+      "eyebrow": "Der Gründer",
+      "title": "Jeder Zentimeter geprüft. Jedes Fahrzeug aussergewöhnlich.",
+      "p1": "Seit mehr als dreissig Jahren hat sich Cem Köse einen Namen nach einem einzigen Grundsatz gemacht: keine Kompromisse. Er prüft jeden Aspekt jedes Fahrzeugs persönlich — mechanisch, optisch und historisch — bevor es einen Platz in unserer Kollektion erhält.",
+      "p2": "Es ist diese Detailbesessenheit, gepaart mit einer über Kontinente hinweg bewiesenen Erfolgsbilanz, die unseren Kunden den Kauf mit absoluter Sicherheit ermöglicht.",
+      "role": "Gründer & Chefprüfer",
+      "imageAlt": "Ein aussergewöhnliches Fahrzeug aus der Kollektion der CK Retro Garage",
+      "link": "Das Team kennenlernen"
+    },
+    "pillars": {
+      "sourcing": {
+        "title": "Wir beschaffen",
+        "body": "Welches Fahrzeug Sie auch suchen — ein bestimmtes Modell, eine seltene Spezifikation, eine Ikone, die Sie sich immer gewünscht haben — wir finden es über ein über Jahrzehnte aufgebautes globales Netzwerk."
+      },
+      "inspection": {
+        "title": "Wir prüfen",
+        "body": "Cem untersucht jedes Fahrzeug persönlich bis ins letzte Detail: Motor, Struktur, Historie und Provenienz. Nichts wird auf Vertrauen hingenommen; alles wird verifiziert."
+      },
+      "custody": {
+        "title": "Wir bewahren",
+        "body": "Jedes Fahrzeug wird klimatisiert und sicher bei unseren Partnern von Collection Suites verwahrt — geschützt, gepflegt und bereit."
+      }
+    },
+    "collection": {
+      "eyebrow": "Kürzlich erworben",
+      "title": "Eine Auswahl aus der Kollektion.",
+      "viewAll": "Alle Fahrzeuge ansehen"
+    },
+    "custody": {
+      "eyebrow": "Sichere Verwahrung",
+      "title": "Verwahrt in erstklassiger Obhut bei Collection Suites.",
+      "body": "Unsere Fahrzeuge werden in einer klimatisierten, vollständig gesicherten Anlage gelagert, geschützt und gepflegt — der Beweis, dass unser Angebot echt, betreut und besichtigungsbereit ist.",
+      "cta": "Verwahrung entdecken",
+      "imageAlt": "Sichere, klimatisierte Lageranlage",
+      "tapSound": "Für Ton tippen"
+    },
+    "cta": {
+      "title": "Nennen Sie uns das Fahrzeug, das Sie suchen.",
+      "body": "Jede Marke, jede Epoche, überall auf der Welt. Teilen Sie uns Ihre Vorgaben mit und wir beginnen die Suche.",
+      "button": "Suchanfrage starten"
+    }
+  },
+  "collection": {
+    "metaTitle": "Die Kollektion",
+    "eyebrow": "Die Kollektion",
+    "title": "Fahrzeuge, die wir beschafft und erworben haben.",
+    "intro": "Eine Auswahl aussergewöhnlicher Automobile, die wir gefunden, geprüft und an die richtigen Besitzer vermittelt haben — repräsentativ für den Massstab, den wir bei jeder Suche anlegen.",
+    "note": "Die gezeigten Fahrzeuge sind Beispiele früherer Akquisitionen. Um ein bestimmtes Fahrzeug zu beauftragen, starten Sie eine Suchanfrage."
+  },
+  "car": {
+    "back": "Zurück zur Kollektion",
+    "category": {
+      "grand-touring": "Grand Touring",
+      "sports": "Sport",
+      "rally": "Rallye",
+      "collector": "Sammlerstück"
+    },
+    "priceLabel": "Verfügbarkeit",
+    "priceValue": "Auf Anfrage",
+    "inquire": "Anfragen",
+    "aboutHeading": "Über dieses Fahrzeug",
+    "inspectionHeading": "Was wir geprüft haben",
+    "similarTitle": "Suchen Sie ein vergleichbares Fahrzeug?",
+    "similarBody": "Wir beschaffen ein vergleichbares Exemplar nach Ihren genauen Vorgaben.",
+    "similarCta": "Ähnliches Fahrzeug finden lassen",
+    "inMotion": "In Bewegung",
+    "filmEyebrow": "Der Film",
+    "filmTitle": "Erleben Sie ihn mit vollem Klang.",
+    "watchFilm": "Film ansehen"
+  },
+  "process": {
+    "metaTitle": "Unser Vorgehen",
+    "eyebrow": "Unser Vorgehen",
+    "title": "Wie wir finden, prüfen und liefern.",
+    "intro": "Ein gründliches, transparentes Vorgehen, über dreissig Jahre verfeinert — darauf ausgelegt, dass Sie mit absoluter Sicherheit kaufen, ganz gleich, wo auf der Welt Sie sich befinden.",
+    "quote": "Ich prüfe jeden Zentimeter jedes Fahrzeugs, das ich kaufe. Ist es nicht gut genug für meine eigene Kollektion, ist es nicht gut genug für meinen Kunden.",
+    "quoteRole": "Gründer & Chefprüfer",
+    "steps": {
+      "brief": {
+        "title": "Die Vorgaben",
+        "body": "Wir hören zu. Sie nennen uns genau, wonach Sie suchen — Modell, Spezifikation, Zustand, Budget — und gemeinsam definieren wir die Suche."
+      },
+      "search": {
+        "title": "Die Suche",
+        "body": "Wir nutzen ein über Jahrzehnte aufgebautes globales Netzwerk, um die allerbesten Kandidaten ausfindig zu machen, einschliesslich nie öffentlich angebotener Fahrzeuge."
+      },
+      "inspect": {
+        "title": "Die Prüfung",
+        "body": "Cem prüft jeden Aspekt persönlich — Motor, Struktur, Elektronik, Optik — bis ins letzte Detail. Nichts wird vorausgesetzt."
+      },
+      "verify": {
+        "title": "Die Verifizierung",
+        "body": "Provenienz, Servicehistorie, übereinstimmende Nummern und Dokumentation werden authentifiziert, bevor auch nur eine einzige Empfehlung ausgesprochen wird."
+      },
+      "custody": {
+        "title": "Die Verwahrung",
+        "body": "Ihr Fahrzeug wird in klimatisierter Lagerung bei Collection Suites gesichert, vollständig geschützt und gepflegt bis zur Lieferung."
+      },
+      "deliver": {
+        "title": "Die Lieferung",
+        "body": "Wir übernehmen Logistik, Export und Import weltweit — und liefern Ihr Fahrzeug sicher vor Ihre Tür, wo immer Sie sind."
+      }
+    },
+    "ctaTitle": "Bereit, die Suche zu beginnen?",
+    "ctaButton": "Fahrzeug finden lassen"
+  },
+  "about": {
+    "metaTitle": "Über uns",
+    "eyebrow": "Über CK Retro Garage",
+    "title": "Ein privates Akquisitionshaus, weltweit geschätzt.",
+    "intro": "Wir sind ein kleines, engagiertes Team, aufgebaut um die Besessenheit eines Mannes für aussergewöhnliche Fahrzeuge — und um eine globale Struktur, die Kunden in Amerika, Europa und der Türkei betreut.",
+    "founderEyebrow": "Der Gründer",
+    "founderP1": "Cem Köse hat über dreissig Jahre damit verbracht, die qualitativ besten Fahrzeuge der Welt zu finden. Was als Leidenschaft begann, wurde zu einer unübertroffenen Expertise im Beschaffen, Prüfen und Authentifizieren aussergewöhnlicher Automobile.",
+    "founderP2": "Seine Methode ist kompromisslos. Er prüft jeden Aspekt jedes Fahrzeugs selbst und kontrolliert jeden Zentimeter — denn sein Name und das Vertrauen seiner Kunden hängen davon ab.",
+    "founderP3": "Dieser Massstab und eine über Kontinente hinweg bewiesene Erfolgsbilanz sind das Fundament, auf dem die CK Retro Garage errichtet ist.",
+    "teamEyebrow": "Führung",
+    "teamTitle": "Ein globales Team.",
+    "teamIntro": "Ein einheitlicher Standard in jedem Markt – damit Sie, wo immer Sie sind, jemanden haben, der Ihre Sprache spricht und Ihre Region kennt.",
+    "roles": {
+      "founder": "Gründer & Chefprüfer"
+    },
+    "bios": {
+      "founder": "Über 30 Jahre im Finden, Prüfen und Liefern der qualitativ besten Fahrzeuge der Welt. Er kontrolliert jeden Zentimeter jedes Fahrzeugs persönlich.",
+      "andres": "Leitet unsere Abteilung für Lateinamerika und betreut Kunden in Argentinien, Uruguay, Peru, Kolumbien, Panama, Mexiko und der Schweiz.",
+      "cenk": "Leitet unsere Abteilung für die USA, die Türkei und die Niederlande."
+    },
+    "photoNote": "Das gezeigte Bildmaterial zeigt Fahrzeuge, die vom Unternehmen beschafft und erworben wurden.",
+    "ctaTitle": "Arbeiten Sie mit uns.",
+    "ctaButton": "Fahrzeug finden lassen",
+    "ceoLabel": "CEO"
+  },
+  "storage": {
+    "metaTitle": "Verwahrung & Lagerung",
+    "eyebrow": "Verwahrung & Lagerung",
+    "title": "Geschützt, gepflegt und bereit.",
+    "intro": "Jedes Fahrzeug, das wir verwahren, wird in einer klimatisierten, vollständig gesicherten Anlage aufbewahrt — Beweis für die Qualität und Sorgfalt hinter allem, was wir tun.",
+    "imageAlt": "Sichere, klimatisierte Fahrzeuglagerung",
+    "features": {
+      "climate": {
+        "title": "Klimatisiert",
+        "body": "Temperatur und Luftfeuchtigkeit werden präzise geregelt, um Lack, Leder, Gummi und Mechanik in bestem Zustand zu erhalten."
+      },
+      "security": {
+        "title": "Vollständig gesichert",
+        "body": "Rund um die Uhr überwachte, zugangskontrollierte Lagerung stellt sicher, dass jedes Fahrzeug nach höchstem Massstab geschützt ist."
+      },
+      "maintenance": {
+        "title": "Aktiv gepflegt",
+        "body": "Die Fahrzeuge werden bewegt und gewartet, sodass sie stets in perfektem Betriebszustand und jederzeit besichtigungs- oder lieferbereit bleiben."
+      },
+      "access": {
+        "title": "Private Besichtigung",
+        "body": "Kunden sind herzlich eingeladen, ihr Fahrzeug nach Vereinbarung persönlich in einem diskreten und professionellen Rahmen zu besichtigen."
+      }
+    },
+    "partnerEyebrow": "Unser Verwahrungspartner",
+    "partnerTitle": "In Partnerschaft mit Collection Suites.",
+    "partnerBody": "Unsere Fahrzeuge werden bei Collection Suites verwahrt, einer Spezialanlage für die Pflege und Lagerung aussergewöhnlicher Automobile.",
+    "ctaTitle": "Beauftragen Sie Ihr nächstes Fahrzeug.",
+    "ctaButton": "Fahrzeug finden lassen"
+  },
+  "source": {
+    "metaTitle": "Fahrzeug finden lassen",
+    "eyebrow": "Suchanfrage",
+    "title": "Nennen Sie uns das Fahrzeug, das Sie suchen.",
+    "intro": "Jede Marke, jede Epoche, überall auf der Welt. Teilen Sie uns Ihre Vorgaben mit, und Cem und das Team beginnen die Suche persönlich.",
+    "assurances": {
+      "confidential": {
+        "title": "Diskret & Vertraulich",
+        "body": "Jede Anfrage wird mit absoluter Diskretion behandelt. Ihre Angaben werden niemals weitergegeben."
+      },
+      "global": {
+        "title": "Weltweit beschafft",
+        "body": "Ein über Jahrzehnte aufgebautes Netzwerk in Amerika, Europa und darüber hinaus — einschliesslich nie öffentlich gelisteter Fahrzeuge."
+      },
+      "inspected": {
+        "title": "Persönlich geprüft",
+        "body": "Jedes Fahrzeug, das wir empfehlen, wird bis ins letzte Detail geprüft, bevor es Sie erreicht."
+      }
+    },
+    "fields": {
+      "name": "Vollständiger Name",
+      "email": "E-Mail",
+      "phone": "Telefon / WhatsApp",
+      "country": "Land",
+      "car": "Gesuchtes Fahrzeug",
+      "budget": "Budget (optional)",
+      "details": "Details & Spezifikation"
+    },
+    "ph": {
+      "name": "Ihr Name",
+      "email": "you@email.com",
+      "phone": "+1 …",
+      "country": "Ihr Land",
+      "car": "z. B. Ferrari 308 GTSi, 1980–1985",
+      "budget": "z. B. USD 120,000",
+      "details": "Wunschfarbe, Spezifikation, Zustand, Zeitrahmen…"
+    },
+    "consent": "Ich bin damit einverstanden, zu meiner Anfrage kontaktiert zu werden, und akzeptiere die Datenschutzerklärung.",
+    "errorMsg": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut oder schreiben Sie uns direkt eine E-Mail.",
+    "sending": "Wird gesendet…",
+    "submit": "Anfrage absenden",
+    "successTitle": "Anfrage erhalten.",
+    "successBody": "Vielen Dank. Das passende Mitglied unseres Teams wird sich sehr bald persönlich bei Ihnen melden."
+  },
+  "contact": {
+    "metaTitle": "Kontakt",
+    "eyebrow": "Kontakt",
+    "title": "Sprechen Sie mit unserem Team.",
+    "intro": "Wo immer Sie sind, steht Ihnen ein persönlicher Ansprechpartner zur Seite, der Ihren Markt kennt. Wenden Sie sich direkt an uns oder starten Sie eine Suchanfrage.",
+    "orSource": "Sie wissen, welches Fahrzeug Sie suchen? Überspringen Sie die Schritte und senden Sie uns Ihre Vorgaben direkt.",
+    "sourceCta": "Fahrzeug finden lassen"
+  },
+  "privacy": {
+    "title": "Datenschutzerklärung",
+    "intro": "Diese Erklärung beschreibt, wie CK Retro Garage Ihre Informationen erhebt und verwendet. Bitte lassen Sie sie vor der Veröffentlichung von Ihrem Rechtsberater prüfen.",
+    "sections": {
+      "collect": {
+        "title": "Informationen, die wir erheben",
+        "body": "Wir erheben die Angaben, die Sie über unsere Formulare bereitstellen — etwa Ihren Namen, Ihre E-Mail-Adresse, Telefonnummer, Ihr Land und die Details Ihrer Anfrage — damit wir Ihnen antworten können."
+      },
+      "use": {
+        "title": "Wie wir sie verwenden",
+        "body": "Ihre Informationen werden ausschliesslich verwendet, um Ihre Anfrage zu beantworten, Fahrzeuge in Ihrem Auftrag zu beschaffen und mit Ihnen über unsere Dienstleistungen zu kommunizieren."
+      },
+      "share": {
+        "title": "Weitergabe",
+        "body": "Wir verkaufen Ihre Daten nicht. Wir geben sie nur innerhalb unseres Teams und an vertrauenswürdige Partner weiter, soweit dies zur Erfüllung Ihrer Anfrage erforderlich ist."
+      },
+      "rights": {
+        "title": "Ihre Rechte",
+        "body": "Wenn Sie sich in der EU, der Schweiz oder einer anderen einschlägigen Rechtsordnung befinden, können Sie jederzeit Auskunft über, Berichtigung oder Löschung Ihrer personenbezogenen Daten verlangen."
+      },
+      "contact": {
+        "title": "Kontakt",
+        "body": "Für jegliche Datenschutzanfrage kontaktieren Sie uns unter contact@cksretrogarage.com."
+      }
+    },
+    "disclaimer": "Dies ist ein Platzhaltertext und keine Rechtsberatung. Lassen Sie Ihre endgültige Datenschutzerklärung und Ihren Cookie-Hinweis von einem qualifizierten Anwalt für die Einhaltung der DSGVO und des Schweizer Rechts erstellen."
+  },
+  "contacts": {
+    "andres": {
+      "label": "Lateinamerika & Schweiz",
+      "scope": "Argentinien, Uruguay, Peru, Kolumbien, Panama, Mexiko & Schweiz"
+    },
+    "cenk": {
+      "label": "USA, Türkei & Niederlande",
+      "scope": "USA, Türkei & Niederlande"
+    }
+  }
+}

@@ -1,0 +1,286 @@
+{
+  "meta": {
+    "titleDefault": "CK Retro Garage — Adquisición de Autos para Conocedores",
+    "description": "Durante más de 30 años, Cem Köse ha buscado, inspeccionado y entregado autos excepcionales a propietarios exigentes en todo el mundo. Díganos qué auto desea."
+  },
+  "nav": {
+    "collection": "Colección",
+    "process": "Nuestro Proceso",
+    "storage": "Custodia",
+    "about": "Quiénes Somos",
+    "contact": "Contacto",
+    "cta": "Encuentre Mi Auto"
+  },
+  "footer": {
+    "blurb": "Una casa privada de adquisición de automóviles excepcionales. Cada auto buscado, inspeccionado y entregado con tres décadas de experiencia.",
+    "explore": "Explorar",
+    "regions": "En todo el mundo",
+    "custody": "Custodia segura a cargo de Collection Suites",
+    "rights": "Todos los derechos reservados.",
+    "privacy": "Privacidad"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Adquisiciones para Conocedores",
+      "title": "Encontramos los autos que otros no pueden.",
+      "subtitle": "Tres décadas buscando, inspeccionando y entregando automóviles excepcionales para propietarios exigentes en todo el mundo.",
+      "ctaPrimary": "Encuentre Mi Auto",
+      "ctaSecondary": "Ver la Colección"
+    },
+    "stats": {
+      "years": "Años de experiencia",
+      "countries": "Países atendidos",
+      "divisions": "Divisiones globales",
+      "inspected": "Inspeccionados personalmente"
+    },
+    "founder": {
+      "eyebrow": "El Fundador",
+      "title": "Cada detalle inspeccionado. Cada auto excepcional.",
+      "p1": "Durante más de treinta años, Cem Köse ha construido su reputación sobre un único principio: nunca transigir. Inspecciona personalmente cada aspecto de cada auto —mecánico, estético e histórico— antes de que gane un lugar en nuestra colección.",
+      "p2": "Es esta obsesión por el detalle, junto a una trayectoria comprobada en distintos continentes, lo que permite a nuestros clientes comprar con absoluta confianza.",
+      "role": "Fundador y Maestro Inspector",
+      "imageAlt": "Un auto excepcional de la colección de CK Retro Garage",
+      "link": "Conozca al equipo"
+    },
+    "pillars": {
+      "sourcing": {
+        "title": "Buscamos",
+        "body": "Cualquiera sea el auto que busca —un modelo específico, una especificación rara, un ícono que siempre ha deseado— lo encontramos a través de una red global construida durante décadas."
+      },
+      "inspection": {
+        "title": "Inspeccionamos",
+        "body": "Cem examina personalmente cada auto hasta el último detalle: motor, estructura, historia y procedencia. Nada se da por sentado; todo se verifica."
+      },
+      "custody": {
+        "title": "Resguardamos",
+        "body": "Cada auto se mantiene en custodia segura y con clima controlado junto a nuestros socios de Collection Suites: protegido, mantenido y listo."
+      }
+    },
+    "collection": {
+      "eyebrow": "Adquiridos Recientemente",
+      "title": "Una selección de la colección.",
+      "viewAll": "Ver Todos los Autos"
+    },
+    "custody": {
+      "eyebrow": "Custodia Segura",
+      "title": "Resguardados en custodia de primer nivel en Collection Suites.",
+      "body": "Nuestros autos se almacenan, protegen y mantienen en una instalación con clima controlado y plenamente segura: prueba de que lo que ofrecemos es real, cuidado y está listo para ver.",
+      "cta": "Conozca la Custodia",
+      "imageAlt": "Instalación de almacenamiento seguro con clima controlado",
+      "tapSound": "Toque para activar el sonido"
+    },
+    "cta": {
+      "title": "Díganos qué auto desea.",
+      "body": "Cualquier marca, cualquier época, en cualquier lugar del mundo. Comparta su requerimiento y comenzaremos la búsqueda.",
+      "button": "Iniciar una Solicitud de Búsqueda"
+    }
+  },
+  "collection": {
+    "metaTitle": "La Colección",
+    "eyebrow": "La Colección",
+    "title": "Autos que hemos buscado y adquirido.",
+    "intro": "Una selección de automóviles excepcionales que hemos encontrado, inspeccionado y colocado con los propietarios indicados, representativa del estándar que mantenemos en cada búsqueda.",
+    "note": "Los autos mostrados son ejemplos de adquisiciones anteriores. Para encargar un auto específico, inicie una solicitud de búsqueda."
+  },
+  "car": {
+    "back": "Volver a la Colección",
+    "category": {
+      "grand-touring": "Grand Touring",
+      "sports": "Deportivos",
+      "rally": "Rally",
+      "collector": "De Colección"
+    },
+    "priceLabel": "Disponibilidad",
+    "priceValue": "A Consultar",
+    "inquire": "Consultar",
+    "aboutHeading": "Sobre este auto",
+    "inspectionHeading": "Lo que inspeccionamos",
+    "similarTitle": "¿Busca uno como este?",
+    "similarBody": "Podemos encontrar un ejemplar comparable según su especificación exacta.",
+    "similarCta": "Buscar un Auto Similar",
+    "inMotion": "En Movimiento",
+    "filmEyebrow": "El Film",
+    "filmTitle": "Véalo a plena voz.",
+    "watchFilm": "Ver el Film"
+  },
+  "process": {
+    "metaTitle": "Nuestro Proceso",
+    "eyebrow": "Nuestro Proceso",
+    "title": "Cómo encontramos, evaluamos y entregamos.",
+    "intro": "Un proceso riguroso y transparente perfeccionado a lo largo de treinta años, diseñado para que usted compre con total confianza, sin importar en qué parte del mundo se encuentre.",
+    "quote": "Reviso cada detalle de cada auto que compro. Si no es lo bastante bueno para mi propia colección, no lo es para mi cliente.",
+    "quoteRole": "Fundador y Maestro Inspector",
+    "steps": {
+      "brief": {
+        "title": "El Requerimiento",
+        "body": "Escuchamos. Usted nos dice exactamente qué busca —modelo, especificación, condición, presupuesto— y definimos juntos la búsqueda."
+      },
+      "search": {
+        "title": "La Búsqueda",
+        "body": "Recurrimos a una red global construida durante décadas para localizar a los mejores candidatos, incluidos autos que nunca se publicitaron."
+      },
+      "inspect": {
+        "title": "La Inspección",
+        "body": "Cem inspecciona personalmente cada aspecto —motor, estructura, electrónica, estética— hasta el último detalle. Nada se presume."
+      },
+      "verify": {
+        "title": "La Verificación",
+        "body": "Se autentican la procedencia, el historial de servicio, los números coincidentes y la documentación antes de hacer cualquier recomendación."
+      },
+      "custody": {
+        "title": "La Custodia",
+        "body": "Su auto se resguarda en almacenamiento con clima controlado en Collection Suites, plenamente protegido y mantenido hasta su entrega."
+      },
+      "deliver": {
+        "title": "La Entrega",
+        "body": "Nos encargamos de la logística, la exportación y la importación en todo el mundo, entregando su auto de forma segura en su puerta, donde sea que esté."
+      }
+    },
+    "ctaTitle": "¿Listo para comenzar la búsqueda?",
+    "ctaButton": "Encuentre Mi Auto"
+  },
+  "about": {
+    "metaTitle": "Quiénes Somos",
+    "eyebrow": "Sobre CK Retro Garage",
+    "title": "Una casa privada de adquisición, de confianza en todo el mundo.",
+    "intro": "Somos un equipo pequeño y dedicado, construido en torno a la obsesión de un hombre por los autos excepcionales, con una estructura global para atender a clientes en América, Europa y Turquía.",
+    "founderEyebrow": "El Fundador",
+    "founderP1": "Cem Köse ha dedicado más de treinta años a encontrar los autos de mayor calidad del mundo. Lo que comenzó como una pasión se convirtió en una experiencia inigualable en la búsqueda, inspección y autenticación de automóviles excepcionales.",
+    "founderP2": "Su método es intransigente. Inspecciona personalmente cada aspecto de cada auto, revisando hasta el último detalle, porque su nombre y la confianza de sus clientes dependen de ello.",
+    "founderP3": "Ese estándar, junto a una trayectoria comprobada en distintos continentes, es la base sobre la que se construye CK Retro Garage.",
+    "teamEyebrow": "Liderazgo",
+    "teamTitle": "Un equipo global.",
+    "teamIntro": "Un mismo estándar en cada mercado, para que, esté donde esté, cuente con alguien que habla su idioma y conoce su región.",
+    "roles": {
+      "founder": "Fundador y Maestro Inspector"
+    },
+    "bios": {
+      "founder": "Más de 30 años encontrando, inspeccionando y entregando los autos de mayor calidad del mundo. Revisa personalmente cada detalle de cada auto.",
+      "andres": "Dirige nuestra división de Latinoamérica, atendiendo a clientes en Argentina, Uruguay, Perú, Colombia, Panamá, México y Suiza.",
+      "cenk": "Dirige nuestra división para EE. UU., Turquía y los Países Bajos."
+    },
+    "photoNote": "Las imágenes mostradas representan autos buscados y adquiridos por la empresa.",
+    "ctaTitle": "Trabaje con nosotros.",
+    "ctaButton": "Encuentre Mi Auto",
+    "ceoLabel": "CEO"
+  },
+  "storage": {
+    "metaTitle": "Custodia y Almacenamiento",
+    "eyebrow": "Custodia y Almacenamiento",
+    "title": "Protegido, mantenido y listo.",
+    "intro": "Cada auto que resguardamos se mantiene en una instalación con clima controlado y plenamente segura: prueba de la calidad y el cuidado detrás de todo lo que hacemos.",
+    "imageAlt": "Almacenamiento seguro de autos con clima controlado",
+    "features": {
+      "climate": {
+        "title": "Clima Controlado",
+        "body": "La temperatura y la humedad se gestionan con precisión para preservar pintura, cuero, caucho y mecánica en su mejor condición."
+      },
+      "security": {
+        "title": "Plenamente Seguro",
+        "body": "Almacenamiento monitoreado las 24 horas y con acceso controlado que garantiza la protección de cada auto al más alto estándar."
+      },
+      "maintenance": {
+        "title": "Mantenimiento Activo",
+        "body": "Los autos se ponen en marcha y se mantienen para conservarlos en perfecto estado de funcionamiento, listos para ver o entregar en cualquier momento."
+      },
+      "access": {
+        "title": "Visita Privada",
+        "body": "Los clientes pueden inspeccionar su auto en persona, con cita previa, en un entorno discreto y profesional."
+      }
+    },
+    "partnerEyebrow": "Nuestro Socio de Custodia",
+    "partnerTitle": "En asociación con Collection Suites.",
+    "partnerBody": "Nuestros autos se resguardan en Collection Suites, una instalación especializada en el cuidado y almacenamiento de automóviles excepcionales.",
+    "ctaTitle": "Encargue su próximo auto.",
+    "ctaButton": "Encuentre Mi Auto"
+  },
+  "source": {
+    "metaTitle": "Encuentre Mi Auto",
+    "eyebrow": "Solicitud de Búsqueda",
+    "title": "Díganos qué auto desea.",
+    "intro": "Cualquier marca, cualquier época, en cualquier lugar del mundo. Comparta su requerimiento y Cem y el equipo comenzarán la búsqueda personalmente.",
+    "assurances": {
+      "confidential": {
+        "title": "Discreto y Confidencial",
+        "body": "Cada consulta se maneja con total discreción. Sus datos nunca se comparten."
+      },
+      "global": {
+        "title": "Búsqueda Mundial",
+        "body": "Una red construida durante décadas en América, Europa y más allá, incluidos autos que nunca se publicaron."
+      },
+      "inspected": {
+        "title": "Inspeccionado Personalmente",
+        "body": "Cada auto que recomendamos se inspecciona hasta el último detalle antes de llegar a usted."
+      }
+    },
+    "fields": {
+      "name": "Nombre Completo",
+      "email": "Correo electrónico",
+      "phone": "Teléfono / WhatsApp",
+      "country": "País",
+      "car": "Auto que busca",
+      "budget": "Presupuesto (opcional)",
+      "details": "Detalles y especificación"
+    },
+    "ph": {
+      "name": "Su nombre",
+      "email": "you@email.com",
+      "phone": "+1 …",
+      "country": "Su país",
+      "car": "ej. Ferrari 308 GTSi, 1980–1985",
+      "budget": "ej. USD 120,000",
+      "details": "Color preferido, especificación, condición, plazos…"
+    },
+    "consent": "Acepto ser contactado sobre mi solicitud y acepto la política de privacidad.",
+    "errorMsg": "Algo salió mal. Inténtelo de nuevo o escríbanos directamente.",
+    "sending": "Enviando…",
+    "submit": "Enviar Solicitud",
+    "successTitle": "Solicitud recibida.",
+    "successBody": "Gracias. El miembro indicado de nuestro equipo se pondrá en contacto personalmente, muy pronto."
+  },
+  "contact": {
+    "metaTitle": "Contacto",
+    "eyebrow": "Contacto",
+    "title": "Hable con nuestro equipo.",
+    "intro": "Dondequiera que esté, cuenta con un contacto dedicado que conoce su mercado. Comuníquese directamente o inicie una solicitud de búsqueda.",
+    "orSource": "¿Ya sabe qué auto desea? Adelántese y envíenos su requerimiento directamente.",
+    "sourceCta": "Encuentre Mi Auto"
+  },
+  "privacy": {
+    "title": "Política de Privacidad",
+    "intro": "Esta política explica cómo CK Retro Garage recopila y utiliza su información. Revísela con su asesor legal antes del lanzamiento.",
+    "sections": {
+      "collect": {
+        "title": "Información que recopilamos",
+        "body": "Recopilamos los datos que usted proporciona a través de nuestros formularios —como su nombre, correo electrónico, número de teléfono, país y los detalles de su solicitud— para poder responderle."
+      },
+      "use": {
+        "title": "Cómo la utilizamos",
+        "body": "Su información se utiliza únicamente para responder a su consulta, buscar autos en su nombre y comunicarnos con usted sobre nuestros servicios."
+      },
+      "share": {
+        "title": "Divulgación",
+        "body": "No vendemos sus datos. Los compartimos solo dentro de nuestro equipo y con socios de confianza, según sea necesario para atender su solicitud."
+      },
+      "rights": {
+        "title": "Sus derechos",
+        "body": "Si se encuentra en la UE, Suiza u otra jurisdicción aplicable, puede solicitar el acceso, la corrección o la eliminación de sus datos personales en cualquier momento."
+      },
+      "contact": {
+        "title": "Contacto",
+        "body": "Para cualquier solicitud de privacidad, contáctenos en contact@cksretrogarage.com."
+      }
+    },
+    "disclaimer": "Este es un texto de ejemplo y no constituye asesoramiento legal. Encargue a un abogado calificado la preparación de su política de privacidad y aviso de cookies definitivos para el cumplimiento del RGPD y la normativa suiza."
+  },
+  "contacts": {
+    "andres": {
+      "label": "Latinoamérica y Suiza",
+      "scope": "Argentina, Uruguay, Perú, Colombia, Panamá, México y Suiza"
+    },
+    "cenk": {
+      "label": "EE. UU., Turquía y Países Bajos",
+      "scope": "Estados Unidos, Turquía y Países Bajos"
+    }
+  }
+}

@@ -45,7 +45,11 @@ type ImageEntry =
   | { type: 'new'; data: string; ext?: string };
 
 export async function POST(req: NextRequest) {
-  if (!(await verifySessionToken(req.cookies.get(ADMIN_COOKIE)?.value))) {
+  // Enforce auth only when a password is configured (open otherwise).
+  if (
+    process.env.ADMIN_PASSWORD &&
+    !(await verifySessionToken(req.cookies.get(ADMIN_COOKIE)?.value))
+  ) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

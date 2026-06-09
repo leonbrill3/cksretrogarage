@@ -8,15 +8,18 @@ const intlMiddleware = createMiddleware(routing);
 export default async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Admin area: not localized, protected by session cookie (login page is open).
+  // Admin area: not localized. Auth is enforced ONLY when ADMIN_PASSWORD is set;
+  // with no password configured the panel is open to anyone (re-lock by setting it).
   if (pathname.startsWith('/admin')) {
     if (pathname === '/admin/login') return NextResponse.next();
-    const ok = await verifySessionToken(req.cookies.get(ADMIN_COOKIE)?.value);
-    if (!ok) {
-      const url = req.nextUrl.clone();
-      url.pathname = '/admin/login';
-      url.search = '';
-      return NextResponse.redirect(url);
+    if (process.env.ADMIN_PASSWORD) {
+      const ok = await verifySessionToken(req.cookies.get(ADMIN_COOKIE)?.value);
+      if (!ok) {
+        const url = req.nextUrl.clone();
+        url.pathname = '/admin/login';
+        url.search = '';
+        return NextResponse.redirect(url);
+      }
     }
     return NextResponse.next();
   }

@@ -132,7 +132,7 @@ export default async function Home({
         </div>
         <div className="grid gap-x-6 gap-y-12 md:grid-cols-3">
           {featured.map((car, i) => (
-            <CarCard key={car.slug} car={car} priority={i === 0} />
+            <CarCard key={car.slug} car={car} priority={i === 0} locale={locale} />
           ))}
         </div>
       </section>

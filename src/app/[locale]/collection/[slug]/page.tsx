@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
-import { cars, getCar, carImages, carTitle } from '@/data/cars';
+import { cars, getCar, carImages, carTitle, carText, carList } from '@/data/cars';
 import { routing } from '@/i18n/routing';
 import Gallery from '@/components/Gallery';
 import FilmPlayer from '@/components/FilmPlayer';
@@ -18,10 +18,10 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const car = getCar(slug);
   if (!car) return {};
-  return { title: carTitle(car), description: car.tagline };
+  return { title: carTitle(car), description: carText(car.tagline, locale) };
 }
 
 export default async function CarPage({
@@ -52,7 +52,7 @@ export default async function CarPage({
             <h1 className="h-display text-4xl text-bone md:text-6xl">
               {car.make} {car.model}
             </h1>
-            <p className="mt-5 max-w-xl text-lg leading-relaxed text-bone-muted">{car.tagline}</p>
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-bone-muted">{carText(car.tagline, locale)}</p>
           </div>
           <div className="md:text-right">
             <div className="text-sm text-bone-dim">{t('priceLabel')}</div>
@@ -101,12 +101,12 @@ export default async function CarPage({
       <div className="container-site grid gap-14 pb-28 md:grid-cols-[1.4fr_1fr]">
         <div>
           <div className="eyebrow mb-5">{t('aboutHeading')}</div>
-          <p className="text-lg leading-relaxed text-bone-muted">{car.description}</p>
+          <p className="text-lg leading-relaxed text-bone-muted">{carText(car.description, locale)}</p>
         </div>
         <div className="border-l border-bone/10 pl-8">
           <div className="eyebrow mb-5">{t('inspectionHeading')}</div>
           <ul className="space-y-4">
-            {car.inspection.map((item) => (
+            {carList(car.inspection, locale).map((item) => (
               <li key={item} className="flex gap-3 text-sm leading-relaxed text-bone-muted">
                 <span className="mt-1.5 block h-1 w-1 shrink-0 bg-brass" />
                 {item}

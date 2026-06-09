@@ -33,7 +33,7 @@ export default async function CollectionPage({
 
       <div className="mt-16 grid gap-x-6 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
         {cars.map((car, i) => (
-          <CarCard key={car.slug} car={car} priority={i < 3} />
+          <CarCard key={car.slug} car={car} priority={i < 3} locale={locale} />
         ))}
       </div>
     </div>

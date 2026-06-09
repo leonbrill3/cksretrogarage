@@ -1,8 +1,16 @@
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
-import { Car, carImages, carTitle } from '@/data/cars';
+import { Car, carImages, carTitle, carText } from '@/data/cars';
 
-export default function CarCard({ car, priority }: { car: Car; priority?: boolean }) {
+export default function CarCard({
+  car,
+  priority,
+  locale,
+}: {
+  car: Car;
+  priority?: boolean;
+  locale: string;
+}) {
   const cover = carImages(car)[0];
   return (
     <Link href={`/collection/${car.slug}`} className="group reveal block">
@@ -22,7 +30,7 @@ export default function CarCard({ car, priority }: { car: Car; priority?: boolea
         <h3 className="mt-1.5 font-serif text-xl text-bone transition-colors group-hover:text-brass">
           {car.make} {car.model}
         </h3>
-        <p className="mt-2 text-sm leading-relaxed text-bone-dim">{car.tagline}</p>
+        <p className="mt-2 text-sm leading-relaxed text-bone-dim">{carText(car.tagline, locale)}</p>
       </div>
     </Link>
   );

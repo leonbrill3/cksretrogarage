@@ -4,6 +4,24 @@ import { commitFiles, getRepoJson } from '@/lib/github';
 
 export const runtime = 'nodejs';
 
+// Trigger a Render deploy so the committed change goes live (no GitHub webhook needed).
+async function triggerRedeploy(): Promise<void> {
+  const hook = process.env.RENDER_DEPLOY_HOOK;
+  if (hook) {
+    await fetch(hook, { method: 'POST' }).catch(() => {});
+    return;
+  }
+  const key = process.env.RENDER_API_KEY;
+  const svc = process.env.RENDER_SERVICE_ID;
+  if (key && svc) {
+    await fetch(`https://api.render.com/v1/services/${svc}/deploys`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: '{}',
+    }).catch(() => {});
+  }
+}
+
 type Localized = { en: string; tr?: string };
 type LocalizedList = { en: string[]; tr?: string[] };
 type CarRecord = {
@@ -66,6 +84,7 @@ export async function POST(req: NextRequest) {
       textFiles: [{ path: 'content/cars.json', content: JSON.stringify(next, null, 2) + '\n' }],
       deletePaths,
     });
+    await triggerRedeploy();
     return NextResponse.json({ ok: true, commitSha, deleted: originalSlug });
   }
 
@@ -141,6 +160,7 @@ export async function POST(req: NextRequest) {
       binaryFiles,
       deletePaths,
     });
+    await triggerRedeploy();
     return NextResponse.json({ ok: true, commitSha, slug });
   } catch (e) {
     return NextResponse.json({ error: 'Commit failed', detail: String(e) }, { status: 500 });

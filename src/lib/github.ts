@@ -16,23 +16,32 @@ function cfg() {
   return { token, repo, branch };
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 async function gh(path: string, init?: RequestInit) {
   const { token } = cfg();
-  const res = await fetch(`${API}${path}`, {
-    ...init,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/vnd.github+json',
-      'X-GitHub-Api-Version': '2022-11-28',
-      'Content-Type': 'application/json',
-      ...(init?.headers || {}),
-    },
-  });
-  if (!res.ok) {
+  // Retry transient auth/rate/5xx failures — GitHub occasionally rejects an
+  // otherwise-valid token on the first write from a server IP, then accepts it.
+  const RETRYABLE = new Set([401, 403, 429, 500, 502, 503, 504]);
+  let lastErr = '';
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const res = await fetch(`${API}${path}`, {
+      ...init,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+        'Content-Type': 'application/json',
+        ...(init?.headers || {}),
+      },
+    });
+    if (res.ok) return res.json();
     const body = await res.text();
-    throw new Error(`GitHub ${path} -> ${res.status}: ${body.slice(0, 300)}`);
+    lastErr = `GitHub ${path} -> ${res.status}: ${body.slice(0, 200)}`;
+    if (!RETRYABLE.has(res.status) || attempt === 3) break;
+    await sleep(600 * (attempt + 1));
   }
-  return res.json();
+  throw new Error(lastErr);
 }
 
 // Read and parse a JSON file from the repo (latest committed version on the branch).

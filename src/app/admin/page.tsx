@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { cars, carImages, carTitle } from '@/data/cars';
+import { agents, agentPhoto } from '@/data/agents';
 import LogoutButton from '@/components/admin/LogoutButton';
 
 export const dynamic = 'force-dynamic';
@@ -55,11 +56,50 @@ export default function AdminDashboard() {
               <div className="mt-1 text-xs text-bone-dim">
                 {car.images.length} photos · {car.category}
                 {car.featured ? ' · ★ featured' : ''}
+                {car.forSale ? ` · ● for sale${car.status && car.status !== 'available' ? ` (${car.status})` : ''}` : ''}
               </div>
               <div className="mt-1 truncate text-xs text-bone-dim">{car.tagline.en}</div>
             </div>
           </Link>
         ))}
+      </div>
+
+      {/* Agents */}
+      <div className="mt-16 mb-6 flex items-center justify-between border-t border-bone/10 pt-12">
+        <h1 className="font-serif text-xl">{agents.length} agents</h1>
+        <Link href="/admin/agents/new" className="btn-primary !py-2.5">
+          + Add Agent
+        </Link>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        {agents.map((agent) => {
+          const photo = agentPhoto(agent);
+          return (
+            <Link
+              key={agent.id}
+              href={`/admin/agents/${agent.id}`}
+              className="group flex items-center gap-4 border border-bone/10 bg-ink-800 p-3 transition-colors hover:border-bone/30"
+            >
+              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-ink-700">
+                {photo ? (
+                  <Image src={photo} alt="" fill sizes="56px" className="object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center font-serif text-lg text-brass">
+                    {agent.name.slice(0, 1)}
+                  </div>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="truncate font-serif text-lg group-hover:text-brass">{agent.name}</div>
+                <div className="mt-0.5 truncate text-xs text-bone-dim">{agent.scope}</div>
+                <div className="mt-0.5 truncate text-[11px] text-bone-dim">
+                  {agent.token ? 'has share link' : 'no share link'}
+                </div>
+              </div>
+            </Link>
+          );
+        })}
       </div>
 
       <p className="mt-10 text-xs text-bone-dim">

@@ -9,7 +9,8 @@
     "storage": "Muhafaza",
     "about": "Hakkımızda",
     "contact": "İletişim",
-    "cta": "Aracımı Buldur"
+    "cta": "Aracımı Buldur",
+    "forSale": "Satılık"
   },
   "footer": {
     "blurb": "Olağanüstü otomobiller için özel bir tedarik kuruluşu. Her otomobil, otuz yıllık uzmanlıkla bulunur, incelenir ve teslim edilir.",
@@ -73,6 +74,11 @@
       "title": "Aradığınız otomobili bize anlatın.",
       "body": "Her marka, her dönem, dünyanın her yerinde. Taleplerinizi paylaşın, aramaya başlayalım.",
       "button": "Tedarik Talebi Başlat"
+    },
+    "available": {
+      "eyebrow": "Satılık",
+      "title": "Şimdi mevcut.",
+      "viewAll": "Tümünü gör"
     }
   },
   "collection": {
@@ -101,7 +107,24 @@
     "inMotion": "Hareket Halinde",
     "filmEyebrow": "Film",
     "filmTitle": "Tüm sesiyle izleyin.",
-    "watchFilm": "Filmi İzle"
+    "watchFilm": "Filmi İzle",
+    "forSaleBack": "Satılığa Dön",
+    "priceOnRequest": "Fiyat için sorunuz",
+    "specsHeading": "Teknik Özellikler",
+    "locationLabel": "Konum",
+    "status": {
+      "available": "Mevcut",
+      "reserved": "Rezerve",
+      "sold": "Satıldı"
+    },
+    "spec": {
+      "mileage": "Kilometre",
+      "transmission": "Şanzıman",
+      "engine": "Motor",
+      "exterior": "Dış Renk",
+      "interior": "İç Mekan",
+      "vin": "Şasi · VIN"
+    }
   },
   "process": {
     "metaTitle": "Sürecimiz",
@@ -282,5 +305,35 @@
       "label": "ABD, Türkiye ve Hollanda",
       "scope": "Amerika Birleşik Devletleri, Türkiye ve Hollanda"
     }
+  },
+  "forSale": {
+    "metaTitle": "Satılık Otomobiller",
+    "eyebrow": "Satılık",
+    "title": "Şimdi mevcut.",
+    "intro": "Şu anda satışa sunulan, özenle seçilmiş istisnai otomobiller — her biri her alımda uyguladığımız standartta bulundu ve incelendi.",
+    "note": "Her otomobil ortaklarımızdan biri aracılığıyla sunulmaktadır. Tüm detaylar, geçmiş ve görüntüleme için doğrudan onlarla iletişime geçin.",
+    "empty": "Şu anda satılık otomobil bulunmuyor. Ne aradığınızı bize söyleyin, sizin için bulalım.",
+    "emptyCta": "Otomobil Buldur"
+  },
+  "agent": {
+    "yourSpecialist": "Uzmanınız",
+    "presentedBy": "Sunan",
+    "whatsapp": "WhatsApp",
+    "call": "Ara",
+    "email": "E-posta",
+    "speaks": "Diller"
+  },
+  "inquiry": {
+    "title": "Bilgi isteyin",
+    "name": "İsim",
+    "email": "E-posta",
+    "phone": "Telefon (isteğe bağlı)",
+    "message": "Mesaj",
+    "messagePlaceholder": "Bu otomobille ilgileniyorum — lütfen tüm detayları gönderin.",
+    "consent": "Bu talep hakkında benimle iletişime geçilmesini kabul ediyorum.",
+    "submit": "Gönder",
+    "sending": "Gönderiliyor…",
+    "success": "Teşekkürler — kısa süre içinde sizinle iletişime geçeceğiz.",
+    "error": "Bir şeyler ters gitti. Lütfen tekrar deneyin."
   }
 }

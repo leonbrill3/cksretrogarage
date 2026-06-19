@@ -38,6 +38,11 @@ type CarRecord = {
   clip?: string;
   film?: string;
   filmPoster?: string;
+  forSale?: boolean;
+  price?: string;
+  status?: string;
+  location?: string;
+  specs?: Record<string, string>;
 };
 
 type ImageEntry =
@@ -145,6 +150,15 @@ export async function POST(req: NextRequest) {
     description: normLoc(car.description, previous?.description),
     inspection: normList(car.inspection, previous?.inspection),
   };
+  if (car.forSale) {
+    record.forSale = true;
+    record.price = (car.price || '').trim();
+    record.status = (car.status as string) || 'available';
+    const loc = (car.location || '').trim();
+    if (loc) record.location = loc;
+    const specs = cleanSpecs(car.specs);
+    if (specs) record.specs = specs;
+  }
   if (previous?.clip) record.clip = previous.clip;
   if (previous?.film) record.film = previous.film;
   if (previous?.filmPoster) record.filmPoster = previous.filmPoster;
@@ -174,6 +188,17 @@ export async function POST(req: NextRequest) {
 function normLoc(v: Localized | undefined, prev?: Localized): Localized {
   return { en: (v?.en ?? prev?.en ?? '').trim(), tr: (v?.tr ?? prev?.tr ?? '').trim() };
 }
+// Keep only non-empty spec values; return undefined if the sheet is empty.
+function cleanSpecs(v: Record<string, string> | undefined): Record<string, string> | undefined {
+  if (!v) return undefined;
+  const out: Record<string, string> = {};
+  for (const [k, raw] of Object.entries(v)) {
+    const val = (raw || '').trim();
+    if (val) out[k] = val;
+  }
+  return Object.keys(out).length ? out : undefined;
+}
+
 function normList(v: LocalizedList | undefined, prev?: LocalizedList): LocalizedList {
   const clean = (arr?: string[]) => (arr || []).map((s) => s.trim()).filter(Boolean);
   return {

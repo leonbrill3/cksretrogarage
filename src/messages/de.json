@@ -9,7 +9,8 @@
     "storage": "Verwahrung",
     "about": "Über uns",
     "contact": "Kontakt",
-    "cta": "Fahrzeug finden lassen"
+    "cta": "Fahrzeug finden lassen",
+    "forSale": "Zu Verkaufen"
   },
   "footer": {
     "blurb": "Ein privates Akquisitionshaus für aussergewöhnliche Automobile. Jedes Fahrzeug beschafft, geprüft und geliefert mit drei Jahrzehnten Erfahrung.",
@@ -73,6 +74,11 @@
       "title": "Nennen Sie uns das Fahrzeug, das Sie suchen.",
       "body": "Jede Marke, jede Epoche, überall auf der Welt. Teilen Sie uns Ihre Vorgaben mit und wir beginnen die Suche.",
       "button": "Suchanfrage starten"
+    },
+    "available": {
+      "eyebrow": "Zu Verkaufen",
+      "title": "Jetzt verfügbar.",
+      "viewAll": "Alle ansehen"
     }
   },
   "collection": {
@@ -101,7 +107,24 @@
     "inMotion": "In Bewegung",
     "filmEyebrow": "Der Film",
     "filmTitle": "Erleben Sie ihn mit vollem Klang.",
-    "watchFilm": "Film ansehen"
+    "watchFilm": "Film ansehen",
+    "forSaleBack": "Zurück zu Zu Verkaufen",
+    "priceOnRequest": "Preis auf Anfrage",
+    "specsHeading": "Spezifikation",
+    "locationLabel": "Standort",
+    "status": {
+      "available": "Verfügbar",
+      "reserved": "Reserviert",
+      "sold": "Verkauft"
+    },
+    "spec": {
+      "mileage": "Laufleistung",
+      "transmission": "Getriebe",
+      "engine": "Motor",
+      "exterior": "Außen",
+      "interior": "Innen",
+      "vin": "Fahrgestell · VIN"
+    }
   },
   "process": {
     "metaTitle": "Unser Vorgehen",
@@ -282,5 +305,35 @@
       "label": "USA, Türkei & Niederlande",
       "scope": "USA, Türkei & Niederlande"
     }
+  },
+  "forSale": {
+    "metaTitle": "Fahrzeuge zu verkaufen",
+    "eyebrow": "Zu Verkaufen",
+    "title": "Jetzt verfügbar.",
+    "intro": "Eine kuratierte Auswahl außergewöhnlicher Fahrzeuge, die derzeit verfügbar sind — jedes beschafft, geprüft und nach dem Standard gehalten, den wir bei jeder Akquisition anlegen.",
+    "note": "Jedes Fahrzeug wird über einen unserer Partner angeboten. Kontaktieren Sie diese direkt für alle Details, Historie und eine Besichtigung.",
+    "empty": "Derzeit sind keine Fahrzeuge zum Verkauf gelistet. Sagen Sie uns, wonach Sie suchen, und wir beschaffen es.",
+    "emptyCta": "Auto beschaffen"
+  },
+  "agent": {
+    "yourSpecialist": "Ihr Spezialist",
+    "presentedBy": "Präsentiert von",
+    "whatsapp": "WhatsApp",
+    "call": "Anrufen",
+    "email": "E-Mail",
+    "speaks": "Sprachen"
+  },
+  "inquiry": {
+    "title": "Details anfragen",
+    "name": "Name",
+    "email": "E-Mail",
+    "phone": "Telefon (optional)",
+    "message": "Nachricht",
+    "messagePlaceholder": "Ich interessiere mich für dieses Fahrzeug — bitte senden Sie alle Details.",
+    "consent": "Ich stimme zu, bezüglich dieser Anfrage kontaktiert zu werden.",
+    "submit": "Anfrage senden",
+    "sending": "Senden…",
+    "success": "Danke — wir melden uns in Kürze.",
+    "error": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
   }
 }

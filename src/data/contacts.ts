@@ -1,82 +1,36 @@
 // ─────────────────────────────────────────────────────────────
-// SINGLE SOURCE OF TRUTH for regional contacts.
-// Used by: the footer, the contact page, and the sourcing-form
-// email routing (/api/source). Change a territory here and it
-// updates everywhere.
+// BACK-COMPAT SHIM. The real source of truth is now src/data/agents.ts
+// (content/agents.json). This module preserves the older `contacts`
+// API so the footer, contact page and about page keep working.
 //
 // Display labels (territory names per language) live in the
-// `contacts` namespace of src/messages/*.json, keyed by `id`.
+// `contacts` namespace of src/messages/*.json, keyed by `id`, with
+// the agent's stored `scope` used as a fallback for agents added
+// after launch.
 // ─────────────────────────────────────────────────────────────
 
-export type ContactId = 'andres' | 'cenk';
+import { publicAgents, defaultEmail as agentDefaultEmail, routeEmailFor as routeAgentEmail } from './agents';
+
+export type ContactId = string;
 
 export type Contact = {
-  id: ContactId;
+  id: string;
   name: string;
   email: string;
-  // Lowercase substrings matched against the user-supplied country
-  // (multiple spellings / languages) to route a lead to this person.
+  scope: string;
   match: string[];
 };
 
-export const contacts: Contact[] = [
-  {
-    id: 'andres',
-    name: 'Andrés',
-    email: 'andres@cksretrogarage.com',
-    // Latin America + Switzerland
-    match: [
-      'argentina',
-      'uruguay',
-      'peru',
-      'perú',
-      'colombia',
-      'panama',
-      'panamá',
-      'mexico',
-      'méxico',
-      'switzerland',
-      'schweiz',
-      'suisse',
-      'svizzera',
-      'suiza',
-    ],
-  },
-  {
-    id: 'cenk',
-    name: 'Cenk Köse',
-    email: 'cenk@cksretrogarage.com',
-    // USA, Türkiye, Netherlands
-    match: [
-      'usa',
-      'u.s.',
-      'united states',
-      'estados unidos',
-      'turkey',
-      'turkiye',
-      'türkiye',
-      'turkei',
-      'türkei',
-      'turquia',
-      'turquía',
-      'netherlands',
-      'nederland',
-      'holland',
-      'niederlande',
-      'países bajos',
-      'paises bajos',
-    ],
-  },
-];
+export const contacts: Contact[] = publicAgents.map((a) => ({
+  id: a.id,
+  name: a.name,
+  email: a.email,
+  scope: a.scope,
+  match: a.match,
+}));
 
-// Fallback inbox for countries that don't match a specific contact.
-export const defaultEmail = 'contact@cksretrogarage.com';
+export const defaultEmail = agentDefaultEmail;
 
 export function routeEmailFor(country = ''): string {
-  const c = country.trim().toLowerCase();
-  if (!c) return defaultEmail;
-  for (const contact of contacts) {
-    if (contact.match.some((m) => c.includes(m))) return contact.email;
-  }
-  return defaultEmail;
+  return routeAgentEmail(country);
 }

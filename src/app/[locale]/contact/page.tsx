@@ -35,9 +35,9 @@ export default async function ContactPage({
         <div className="mt-16 grid gap-x-8 gap-y-12 md:grid-cols-2">
           {contacts.map((c) => (
             <div key={c.id} className="reveal border-t border-bone/10 pt-6">
-              <div className="eyebrow mb-3">{tc(`${c.id}.label`)}</div>
+              <div className="eyebrow mb-3">{tc.has(`${c.id}.label`) ? tc(`${c.id}.label`) : c.scope}</div>
               <div className="font-serif text-2xl text-bone">{c.name}</div>
-              <div className="mt-1 text-sm text-bone-dim">{tc(`${c.id}.scope`)}</div>
+              <div className="mt-1 text-sm text-bone-dim">{tc.has(`${c.id}.scope`) ? tc(`${c.id}.scope`) : c.scope}</div>
               <a
                 href={`mailto:${c.email}`}
                 className="link-underline mt-4 inline-block text-sm text-brass"

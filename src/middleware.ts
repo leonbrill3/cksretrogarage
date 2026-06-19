@@ -24,6 +24,12 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // Agent Share dashboards: not localized. The secret token in the URL is the
+  // access gate, so no extra auth here.
+  if (pathname.startsWith('/agent')) {
+    return NextResponse.next();
+  }
+
   // Everything else goes through next-intl locale routing.
   return intlMiddleware(req);
 }

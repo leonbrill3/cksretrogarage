@@ -9,7 +9,8 @@
     "storage": "Bewaring",
     "about": "Over ons",
     "contact": "Contact",
-    "cta": "Vind Mijn Auto"
+    "cta": "Vind Mijn Auto",
+    "forSale": "Te Koop"
   },
   "footer": {
     "blurb": "Een privé-acquisitiehuis voor uitzonderlijke automobielen. Elke auto gezocht, gekeurd en geleverd met drie decennia aan expertise.",
@@ -73,6 +74,11 @@
       "title": "Vertel ons welke auto u zoekt.",
       "body": "Elk merk, elk tijdperk, waar ook ter wereld. Deel uw wensen en wij starten de zoektocht.",
       "button": "Start een Zoekopdracht"
+    },
+    "available": {
+      "eyebrow": "Te Koop",
+      "title": "Nu beschikbaar.",
+      "viewAll": "Bekijk alles"
     }
   },
   "collection": {
@@ -101,7 +107,24 @@
     "inMotion": "In Beweging",
     "filmEyebrow": "De Film",
     "filmTitle": "Zie hem in volle glorie.",
-    "watchFilm": "Bekijk de Film"
+    "watchFilm": "Bekijk de Film",
+    "forSaleBack": "Terug naar Te Koop",
+    "priceOnRequest": "Prijs op aanvraag",
+    "specsHeading": "Specificaties",
+    "locationLabel": "Locatie",
+    "status": {
+      "available": "Beschikbaar",
+      "reserved": "Gereserveerd",
+      "sold": "Verkocht"
+    },
+    "spec": {
+      "mileage": "Kilometerstand",
+      "transmission": "Transmissie",
+      "engine": "Motor",
+      "exterior": "Exterieur",
+      "interior": "Interieur",
+      "vin": "Chassis · VIN"
+    }
   },
   "process": {
     "metaTitle": "Onze Werkwijze",
@@ -282,5 +305,35 @@
       "label": "VS, Turkije & Nederland",
       "scope": "Verenigde Staten, Turkije & Nederland"
     }
+  },
+  "forSale": {
+    "metaTitle": "Auto's te koop",
+    "eyebrow": "Te Koop",
+    "title": "Nu beschikbaar.",
+    "intro": "Een samengestelde selectie uitzonderlijke auto's die nu beschikbaar zijn — elk gevonden, geïnspecteerd en gehouden volgens de standaard die wij bij elke aankoop hanteren.",
+    "note": "Elke auto wordt aangeboden via een van onze partners. Neem rechtstreeks contact op voor alle details, historie en een bezichtiging.",
+    "empty": "Er staan momenteel geen auto's te koop. Vertel ons wat u zoekt en wij vinden het.",
+    "emptyCta": "Auto laten zoeken"
+  },
+  "agent": {
+    "yourSpecialist": "Uw specialist",
+    "presentedBy": "Aangeboden door",
+    "whatsapp": "WhatsApp",
+    "call": "Bellen",
+    "email": "E-mail",
+    "speaks": "Talen"
+  },
+  "inquiry": {
+    "title": "Details aanvragen",
+    "name": "Naam",
+    "email": "E-mail",
+    "phone": "Telefoon (optioneel)",
+    "message": "Bericht",
+    "messagePlaceholder": "Ik heb interesse in deze auto — stuur mij alle details.",
+    "consent": "Ik ga akkoord met contact over deze aanvraag.",
+    "submit": "Aanvraag versturen",
+    "sending": "Versturen…",
+    "success": "Bedankt — we nemen spoedig contact op.",
+    "error": "Er ging iets mis. Probeer het opnieuw."
   }
 }

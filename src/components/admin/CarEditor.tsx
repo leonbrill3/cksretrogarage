@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import type { Car } from '@/data/cars';
+import type { Car, SaleStatus } from '@/data/cars';
 
 type ImgItem =
   | { kind: 'existing'; name: string; url: string }
@@ -65,6 +65,18 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
   const [inspEn, setInspEn] = useState((car.inspection.en || []).join('\n'));
   const [inspTr, setInspTr] = useState((car.inspection.tr || []).join('\n'));
 
+  // For-sale listing fields
+  const [forSale, setForSale] = useState(!!car.forSale);
+  const [price, setPrice] = useState(car.price || '');
+  const [saleStatus, setSaleStatus] = useState<SaleStatus>(car.status || 'available');
+  const [location, setLocation] = useState(car.location || '');
+  const [mileage, setMileage] = useState(car.specs?.mileage || '');
+  const [transmission, setTransmission] = useState(car.specs?.transmission || '');
+  const [engine, setEngine] = useState(car.specs?.engine || '');
+  const [exterior, setExterior] = useState(car.specs?.exterior || '');
+  const [interior, setInterior] = useState(car.specs?.interior || '');
+  const [vin, setVin] = useState(car.specs?.vin || '');
+
   const [images, setImages] = useState<ImgItem[]>(
     car.images.map((name) => ({ kind: 'existing', name, url: `/cars/${car.slug}/${name}` })),
   );
@@ -125,6 +137,18 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
         model: model.trim(),
         category,
         featured,
+        forSale,
+        price: price.trim(),
+        status: saleStatus,
+        location: location.trim(),
+        specs: {
+          mileage: mileage.trim(),
+          transmission: transmission.trim(),
+          engine: engine.trim(),
+          exterior: exterior.trim(),
+          interior: interior.trim(),
+          vin: vin.trim(),
+        },
         tagline: { en: tagEn, tr: tagTr },
         description: { en: descEn, tr: descTr },
         inspection: {
@@ -206,6 +230,82 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
           <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} className="accent-oxblood" />
           <span className="text-sm">Featured on homepage</span>
         </label>
+      </section>
+
+      {/* For Sale */}
+      <section className="border border-bone/10 bg-ink-800/40 p-5">
+        <label className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            checked={forSale}
+            onChange={(e) => setForSale(e.target.checked)}
+            className="accent-oxblood"
+          />
+          <span className="font-serif text-lg">List this car for sale</span>
+        </label>
+
+        {forSale && (
+          <div className="mt-6 space-y-5">
+            <div className="grid gap-5 sm:grid-cols-3">
+              <div>
+                <label className={label}>Price</label>
+                <input
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  className={field}
+                  placeholder="€185,000 or POA"
+                />
+              </div>
+              <div>
+                <label className={label}>Status</label>
+                <select value={saleStatus} onChange={(e) => setSaleStatus(e.target.value as SaleStatus)} className={field}>
+                  <option value="available">Available</option>
+                  <option value="reserved">Reserved</option>
+                  <option value="sold">Sold</option>
+                </select>
+              </div>
+              <div>
+                <label className={label}>Location</label>
+                <input
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className={field}
+                  placeholder="Istanbul, Türkiye"
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-2 text-[11px] uppercase tracking-[0.22em] text-bone-dim">Spec sheet (optional)</div>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label className={label}>Mileage</label>
+                  <input value={mileage} onChange={(e) => setMileage(e.target.value)} className={field} placeholder="42,000 km" />
+                </div>
+                <div>
+                  <label className={label}>Transmission</label>
+                  <input value={transmission} onChange={(e) => setTransmission(e.target.value)} className={field} placeholder="5-speed manual" />
+                </div>
+                <div>
+                  <label className={label}>Engine</label>
+                  <input value={engine} onChange={(e) => setEngine(e.target.value)} className={field} placeholder="3.0L V8" />
+                </div>
+                <div>
+                  <label className={label}>Exterior</label>
+                  <input value={exterior} onChange={(e) => setExterior(e.target.value)} className={field} placeholder="Rosso Corsa" />
+                </div>
+                <div>
+                  <label className={label}>Interior</label>
+                  <input value={interior} onChange={(e) => setInterior(e.target.value)} className={field} placeholder="Nero leather" />
+                </div>
+                <div>
+                  <label className={label}>Chassis / VIN</label>
+                  <input value={vin} onChange={(e) => setVin(e.target.value)} className={field} placeholder="ZFF…" />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Images */}

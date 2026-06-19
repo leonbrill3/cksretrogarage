@@ -36,7 +36,7 @@ export default function Footer({ locale }: { locale: string }) {
             <ul className="space-y-3 text-sm text-bone-muted">
               {contacts.map((c) => (
                 <li key={c.id}>
-                  {c.name} — {tc(`${c.id}.label`)}
+                  {c.name} — {tc.has(`${c.id}.label`) ? tc(`${c.id}.label`) : c.scope}
                 </li>
               ))}
             </ul>

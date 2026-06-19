@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
-import { cars, carImages } from '@/data/cars';
+import { cars, carImages, forSaleCars } from '@/data/cars';
 import CarCard from '@/components/CarCard';
 import ShowReel from '@/components/ShowReel';
 
@@ -13,9 +13,16 @@ export default async function Home({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('home');
+  const tc = await getTranslations('car');
 
   const hero = carImages(cars[0])[1] ?? carImages(cars[0])[0];
   const featured = cars.filter((c) => c.featured).slice(0, 3);
+  const forSale = forSaleCars().slice(0, 3);
+  const saleStatusLabels = {
+    available: tc('status.available'),
+    reserved: tc('status.reserved'),
+    sold: tc('status.sold'),
+  };
 
   const stats = [
     { value: '30+', key: 'years' },
@@ -136,6 +143,37 @@ export default async function Home({
           ))}
         </div>
       </section>
+
+      {/* AVAILABLE NOW — cars for sale */}
+      {forSale.length > 0 && (
+        <section className="border-t border-bone/10 bg-ink-800 py-24 md:py-32">
+          <div className="container-site">
+            <div className="mb-14 flex flex-wrap items-end justify-between gap-6">
+              <div>
+                <div className="eyebrow mb-5">{t('available.eyebrow')}</div>
+                <h2 className="h-display text-3xl text-bone md:text-5xl">{t('available.title')}</h2>
+              </div>
+              <Link href="/for-sale" className="btn-ghost">
+                {t('available.viewAll')}
+              </Link>
+            </div>
+            <div className="grid gap-x-6 gap-y-12 md:grid-cols-3">
+              {forSale.map((car, i) => (
+                <CarCard
+                  key={car.slug}
+                  car={car}
+                  priority={i === 0}
+                  locale={locale}
+                  hrefBase="for-sale"
+                  showSale
+                  statusLabels={saleStatusLabels}
+                  priceFallback={tc('priceOnRequest')}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CUSTODY / COLLECTION SUITES — panoramic showroom reel */}
       <section className="border-t border-bone/10 bg-ink-800">

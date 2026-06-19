@@ -34,9 +34,9 @@ export default async function AboutPage({
     { name: 'Cem Köse', img: 1, role: t('roles.founder'), bio: t('bios.founder') },
     ...contacts.map((c) => ({
       name: c.name,
-      img: PORTRAIT[c.id],
-      role: `${t('ceoLabel')} — ${tc(`${c.id}.label`)}`,
-      bio: t(`bios.${c.id}`),
+      img: PORTRAIT[c.id] ?? 3,
+      role: `${t('ceoLabel')} — ${tc.has(`${c.id}.label`) ? tc(`${c.id}.label`) : c.scope}`,
+      bio: t.has(`bios.${c.id}`) ? t(`bios.${c.id}`) : '',
     })),
   ];
 

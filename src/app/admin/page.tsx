@@ -76,28 +76,41 @@ export default function AdminDashboard() {
         {agents.map((agent) => {
           const photo = agentPhoto(agent);
           return (
-            <Link
+            <div
               key={agent.id}
-              href={`/admin/agents/${agent.id}`}
-              className="group flex items-center gap-4 border border-bone/10 bg-ink-800 p-3 transition-colors hover:border-bone/30"
+              className="flex items-center gap-4 border border-bone/10 bg-ink-800 p-3"
             >
-              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-ink-700">
-                {photo ? (
-                  <Image src={photo} alt="" fill sizes="56px" className="object-cover" />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center font-serif text-lg text-brass">
-                    {agent.name.slice(0, 1)}
-                  </div>
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="truncate font-serif text-lg group-hover:text-brass">{agent.name}</div>
-                <div className="mt-0.5 truncate text-xs text-bone-dim">{agent.scope}</div>
-                <div className="mt-0.5 truncate text-[11px] text-bone-dim">
-                  {agent.token ? 'has share link' : 'no share link'}
+              <Link
+                href={`/admin/agents/${agent.id}`}
+                className="group flex min-w-0 flex-1 items-center gap-4"
+              >
+                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-ink-700">
+                  {photo ? (
+                    <Image src={photo} alt="" fill sizes="56px" className="object-cover" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center font-serif text-lg text-brass">
+                      {agent.name.slice(0, 1)}
+                    </div>
+                  )}
                 </div>
-              </div>
-            </Link>
+                <div className="min-w-0 flex-1">
+                  <div className="truncate font-serif text-lg group-hover:text-brass">{agent.name}</div>
+                  <div className="mt-0.5 truncate text-xs text-bone-dim">{agent.scope}</div>
+                  <div className="mt-0.5 truncate text-[11px] text-bone-dim">Edit profile →</div>
+                </div>
+              </Link>
+              {agent.token && (
+                <a
+                  href={`/agent/${agent.token}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 self-stretch flex items-center border border-brass/40 px-3 text-[11px] uppercase tracking-label text-brass transition-colors hover:bg-brass hover:text-ink-900"
+                  title="Open this agent's share dashboard to send listings"
+                >
+                  Open to send ↗
+                </a>
+              )}
+            </div>
           );
         })}
       </div>

@@ -257,7 +257,18 @@ export default function AgentEditor({ agent, isNew }: { agent: Agent; isNew: boo
             <button onClick={copyLink} className="btn-ghost !py-1.5 !px-3 text-xs">
               {copied ? '✓ Copied' : 'Copy'}
             </button>
+            <a
+              href={shareLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary !py-1.5 !px-3 text-xs"
+            >
+              Open share dashboard ↗
+            </a>
           </div>
+          <p className="mt-3 text-xs text-bone-dim">
+            Send the link to the agent — or open it yourself to share listings on their behalf.
+          </p>
         </section>
       )}
 

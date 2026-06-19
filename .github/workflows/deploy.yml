@@ -1,0 +1,28 @@
+name: Deploy to Render
+
+# The native GitHub→Render webhook is missing on this repo, so pushes to main
+# weren't triggering Render's auto-deploy. This workflow restores that: every
+# push to main calls the Render API to deploy the latest commit.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy
+        run: |
+          echo "Triggering Render deploy for commit ${GITHUB_SHA}…"
+          http_code=$(curl -sS -o /tmp/resp.json -w '%{http_code}' -X POST \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
+            -d '{"clearCache":"do_not_clear"}')
+          echo "HTTP $http_code"
+          cat /tmp/resp.json
+          if [ "$http_code" -ge 300 ]; then
+            echo "::error::Render deploy request failed (HTTP $http_code)"
+            exit 1
+          fi

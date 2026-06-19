@@ -1,80 +1,54 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { Link } from '@/i18n/routing';
-import { getCar, carImages, carTitle, carText, carList, specEntries } from '@/data/cars';
+import { getCar, carImages, carTitle, carText, carList, specEntries, formatMoney } from '@/data/cars';
 import { getAgent } from '@/data/agents';
+import { verifyQuote } from '@/lib/quote';
 import Gallery from '@/components/Gallery';
 import AgentCard from '@/components/AgentCard';
 
 const SITE = 'https://cksretrogarage.com';
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string; slug: string }>;
-}): Promise<Metadata> {
-  const { locale, slug } = await params;
-  const car = getCar(slug);
-  if (!car) return {};
-  return { title: `${carTitle(car)} — For Sale`, description: carText(car.tagline, locale) };
-}
+// Private quote pages must never be indexed.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
-export default async function ForSaleCarPage({
+export default async function QuotePage({
   params,
-  searchParams,
 }: {
-  params: Promise<{ locale: string; slug: string }>;
-  searchParams: Promise<{ a?: string }>;
+  params: Promise<{ locale: string; token: string }>;
 }) {
-  const { locale, slug } = await params;
-  const { a } = await searchParams;
+  const { locale, token } = await params;
   setRequestLocale(locale);
 
-  const car = getCar(slug);
-  if (!car || !car.forSale) notFound();
+  const quote = await verifyQuote(token);
+  if (!quote) notFound();
+
+  const car = getCar(quote.c);
+  const agent = getAgent(quote.a);
+  if (!car || !agent) notFound();
 
   const t = await getTranslations('car');
+  const tq = await getTranslations('quote');
   const images = carImages(car);
-  const agent = getAgent(a);
-  const status = car.status || 'available';
   const specs = specEntries(car.specs);
-  const price = (car.price || '').trim() || t('priceOnRequest');
-  const shareUrl = `${SITE}/${locale}/for-sale/${slug}${agent ? `?a=${agent.id}` : ''}`;
-
-  const statusLabel = t(`status.${status}`);
-  const statusClass =
-    status === 'sold'
-      ? 'bg-ink-700 text-bone-dim'
-      : status === 'reserved'
-        ? 'bg-oxblood text-bone'
-        : 'bg-brass text-ink-900';
+  const price = formatMoney(quote.p, car.currency || 'EUR');
+  const shareUrl = `${SITE}/${locale}/q/${token}`;
 
   return (
     <article className="pt-28">
       <div className="container-site">
-        <Link
-          href="/for-sale"
-          className="link-underline text-[11px] uppercase tracking-label text-bone-dim hover:text-bone"
-        >
-          ← {t('forSaleBack')}
-        </Link>
-
-        <header className="mt-8 grid gap-8 border-b border-bone/10 pb-12 md:grid-cols-[1.5fr_1fr] md:items-end">
+        <header className="grid gap-8 border-b border-bone/10 pb-12 md:grid-cols-[1.5fr_1fr] md:items-end">
           <div>
-            <div className="mb-4 flex items-center gap-3">
-              <span className="eyebrow">{car.year} · {t(`category.${car.category}`)}</span>
-              <span className={`px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.18em] ${statusClass}`}>
-                {statusLabel}
-              </span>
-            </div>
+            <div className="eyebrow mb-4">{car.year} · {t(`category.${car.category}`)}</div>
             <h1 className="h-display text-4xl text-bone md:text-6xl">
               {car.make} {car.model}
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-bone-muted">{carText(car.tagline, locale)}</p>
           </div>
           <div className="md:text-right">
-            <div className="text-sm text-bone-dim">{t('priceLabel')}</div>
+            <div className="text-sm text-bone-dim">{tq('priceLabel')}</div>
             <div className="mt-1 font-serif text-3xl text-brass">{price}</div>
             {car.location && (
               <div className="mt-3 text-sm text-bone-dim">
@@ -125,13 +99,12 @@ export default async function ForSaleCarPage({
           )}
         </div>
 
-        {/* Co-branded contact */}
         <div className="md:sticky md:top-28 md:self-start">
           <AgentCard
             agent={agent}
             locale={locale}
             carTitle={carTitle(car)}
-            carSlug={slug}
+            carSlug={car.slug}
             shareUrl={shareUrl}
           />
         </div>

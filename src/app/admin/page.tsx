@@ -56,7 +56,7 @@ export default function AdminDashboard() {
               <div className="mt-1 text-xs text-bone-dim">
                 {car.images.length} photos · {car.category}
                 {car.featured ? ' · ★ featured' : ''}
-                {car.forSale ? ` · ● for sale${car.status && car.status !== 'available' ? ` (${car.status})` : ''}` : ''}
+                {car.sellable ? ` · ● sellable${car.minPrice ? ` (min ${car.currency || 'EUR'} ${car.minPrice.toLocaleString('en-US')})` : ''}` : ''}
               </div>
               <div className="mt-1 truncate text-xs text-bone-dim">{car.tagline.en}</div>
             </div>

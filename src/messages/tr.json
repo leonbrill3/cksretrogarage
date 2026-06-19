@@ -9,8 +9,7 @@
     "storage": "Muhafaza",
     "about": "Hakkımızda",
     "contact": "İletişim",
-    "cta": "Aracımı Buldur",
-    "forSale": "Satılık"
+    "cta": "Aracımı Buldur"
   },
   "footer": {
     "blurb": "Olağanüstü otomobiller için özel bir tedarik kuruluşu. Her otomobil, otuz yıllık uzmanlıkla bulunur, incelenir ve teslim edilir.",
@@ -74,11 +73,6 @@
       "title": "Aradığınız otomobili bize anlatın.",
       "body": "Her marka, her dönem, dünyanın her yerinde. Taleplerinizi paylaşın, aramaya başlayalım.",
       "button": "Tedarik Talebi Başlat"
-    },
-    "available": {
-      "eyebrow": "Satılık",
-      "title": "Şimdi mevcut.",
-      "viewAll": "Tümünü gör"
     }
   },
   "collection": {
@@ -108,15 +102,8 @@
     "filmEyebrow": "Film",
     "filmTitle": "Tüm sesiyle izleyin.",
     "watchFilm": "Filmi İzle",
-    "forSaleBack": "Satılığa Dön",
-    "priceOnRequest": "Fiyat için sorunuz",
     "specsHeading": "Teknik Özellikler",
     "locationLabel": "Konum",
-    "status": {
-      "available": "Mevcut",
-      "reserved": "Rezerve",
-      "sold": "Satıldı"
-    },
     "spec": {
       "mileage": "Kilometre",
       "transmission": "Şanzıman",
@@ -306,15 +293,6 @@
       "scope": "Amerika Birleşik Devletleri, Türkiye ve Hollanda"
     }
   },
-  "forSale": {
-    "metaTitle": "Satılık Otomobiller",
-    "eyebrow": "Satılık",
-    "title": "Şimdi mevcut.",
-    "intro": "Şu anda satışa sunulan, özenle seçilmiş istisnai otomobiller — her biri her alımda uyguladığımız standartta bulundu ve incelendi.",
-    "note": "Her otomobil ortaklarımızdan biri aracılığıyla sunulmaktadır. Tüm detaylar, geçmiş ve görüntüleme için doğrudan onlarla iletişime geçin.",
-    "empty": "Şu anda satılık otomobil bulunmuyor. Ne aradığınızı bize söyleyin, sizin için bulalım.",
-    "emptyCta": "Otomobil Buldur"
-  },
   "agent": {
     "yourSpecialist": "Uzmanınız",
     "presentedBy": "Sunan",
@@ -335,5 +313,8 @@
     "sending": "Gönderiliyor…",
     "success": "Teşekkürler — kısa süre içinde sizinle iletişime geçeceğiz.",
     "error": "Bir şeyler ters gitti. Lütfen tekrar deneyin."
+  },
+  "quote": {
+    "priceLabel": "Fiyat"
   }
 }

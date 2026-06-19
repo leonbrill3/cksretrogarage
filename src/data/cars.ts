@@ -4,9 +4,7 @@ import carsData from '../../content/cars.json';
 export type Localized = { en: string; tr?: string };
 export type LocalizedList = { en: string[]; tr?: string[] };
 
-export type SaleStatus = 'available' | 'reserved' | 'sold';
-
-// Optional technical spec sheet shown on cars that are for sale.
+// Optional technical spec sheet shown on the private quote page.
 export type CarSpecs = {
   mileage?: string;
   transmission?: string;
@@ -32,10 +30,11 @@ export type Car = {
   clip?: string;
   film?: string;
   filmPoster?: string;
-  // Sale listing fields — present on cars actively offered for sale.
-  forSale?: boolean;
-  price?: string; // free text, e.g. "€185,000" or "Price on application"
-  status?: SaleStatus;
+  // Internal selling fields — NEVER rendered on public pages. Agents quote
+  // customers above `minPrice`; minimum & commission stay private.
+  sellable?: boolean;
+  minPrice?: number; // CK's floor, in `currency`
+  currency?: string; // ISO code, e.g. "EUR", "USD", "GBP"
   location?: string;
   specs?: CarSpecs;
 };
@@ -46,11 +45,22 @@ export function getCar(slug: string): Car | undefined {
   return cars.find((c) => c.slug === slug);
 }
 
-// Cars actively offered for sale, sold listings sorted to the end.
-export function forSaleCars(): Car[] {
-  return cars
-    .filter((c) => c.forSale)
-    .sort((a, b) => Number(a.status === 'sold') - Number(b.status === 'sold'));
+// Cars an agent may quote (sellable + a minimum price set).
+export function sellableCars(): Car[] {
+  return cars.filter((c) => c.sellable && typeof c.minPrice === 'number');
+}
+
+// Format an amount in a car's currency (falls back to EUR).
+export function formatMoney(amount: number, currency = 'EUR'): string {
+  try {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  } catch {
+    return `${currency} ${Math.round(amount).toLocaleString('en-US')}`;
+  }
 }
 
 // Non-empty spec entries as [key, value] pairs, in display order.

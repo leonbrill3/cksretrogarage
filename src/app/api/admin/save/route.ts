@@ -38,9 +38,9 @@ type CarRecord = {
   clip?: string;
   film?: string;
   filmPoster?: string;
-  forSale?: boolean;
-  price?: string;
-  status?: string;
+  sellable?: boolean;
+  minPrice?: number;
+  currency?: string;
   location?: string;
   specs?: Record<string, string>;
 };
@@ -150,10 +150,10 @@ export async function POST(req: NextRequest) {
     description: normLoc(car.description, previous?.description),
     inspection: normList(car.inspection, previous?.inspection),
   };
-  if (car.forSale) {
-    record.forSale = true;
-    record.price = (car.price || '').trim();
-    record.status = (car.status as string) || 'available';
+  if (car.sellable) {
+    record.sellable = true;
+    if (typeof car.minPrice === 'number' && car.minPrice > 0) record.minPrice = car.minPrice;
+    record.currency = (car.currency as string) || 'EUR';
     const loc = (car.location || '').trim();
     if (loc) record.location = loc;
     const specs = cleanSpecs(car.specs);

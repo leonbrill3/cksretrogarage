@@ -2,7 +2,9 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import type { Car, SaleStatus } from '@/data/cars';
+import type { Car } from '@/data/cars';
+
+const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF', 'AED'] as const;
 
 type ImgItem =
   | { kind: 'existing'; name: string; url: string }
@@ -65,10 +67,10 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
   const [inspEn, setInspEn] = useState((car.inspection.en || []).join('\n'));
   const [inspTr, setInspTr] = useState((car.inspection.tr || []).join('\n'));
 
-  // For-sale listing fields
-  const [forSale, setForSale] = useState(!!car.forSale);
-  const [price, setPrice] = useState(car.price || '');
-  const [saleStatus, setSaleStatus] = useState<SaleStatus>(car.status || 'available');
+  // Internal selling fields (never shown publicly)
+  const [sellable, setSellable] = useState(!!car.sellable);
+  const [minPrice, setMinPrice] = useState(car.minPrice != null ? String(car.minPrice) : '');
+  const [currency, setCurrency] = useState(car.currency || 'EUR');
   const [location, setLocation] = useState(car.location || '');
   const [mileage, setMileage] = useState(car.specs?.mileage || '');
   const [transmission, setTransmission] = useState(car.specs?.transmission || '');
@@ -137,9 +139,9 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
         model: model.trim(),
         category,
         featured,
-        forSale,
-        price: price.trim(),
-        status: saleStatus,
+        sellable,
+        minPrice: minPrice.trim() ? Number(minPrice.replace(/[^0-9.]/g, '')) : undefined,
+        currency,
         location: location.trim(),
         specs: {
           mileage: mileage.trim(),
@@ -232,36 +234,39 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
         </label>
       </section>
 
-      {/* For Sale */}
+      {/* Selling (internal only) */}
       <section className="border border-bone/10 bg-ink-800/40 p-5">
         <label className="flex items-center gap-3">
           <input
             type="checkbox"
-            checked={forSale}
-            onChange={(e) => setForSale(e.target.checked)}
+            checked={sellable}
+            onChange={(e) => setSellable(e.target.checked)}
             className="accent-oxblood"
           />
-          <span className="font-serif text-lg">List this car for sale</span>
+          <span className="font-serif text-lg">Make this car sellable (agents can quote it)</span>
         </label>
 
-        {forSale && (
+        {sellable && (
           <div className="mt-6 space-y-5">
+            <div className="rounded border border-brass/30 bg-ink-900/40 p-3 text-xs leading-relaxed text-bone-dim">
+              🔒 The minimum price is <strong>internal only</strong> — agents see it, customers never
+              do. Agents quote above it and earn 70% of the difference.
+            </div>
             <div className="grid gap-5 sm:grid-cols-3">
               <div>
-                <label className={label}>Price</label>
+                <label className={label}>Minimum price (your floor)</label>
                 <input
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
+                  value={minPrice}
+                  onChange={(e) => setMinPrice(e.target.value)}
                   className={field}
-                  placeholder="€185,000 or POA"
+                  inputMode="numeric"
+                  placeholder="185000"
                 />
               </div>
               <div>
-                <label className={label}>Status</label>
-                <select value={saleStatus} onChange={(e) => setSaleStatus(e.target.value as SaleStatus)} className={field}>
-                  <option value="available">Available</option>
-                  <option value="reserved">Reserved</option>
-                  <option value="sold">Sold</option>
+                <label className={label}>Currency</label>
+                <select value={currency} onChange={(e) => setCurrency(e.target.value)} className={field}>
+                  {CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
               <div>

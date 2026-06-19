@@ -9,8 +9,7 @@
     "storage": "Custody",
     "about": "About",
     "contact": "Contact",
-    "cta": "Source My Car",
-    "forSale": "For Sale"
+    "cta": "Source My Car"
   },
   "footer": {
     "blurb": "A private acquisition house for exceptional automobiles. Every car sourced, inspected and delivered with three decades of expertise.",
@@ -74,11 +73,6 @@
       "title": "Tell us the car you want.",
       "body": "Any make, any era, anywhere in the world. Share your brief and we will begin the search.",
       "button": "Start a Sourcing Request"
-    },
-    "available": {
-      "eyebrow": "For Sale",
-      "title": "Available now.",
-      "viewAll": "View all"
     }
   },
   "collection": {
@@ -108,15 +102,8 @@
     "filmEyebrow": "The Film",
     "filmTitle": "See it in full voice.",
     "watchFilm": "Watch the Film",
-    "forSaleBack": "Back to For Sale",
-    "priceOnRequest": "Price on application",
     "specsHeading": "Specification",
     "locationLabel": "Location",
-    "status": {
-      "available": "Available",
-      "reserved": "Reserved",
-      "sold": "Sold"
-    },
     "spec": {
       "mileage": "Mileage",
       "transmission": "Transmission",
@@ -306,15 +293,6 @@
       "scope": "United States, Türkiye & Netherlands"
     }
   },
-  "forSale": {
-    "metaTitle": "Cars for Sale",
-    "eyebrow": "For Sale",
-    "title": "Available now.",
-    "intro": "A curated selection of exceptional cars currently available — each one sourced, inspected and held to the standard we apply to every acquisition.",
-    "note": "Each car is offered through one of our partners. Contact them directly for full details, history and a viewing.",
-    "empty": "No cars are listed for sale right now. Tell us what you're looking for and we'll source it.",
-    "emptyCta": "Source a Car"
-  },
   "agent": {
     "yourSpecialist": "Your specialist",
     "presentedBy": "Presented by",
@@ -335,5 +313,8 @@
     "sending": "Sending…",
     "success": "Thank you — we'll be in touch shortly.",
     "error": "Something went wrong. Please try again."
+  },
+  "quote": {
+    "priceLabel": "Price"
   }
 }

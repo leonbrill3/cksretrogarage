@@ -9,8 +9,7 @@
     "storage": "Custodia",
     "about": "Quiénes Somos",
     "contact": "Contacto",
-    "cta": "Encuentre Mi Auto",
-    "forSale": "En Venta"
+    "cta": "Encuentre Mi Auto"
   },
   "footer": {
     "blurb": "Una casa privada de adquisición de automóviles excepcionales. Cada auto buscado, inspeccionado y entregado con tres décadas de experiencia.",
@@ -74,11 +73,6 @@
       "title": "Díganos qué auto desea.",
       "body": "Cualquier marca, cualquier época, en cualquier lugar del mundo. Comparta su requerimiento y comenzaremos la búsqueda.",
       "button": "Iniciar una Solicitud de Búsqueda"
-    },
-    "available": {
-      "eyebrow": "En Venta",
-      "title": "Disponibles ahora.",
-      "viewAll": "Ver todo"
     }
   },
   "collection": {
@@ -108,15 +102,8 @@
     "filmEyebrow": "El Film",
     "filmTitle": "Véalo a plena voz.",
     "watchFilm": "Ver el Film",
-    "forSaleBack": "Volver a En Venta",
-    "priceOnRequest": "Precio a consultar",
     "specsHeading": "Especificaciones",
     "locationLabel": "Ubicación",
-    "status": {
-      "available": "Disponible",
-      "reserved": "Reservado",
-      "sold": "Vendido"
-    },
     "spec": {
       "mileage": "Kilometraje",
       "transmission": "Transmisión",
@@ -306,15 +293,6 @@
       "scope": "Estados Unidos, Turquía y Países Bajos"
     }
   },
-  "forSale": {
-    "metaTitle": "Coches en Venta",
-    "eyebrow": "En Venta",
-    "title": "Disponibles ahora.",
-    "intro": "Una selección curada de automóviles excepcionales actualmente disponibles — cada uno encontrado, inspeccionado y mantenido según el estándar que aplicamos a cada adquisición.",
-    "note": "Cada coche se ofrece a través de uno de nuestros socios. Contáctelos directamente para todos los detalles, historial y una visita.",
-    "empty": "No hay coches en venta en este momento. Díganos qué busca y lo encontraremos.",
-    "emptyCta": "Buscar un Coche"
-  },
   "agent": {
     "yourSpecialist": "Su especialista",
     "presentedBy": "Presentado por",
@@ -335,5 +313,8 @@
     "sending": "Enviando…",
     "success": "Gracias — nos pondremos en contacto pronto.",
     "error": "Algo salió mal. Por favor, inténtelo de nuevo."
+  },
+  "quote": {
+    "priceLabel": "Precio"
   }
 }

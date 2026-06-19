@@ -85,16 +85,16 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
   const [status, setStatus] = useState<'idle' | 'saving' | 'done' | 'error'>('idle');
   const [message, setMessage] = useState('');
   const [viewer, setViewer] = useState<number | null>(null);
+  const [dragging, setDragging] = useState(false);
 
   function autoSlug(nextYear = year, nextMake = make, nextModel = model) {
     if (isNew && !slugTouched) setSlug(slugify(`${nextYear} ${nextMake} ${nextModel}`));
   }
 
-  async function onPick(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files || []);
-    e.target.value = '';
+  async function addFiles(files: File[]) {
+    const imgs = files.filter((f) => f.type.startsWith('image/'));
     const added: ImgItem[] = [];
-    for (const f of files) {
+    for (const f of imgs) {
       try {
         const data = await resizeFile(f);
         added.push({ kind: 'new', data, url: data });
@@ -102,7 +102,19 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
         /* skip unreadable */
       }
     }
-    setImages((prev) => [...prev, ...added]);
+    if (added.length) setImages((prev) => [...prev, ...added]);
+  }
+
+  async function onPick(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    await addFiles(files);
+  }
+
+  async function onDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragging(false);
+    await addFiles(Array.from(e.dataTransfer?.files || []));
   }
 
   function move(i: number, dir: -1 | 1) {
@@ -309,13 +321,20 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
       </section>
 
       {/* Images */}
-      <section>
+      <section
+        onDragOver={(e) => { e.preventDefault(); if (!dragging) setDragging(true); }}
+        onDragLeave={(e) => { if (e.currentTarget === e.target) setDragging(false); }}
+        onDrop={onDrop}
+        className={`rounded p-3 transition-colors ${dragging ? 'bg-brass/10 ring-2 ring-brass' : 'ring-1 ring-transparent'}`}
+      >
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-serif text-lg">Photos ({images.length})</h2>
           <button onClick={() => fileRef.current?.click()} className="btn-ghost !py-2">+ Add photos</button>
           <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={onPick} />
         </div>
-        <p className="mb-4 text-xs text-bone-dim">First photo is the cover. Drag-free reorder with the arrows.</p>
+        <p className="mb-4 text-xs text-bone-dim">
+          Drag photos here from your desktop, or click “Add photos”. First photo is the cover; reorder with the arrows.
+        </p>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {images.map((im, i) => (
             <div key={im.kind === 'existing' ? im.name : `new-${i}`} className="group relative aspect-[4/3] overflow-hidden bg-ink-700">
@@ -337,6 +356,16 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
               </div>
             </div>
           ))}
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            className={`flex aspect-[4/3] flex-col items-center justify-center gap-1 border-2 border-dashed text-xs transition-colors ${
+              dragging ? 'border-brass text-brass' : 'border-bone/20 text-bone-dim hover:border-brass/60 hover:text-bone'
+            }`}
+          >
+            <span className="text-2xl leading-none">+</span>
+            <span className="px-2 text-center">Drop photos here<br />or click to add</span>
+          </button>
         </div>
       </section>
 

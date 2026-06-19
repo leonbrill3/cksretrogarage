@@ -77,7 +77,6 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
   const [engine, setEngine] = useState(car.specs?.engine || '');
   const [exterior, setExterior] = useState(car.specs?.exterior || '');
   const [interior, setInterior] = useState(car.specs?.interior || '');
-  const [vin, setVin] = useState(car.specs?.vin || '');
 
   const [images, setImages] = useState<ImgItem[]>(
     car.images.map((name) => ({ kind: 'existing', name, url: `/cars/${car.slug}/${name}` })),
@@ -85,6 +84,7 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
 
   const [status, setStatus] = useState<'idle' | 'saving' | 'done' | 'error'>('idle');
   const [message, setMessage] = useState('');
+  const [viewer, setViewer] = useState<number | null>(null);
 
   function autoSlug(nextYear = year, nextMake = make, nextModel = model) {
     if (isNew && !slugTouched) setSlug(slugify(`${nextYear} ${nextMake} ${nextModel}`));
@@ -149,7 +149,6 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
           engine: engine.trim(),
           exterior: exterior.trim(),
           interior: interior.trim(),
-          vin: vin.trim(),
         },
         tagline: { en: tagEn, tr: tagTr },
         description: { en: descEn, tr: descTr },
@@ -303,10 +302,6 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
                   <label className={label}>Interior</label>
                   <input value={interior} onChange={(e) => setInterior(e.target.value)} className={field} placeholder="Nero leather" />
                 </div>
-                <div>
-                  <label className={label}>Chassis / VIN</label>
-                  <input value={vin} onChange={(e) => setVin(e.target.value)} className={field} placeholder="ZFF…" />
-                </div>
               </div>
             </div>
           </div>
@@ -325,7 +320,13 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
           {images.map((im, i) => (
             <div key={im.kind === 'existing' ? im.name : `new-${i}`} className="group relative aspect-[4/3] overflow-hidden bg-ink-700">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={im.url} alt="" className="h-full w-full object-cover" />
+              <img
+                src={im.url}
+                alt=""
+                onClick={() => setViewer(i)}
+                className="h-full w-full cursor-zoom-in object-cover"
+                title="Click to enlarge"
+              />
               {i === 0 && <span className="absolute left-1.5 top-1.5 bg-brass px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider text-ink-900">Cover</span>}
               {im.kind === 'new' && <span className="absolute right-1.5 top-1.5 bg-oxblood px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-bone">New</span>}
               <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-ink-900/80 px-1.5 py-1 opacity-0 transition-opacity group-hover:opacity-100">
@@ -364,6 +365,50 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
           <span className={`text-sm ${status === 'error' ? 'text-oxblood-light' : 'text-brass'}`}>{message}</span>
         )}
       </section>
+
+      {/* Full-screen photo viewer */}
+      {viewer !== null && images[viewer] && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-ink-900/97 p-4"
+          onClick={() => setViewer(null)}
+        >
+          <button
+            className="absolute right-6 top-6 text-2xl text-bone-muted hover:text-bone"
+            onClick={() => setViewer(null)}
+            aria-label="Close"
+          >
+            ✕
+          </button>
+          {images.length > 1 && (
+            <button
+              className="absolute left-4 top-1/2 -translate-y-1/2 p-4 text-3xl text-bone-muted hover:text-bone"
+              onClick={(e) => { e.stopPropagation(); setViewer((v) => (v === null ? null : (v - 1 + images.length) % images.length)); }}
+              aria-label="Previous"
+            >
+              ‹
+            </button>
+          )}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={images[viewer].url}
+            alt=""
+            onClick={(e) => e.stopPropagation()}
+            className="max-h-[88vh] max-w-[92vw] object-contain"
+          />
+          {images.length > 1 && (
+            <button
+              className="absolute right-4 top-1/2 -translate-y-1/2 p-4 text-3xl text-bone-muted hover:text-bone"
+              onClick={(e) => { e.stopPropagation(); setViewer((v) => (v === null ? null : (v + 1) % images.length)); }}
+              aria-label="Next"
+            >
+              ›
+            </button>
+          )}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs tracking-label text-bone-dim">
+            {viewer + 1} / {images.length}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

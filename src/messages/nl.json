@@ -109,8 +109,7 @@
       "transmission": "Transmissie",
       "engine": "Motor",
       "exterior": "Exterieur",
-      "interior": "Interieur",
-      "vin": "Chassis · VIN"
+      "interior": "Interieur"
     }
   },
   "process": {

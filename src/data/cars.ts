@@ -11,7 +11,6 @@ export type CarSpecs = {
   engine?: string;
   exterior?: string;
   interior?: string;
-  vin?: string;
 };
 
 export type Car = {
@@ -72,7 +71,6 @@ export function specEntries(specs: CarSpecs | undefined): [keyof CarSpecs, strin
     'engine',
     'exterior',
     'interior',
-    'vin',
   ];
   return order
     .map((k) => [k, (specs[k] || '').trim()] as [keyof CarSpecs, string])

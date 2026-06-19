@@ -109,8 +109,7 @@
       "transmission": "Getriebe",
       "engine": "Motor",
       "exterior": "Außen",
-      "interior": "Innen",
-      "vin": "Fahrgestell · VIN"
+      "interior": "Innen"
     }
   },
   "process": {

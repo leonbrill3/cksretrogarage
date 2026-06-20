@@ -330,7 +330,9 @@
       "tr": []
     },
     "sellable": true,
-    "currency": "EUR",
-    "clip": "/cars/ferrari-599/clip-mqln0byz.mp4"
+    "currency": "USD",
+    "clip": "/cars/ferrari-599/clip-mqln0byz.mp4",
+    "minPrice": 145000,
+    "location": "Miami, FL"
   }
 ]

@@ -194,6 +194,13 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
   }
 
   async function save() {
+    // A sellable car must have a minimum price, or it can't be quoted and won't
+    // appear in agents' dashboards.
+    if (sellable && !(Number(minPrice.replace(/[^0-9.]/g, '')) > 0)) {
+      setStatus('error');
+      setMessage('Set a minimum price — a sellable car needs a floor before agents can quote it.');
+      return;
+    }
     setStatus('saving');
     setMessage('');
     // clip: undefined = keep, null = remove, {data}/{url} = set

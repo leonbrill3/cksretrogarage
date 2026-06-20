@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'node:crypto';
 import { ADMIN_COOKIE, verifySessionToken } from '@/lib/admin-auth';
-import { commitFiles } from '@/lib/github';
-import { getAgents, saveAgents } from '@/lib/store';
+import { getAgents, saveAgents, putMedia } from '@/lib/store';
 import { sendEmail, welcomeEmail } from '@/lib/email';
 import type { Agent } from '@/data/agents';
 
@@ -13,23 +12,6 @@ function baseUrl(req: NextRequest): string {
   if (origin) return origin.replace(/\/$/, '');
   const host = req.headers.get('x-forwarded-host') || req.headers.get('host');
   return host ? `https://${host}` : req.nextUrl.origin;
-}
-
-async function triggerRedeploy(): Promise<void> {
-  const hook = process.env.RENDER_DEPLOY_HOOK;
-  if (hook) {
-    await fetch(hook, { method: 'POST' }).catch(() => {});
-    return;
-  }
-  const key = process.env.RENDER_API_KEY;
-  const svc = process.env.RENDER_SERVICE_ID;
-  if (key && svc) {
-    await fetch(`https://api.render.com/v1/services/${svc}/deploys`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: '{}',
-    }).catch(() => {});
-  }
 }
 
 type AgentRecord = {
@@ -80,11 +62,9 @@ export async function POST(req: NextRequest) {
   // ----- Delete -----
   if (deleteAgent && originalId) {
     const existing = list.find((a) => a.id === originalId);
+    void existing;
     const next = list.filter((a) => a.id !== originalId);
     await saveAgents(next as unknown as Agent[]);
-    if (existing?.photo) {
-      await commitFiles({ message: `admin: delete agent ${originalId} photo`, deletePaths: [`public/agents/${existing.photo}`] }).catch(() => {});
-    }
     return NextResponse.json({ ok: true, deleted: originalId });
   }
 
@@ -102,14 +82,12 @@ export async function POST(req: NextRequest) {
 
   const previous = !isNew ? list.find((a) => a.id === (originalId || id)) : undefined;
 
-  // ----- Photo upload -----
-  const binaryFiles: { path: string; base64: string }[] = [];
+  // ----- Photo upload → DB (instant, no redeploy) -----
   let photoName = previous?.photo || '';
   if (photo && photo.data) {
-    const ext = (photo.ext || 'jpg').replace(/[^a-z0-9]/gi, '').toLowerCase() || 'jpg';
-    photoName = `${id}.${ext}`;
     const base64 = photo.data.includes(',') ? photo.data.split(',')[1] : photo.data;
-    binaryFiles.push({ path: `public/agents/${photoName}`, base64 });
+    const mediaId = await putMedia('image/jpeg', Buffer.from(base64, 'base64'));
+    photoName = `/api/media/${mediaId}`;
   }
 
   const record: AgentRecord = {
@@ -132,12 +110,8 @@ export async function POST(req: NextRequest) {
     : list.map((a) => (a.id === (originalId || id) ? record : a));
 
   try {
-    // Agent data → database (instant). Photo file (if any) → repo + redeploy.
+    // Everything (incl. photo) is in the DB now — instant, no redeploy.
     await saveAgents(next as unknown as Agent[]);
-    if (binaryFiles.length) {
-      await commitFiles({ message: `admin: ${id} photo`, binaryFiles });
-      await triggerRedeploy();
-    }
 
     // Welcome a brand-new agent with their private dashboard link.
     let welcomed: boolean | undefined;

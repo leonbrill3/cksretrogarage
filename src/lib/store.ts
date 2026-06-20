@@ -3,6 +3,7 @@
 // Falls back to the bundled JSON on read if the DB is ever unreachable.
 
 import { Pool } from 'pg';
+import { randomUUID } from 'node:crypto';
 import bundledCars from '../../content/cars.json';
 import bundledAgents from '../../content/agents.json';
 import type { Car } from '@/data/cars';
@@ -25,6 +26,9 @@ async function ensureSchema() {
   if (!pool || schemaReady) return;
   await pool.query(
     'CREATE TABLE IF NOT EXISTS app_data (key text PRIMARY KEY, value jsonb NOT NULL, updated_at timestamptz DEFAULT now())',
+  );
+  await pool.query(
+    'CREATE TABLE IF NOT EXISTS media (id text PRIMARY KEY, content_type text NOT NULL, bytes bytea NOT NULL, created_at timestamptz DEFAULT now())',
   );
   schemaReady = true;
 }
@@ -69,4 +73,26 @@ export async function getAgents(): Promise<Agent[]> {
 }
 export async function saveAgents(agents: Agent[]): Promise<void> {
   return setCollection('agents', agents);
+}
+
+// ----- Media (images) stored in the DB, served via /api/media/[id] -----
+export async function putMedia(contentType: string, bytes: Buffer): Promise<string> {
+  if (!pool) throw new Error('DATABASE_URL not configured');
+  await ensureSchema();
+  const id = randomUUID().replace(/-/g, '');
+  await pool.query('INSERT INTO media (id, content_type, bytes) VALUES ($1, $2, $3)', [id, contentType, bytes]);
+  return id;
+}
+
+export async function getMedia(id: string): Promise<{ contentType: string; bytes: Buffer } | null> {
+  if (!pool) return null;
+  try {
+    await ensureSchema();
+    const r = await pool.query('SELECT content_type, bytes FROM media WHERE id = $1', [id]);
+    if (!r.rows.length) return null;
+    return { contentType: r.rows[0].content_type, bytes: r.rows[0].bytes as Buffer };
+  } catch (e) {
+    console.error('[store] media read failed', id, e);
+    return null;
+  }
 }

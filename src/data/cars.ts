@@ -78,7 +78,9 @@ export function specEntries(specs: CarSpecs | undefined): [keyof CarSpecs, strin
 }
 
 export function carImages(car: Car): string[] {
-  return car.images.map((f) => `/cars/${car.slug}/${f}`);
+  // New uploads are absolute refs (/api/media/… or https://…); older entries are
+  // bare filenames served from /public/cars/<slug>/.
+  return car.images.map((f) => (/^(https?:)?\/\//.test(f) || f.startsWith('/') ? f : `/cars/${car.slug}/${f}`));
 }
 
 export function carTitle(car: Car): string {

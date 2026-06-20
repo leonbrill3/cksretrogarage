@@ -101,7 +101,13 @@ export function newCarEmail(car: Car, dashboardUrl: string) {
   const title = `${car.year} ${car.make} ${car.model}`;
   const subject = `New car to sell — ${title}`;
   const min = typeof car.minPrice === 'number' ? formatMoney(car.minPrice, car.currency || 'EUR') : '—';
-  const cover = car.images[0] ? `${dashboardUrl.replace(/\/agent\/.*$/, '')}/cars/${car.slug}/${car.images[0]}` : '';
+  const base = dashboardUrl.replace(/\/agent\/.*$/, '');
+  const first = car.images[0] || '';
+  const cover = first
+    ? /^https?:\/\//.test(first)
+      ? first
+      : `${base}${first.startsWith('/') ? '' : `/cars/${car.slug}/`}${first}`
+    : '';
   const inner = `${cover ? `<img src="${esc(cover)}" alt="${esc(title)}" style="display:block;width:100%;height:auto;" />` : ''}
   <div style="padding:30px;">
     <div style="font-size:11px;letter-spacing:.2em;color:#c8a96a;text-transform:uppercase;margin-bottom:10px;">New car to sell</div>

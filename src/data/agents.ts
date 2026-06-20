@@ -49,8 +49,13 @@ export function agentByToken(token: string | undefined | null): Agent | undefine
 }
 
 // Photo URL or null (the AgentCard falls back to initials when null).
+// New uploads are absolute refs (/api/media/… or https://…); older ones are
+// bare filenames under /public/agents/.
 export function agentPhoto(agent: Agent): string | null {
-  return agent.photo ? `/agents/${agent.photo}` : null;
+  if (!agent.photo) return null;
+  return /^(https?:)?\/\//.test(agent.photo) || agent.photo.startsWith('/')
+    ? agent.photo
+    : `/agents/${agent.photo}`;
 }
 
 // Route a country string to the responsible agent (or undefined → house inbox).

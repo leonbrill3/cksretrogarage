@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ADMIN_COOKIE, verifySessionToken } from '@/lib/admin-auth';
 import { commitFiles } from '@/lib/github';
-import { getCars, saveCars } from '@/lib/store';
+import { getCars, saveCars, putMedia } from '@/lib/store';
 import type { Car } from '@/data/cars';
 
 export const runtime = 'nodejs';
@@ -112,34 +112,25 @@ export async function POST(req: NextRequest) {
 
   const previous = !isNew ? list.find((c) => c.slug === (originalSlug || slug)) : undefined;
 
-  // ----- Resolve final image list + new uploads + deletions -----
-  const binaryFiles: { path: string; base64: string }[] = [];
+  // ----- Resolve final image list. New uploads go to the DB (instant, no
+  // redeploy); existing entries are kept as-is. -----
   const finalImages: string[] = [];
-  let counter = Date.now();
   for (const entry of images) {
     if (entry.type === 'existing') {
       finalImages.push(entry.name);
     } else if (entry.type === 'new' && entry.data) {
-      const ext = (entry.ext || 'jpg').replace(/[^a-z0-9]/gi, '').toLowerCase() || 'jpg';
-      const name = `u${(counter++).toString(36)}.${ext}`;
       const base64 = entry.data.includes(',') ? entry.data.split(',')[1] : entry.data;
-      binaryFiles.push({ path: `public/cars/${slug}/${name}`, base64 });
-      finalImages.push(name);
+      const id = await putMedia('image/jpeg', Buffer.from(base64, 'base64'));
+      finalImages.push(`/api/media/${id}`);
     }
   }
   if (finalImages.length === 0) {
     return NextResponse.json({ error: 'A car needs at least one image.' }, { status: 400 });
   }
 
-  // Files removed from an existing car
+  // Git is now only touched for video clips; image add/remove never redeploys.
+  const binaryFiles: { path: string; base64: string }[] = [];
   const deletePaths: string[] = [];
-  if (previous) {
-    for (const oldName of previous.images) {
-      if (!finalImages.includes(oldName)) {
-        deletePaths.push(`public/cars/${previous.slug}/${oldName}`);
-      }
-    }
-  }
 
   // ----- Build the updated record (preserve video fields unless cleared) -----
   const record: CarRecord = {

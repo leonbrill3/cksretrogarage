@@ -57,7 +57,11 @@ export default function AgentEditor({ agent, isNew }: { agent: Agent; isNew: boo
   const [match, setMatch] = useState((agent.match || []).join('\n'));
   const [isPublic, setIsPublic] = useState(agent.public !== false);
 
-  const existingPhoto = agent.photo ? `/agents/${agent.photo}` : '';
+  const existingPhoto = agent.photo
+    ? /^(https?:)?\/\//.test(agent.photo) || agent.photo.startsWith('/')
+      ? agent.photo
+      : `/agents/${agent.photo}`
+    : '';
   const [photoData, setPhotoData] = useState<string | null>(null);
   const photoPreview = photoData || existingPhoto;
 

@@ -88,7 +88,11 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
   const [interior, setInterior] = useState(car.specs?.interior || '');
 
   const [images, setImages] = useState<ImgItem[]>(
-    car.images.map((name) => ({ kind: 'existing', name, url: `/cars/${car.slug}/${name}` })),
+    car.images.map((name) => ({
+      kind: 'existing',
+      name,
+      url: /^(https?:)?\/\//.test(name) || name.startsWith('/') ? name : `/cars/${car.slug}/${name}`,
+    })),
   );
 
   const [status, setStatus] = useState<'idle' | 'saving' | 'done' | 'error'>('idle');

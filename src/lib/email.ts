@@ -2,8 +2,16 @@
 // Uses Resend when RESEND_API_KEY is set; otherwise logs (so nothing is lost)
 // and reports skipped:true.
 
-import { formatMoney, type Car } from '@/data/cars';
+import { formatMoney, specEntries, type Car } from '@/data/cars';
 import type { Agent } from '@/data/agents';
+
+const SPEC_LABELS: Record<string, string> = {
+  mileage: 'Mileage',
+  transmission: 'Transmission',
+  engine: 'Engine',
+  exterior: 'Exterior',
+  interior: 'Interior',
+};
 
 // Sender is configurable so we can use a verified domain now (aivacations.com)
 // and switch to leads@cksretrogarage.com once that domain is verified.
@@ -121,5 +129,60 @@ export function newCarEmail(car: Car, dashboardUrl: string) {
     ${btn(dashboardUrl, 'Open your dashboard to send quotes →')}
   </div>`;
   const text = `New car to sell — ${title}\n\nCK has a new car available for you to offer your clients.\n\nYour minimum (private): ${min}\n${car.location ? `Location: ${car.location}\n` : ''}\nQuote above the minimum and keep 70% of the difference.\n\nOpen your dashboard:\n${dashboardUrl}\n\n— CK Retro Garage`;
+  return { subject, html: shell(inner), text };
+}
+
+// ---- Branded quote email an agent sends to a client ----
+export function quoteEmail(opts: {
+  car: Car;
+  agent: Agent;
+  asking: number;
+  currency: string;
+  url: string;
+  message: string;
+  baseUrl: string;
+}) {
+  const { car, agent, asking, currency, url, message, baseUrl } = opts;
+  const title = `${car.year} ${car.make} ${car.model}`;
+  const subject = `${title} — from ${agent.name}, CK Retro Garage`;
+  const price = formatMoney(asking, currency);
+  const first = car.images[0] || '';
+  const cover = first
+    ? /^https?:\/\//.test(first)
+      ? first
+      : `${baseUrl}${first.startsWith('/') ? '' : `/cars/${car.slug}/`}${first}`
+    : '';
+  const specs = specEntries(car.specs).slice(0, 4);
+  const phone = (agent.phone || '').trim();
+
+  const specsHtml = specs.length
+    ? `<table style="width:100%;border-collapse:collapse;font-size:13px;color:#ece6da;margin-top:8px;">${specs
+        .map(
+          ([k, v], i) =>
+            `<tr><td style="padding:7px 0;color:#7f7a70;width:120px;${i ? 'border-top:1px solid #262628;' : ''}">${esc(SPEC_LABELS[k] || k)}</td><td style="padding:7px 0;${i ? 'border-top:1px solid #262628;' : ''}">${esc(v)}</td></tr>`,
+        )
+        .join('')}</table>`
+    : '';
+
+  const messageHtml = message.trim()
+    ? `<div style="margin:0 0 22px;font-size:14px;color:#cfc9bd;line-height:1.6;white-space:pre-wrap;">${esc(message.trim())}</div>`
+    : '';
+
+  const inner = `${cover ? `<img src="${esc(cover)}" alt="${esc(title)}" style="display:block;width:100%;height:auto;" />` : ''}
+  <div style="padding:30px;">
+    ${messageHtml}
+    <div style="font-size:11px;letter-spacing:.2em;color:#c8a96a;text-transform:uppercase;margin-bottom:10px;">A car selected for you</div>
+    <div style="font-family:Georgia,serif;font-size:26px;line-height:1.2;color:#ece6da;margin-bottom:6px;">${esc(title)}</div>
+    <div style="font-family:Georgia,serif;font-size:22px;color:#c8a96a;margin-bottom:6px;">${esc(price)}</div>
+    ${car.location ? `<div style="font-size:13px;color:#9a948a;">${esc(car.location)}</div>` : ''}
+    ${specsHtml}
+    ${btn(url, 'View full details & photos →')}
+    <div style="margin-top:28px;border-top:1px solid #2a2a2c;padding-top:18px;font-size:13px;color:#9a948a;line-height:1.6;">
+      <strong style="color:#ece6da;">${esc(agent.name)}</strong> · CK Retro Garage<br />
+      <a href="mailto:${esc(agent.email)}" style="color:#c8a96a;text-decoration:none;">${esc(agent.email)}</a>${phone ? ` · <a href="tel:${esc(phone)}" style="color:#c8a96a;text-decoration:none;">${esc(phone)}</a>` : ''}
+    </div>
+  </div>`;
+
+  const text = `${message.trim() ? message.trim() + '\n\n' : ''}${title}\n${price}${car.location ? `\n${car.location}` : ''}\n\nView full details & photos:\n${url}\n\n${agent.name} · CK Retro Garage\n${agent.email}${phone ? ` · ${phone}` : ''}`;
   return { subject, html: shell(inner), text };
 }

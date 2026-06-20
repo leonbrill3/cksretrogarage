@@ -54,6 +54,11 @@ export default function QuoteBuilder({
   const [url, setUrl] = useState('');
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
+  const [emailOpen, setEmailOpen] = useState(false);
+  const [custEmail, setCustEmail] = useState('');
+  const [custMsg, setCustMsg] = useState('');
+  const [emailStatus, setEmailStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [emailMsg, setEmailMsg] = useState('');
 
   const askingNum = Number(asking.replace(/[^0-9.]/g, ''));
   const valid = Number.isFinite(askingNum) && askingNum >= minPrice;
@@ -92,7 +97,26 @@ export default function QuoteBuilder({
 
   const msg = `Hi — here is the ${title} I mentioned, priced at ${fmt(askingNum, currency)}.`;
   const waHref = `https://wa.me/?text=${encodeURIComponent(`${msg} ${url}`)}`;
-  const mailHref = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(`${msg}\n\n${url}`)}`;
+
+  async function sendBrandedEmail() {
+    if (!custEmail.trim()) { setEmailStatus('error'); setEmailMsg('Enter the client’s email.'); return; }
+    setEmailStatus('sending');
+    setEmailMsg('');
+    try {
+      const res = await fetch('/api/agent/send-quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, slug, askingPrice: askingNum, locale: lang, to: custEmail.trim(), message: custMsg }),
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'Failed');
+      setEmailStatus('sent');
+      setEmailMsg(d.sent ? `Sent to ${d.to} ✓` : `Email isn’t connected yet — nothing sent.`);
+    } catch (e) {
+      setEmailStatus('error');
+      setEmailMsg(e instanceof Error ? e.message : 'Failed');
+    }
+  }
 
   const action =
     'flex items-center justify-center gap-2 border border-bone/20 px-3 py-2 text-[11px] uppercase tracking-label text-bone-muted transition-colors hover:border-brass hover:text-bone';
@@ -186,11 +210,43 @@ export default function QuoteBuilder({
             </a>
             <div className="truncate text-[11px] text-bone-dim">{url}</div>
             <div className="grid grid-cols-3 gap-2">
-              <button onClick={copy} className={action}>{copied ? '✓ Copied' : 'Copy'}</button>
+              <button onClick={copy} className={action}>{copied ? '✓ Copied' : 'Copy link'}</button>
               <a href={waHref} target="_blank" rel="noopener noreferrer" className={action}>WhatsApp</a>
-              <a href={mailHref} className={action}>Email</a>
+              <button onClick={() => setEmailOpen((v) => !v)} className={action}>✉ Email</button>
             </div>
-            <p className="text-[11px] text-bone-dim">Preview opens the exact page your client sees — no price or details are hidden from you, but your minimum and commission never appear there.</p>
+
+            {emailOpen && (
+              <div className="space-y-2 border border-bone/15 bg-ink-900/50 p-3">
+                <div className="text-[11px] uppercase tracking-label text-bone-dim">Send a branded email</div>
+                <input
+                  value={custEmail}
+                  onChange={(e) => setCustEmail(e.target.value)}
+                  placeholder="client@email.com"
+                  className={fieldCls}
+                  type="email"
+                />
+                <textarea
+                  value={custMsg}
+                  onChange={(e) => setCustMsg(e.target.value)}
+                  rows={3}
+                  placeholder="Add a personal note (optional)…"
+                  className={fieldCls}
+                />
+                <button
+                  onClick={sendBrandedEmail}
+                  disabled={emailStatus === 'sending'}
+                  className="btn-primary !py-2 !px-4 text-xs disabled:opacity-40"
+                >
+                  {emailStatus === 'sending' ? 'Sending…' : 'Send branded email'}
+                </button>
+                {emailMsg && (
+                  <p className={`text-[11px] ${emailStatus === 'error' ? 'text-oxblood-light' : 'text-brass'}`}>{emailMsg}</p>
+                )}
+                <p className="text-[11px] text-bone-dim">Sends a designed CK Retro Garage email with your note, photos, price, and a button to view the car. Replies come to you.</p>
+              </div>
+            )}
+
+            <p className="text-[11px] text-bone-dim">Preview opens the exact page your client sees — your minimum and commission never appear there.</p>
           </div>
         )}
       </div>

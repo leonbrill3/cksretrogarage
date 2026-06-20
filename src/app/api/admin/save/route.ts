@@ -77,7 +77,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
-  const { car = {}, images = [], isNew = false, originalSlug, deleteCar = false } = body;
+  const { car = {}, isNew = false, originalSlug, deleteCar = false } = body;
+  // images omitted entirely (partial update) → keep the car's existing images.
+  const providedImages = body.images;
 
   let list: CarRecord[];
   try {
@@ -113,15 +115,21 @@ export async function POST(req: NextRequest) {
   const previous = !isNew ? list.find((c) => c.slug === (originalSlug || slug)) : undefined;
 
   // ----- Resolve final image list. New uploads go to the DB (instant, no
-  // redeploy); existing entries are kept as-is. -----
-  const finalImages: string[] = [];
-  for (const entry of images) {
-    if (entry.type === 'existing') {
-      finalImages.push(entry.name);
-    } else if (entry.type === 'new' && entry.data) {
-      const base64 = entry.data.includes(',') ? entry.data.split(',')[1] : entry.data;
-      const id = await putMedia('image/jpeg', Buffer.from(base64, 'base64'));
-      finalImages.push(`/api/media/${id}`);
+  // redeploy); existing entries are kept as-is. If `images` is omitted entirely
+  // (a partial update), the car keeps its current images. -----
+  let finalImages: string[];
+  if (providedImages === undefined && previous) {
+    finalImages = [...previous.images];
+  } else {
+    finalImages = [];
+    for (const entry of providedImages || []) {
+      if (entry.type === 'existing') {
+        finalImages.push(entry.name);
+      } else if (entry.type === 'new' && entry.data) {
+        const base64 = entry.data.includes(',') ? entry.data.split(',')[1] : entry.data;
+        const id = await putMedia('image/jpeg', Buffer.from(base64, 'base64'));
+        finalImages.push(`/api/media/${id}`);
+      }
     }
   }
   if (finalImages.length === 0) {
@@ -145,17 +153,25 @@ export async function POST(req: NextRequest) {
     description: normLoc(car.description, previous?.description),
     inspection: normList(car.inspection, previous?.inspection),
   };
-  // Specs + location belong to the car itself — always saved, so they're ready
-  // for agents/quotes whether or not the car is currently sellable.
-  const loc = (car.location || '').trim();
+  // Specs + location belong to the car — keep previous values when not provided
+  // (so a partial update never wipes them).
+  const loc = car.location !== undefined ? String(car.location).trim() : previous?.location || '';
   if (loc) record.location = loc;
-  const specs = cleanSpecs(car.specs);
+  const specs = car.specs !== undefined ? cleanSpecs(car.specs) : previous?.specs;
   if (specs) record.specs = specs;
 
-  if (car.sellable) {
+  // Selling fields: honor an explicit `sellable` in the payload; otherwise keep
+  // whatever the car already had.
+  if ('sellable' in car) {
+    if (car.sellable) {
+      record.sellable = true;
+      if (typeof car.minPrice === 'number' && car.minPrice > 0) record.minPrice = car.minPrice;
+      record.currency = (car.currency as string) || 'EUR';
+    }
+  } else if (previous?.sellable) {
     record.sellable = true;
-    if (typeof car.minPrice === 'number' && car.minPrice > 0) record.minPrice = car.minPrice;
-    record.currency = (car.currency as string) || 'EUR';
+    if (typeof previous.minPrice === 'number') record.minPrice = previous.minPrice;
+    if (previous.currency) record.currency = previous.currency;
   }
   // ----- Resolve the vertical clip (upload / URL / remove / keep) -----
   const clipInput = body.clip;

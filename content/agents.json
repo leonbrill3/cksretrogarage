@@ -7,7 +7,10 @@
     "email": "andres@cksretrogarage.com",
     "phone": "",
     "whatsapp": "",
-    "languages": ["Español", "English"],
+    "languages": [
+      "Español",
+      "English"
+    ],
     "photo": "",
     "token": "ag_fbc6c3ec9eee9491",
     "public": true,
@@ -33,10 +36,14 @@
     "name": "Cenk Köse",
     "title": "Partner",
     "scope": "USA, Türkiye & Netherlands",
-    "email": "cenk@cksretrogarage.com",
+    "email": "jenk1907@gmail.com",
     "phone": "",
     "whatsapp": "",
-    "languages": ["English", "Türkçe", "Nederlands"],
+    "languages": [
+      "English",
+      "Türkçe",
+      "Nederlands"
+    ],
     "photo": "",
     "token": "ag_f60577a07eb6d567",
     "public": true,
@@ -68,7 +75,9 @@
     "email": "carl@cksretrogarage.com",
     "phone": "",
     "whatsapp": "",
-    "languages": ["English"],
+    "languages": [
+      "English"
+    ],
     "photo": "",
     "token": "ag_4c6d129632922da5",
     "public": false,

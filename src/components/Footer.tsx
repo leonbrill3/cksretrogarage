@@ -1,11 +1,12 @@
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
-import { contacts } from '@/data/contacts';
+import { getAgents } from '@/lib/store';
 
-export default function Footer({ locale }: { locale: string }) {
-  const t = useTranslations('footer');
-  const tn = useTranslations('nav');
-  const tc = useTranslations('contacts');
+export default async function Footer({ locale }: { locale: string }) {
+  const t = await getTranslations({ locale, namespace: 'footer' });
+  const tn = await getTranslations({ locale, namespace: 'nav' });
+  const tc = await getTranslations({ locale, namespace: 'contacts' });
+  const contacts = (await getAgents()).filter((a) => a.public !== false);
 
   return (
     <footer className="border-t border-bone/10 bg-ink-800">

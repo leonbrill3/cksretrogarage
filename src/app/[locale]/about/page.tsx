@@ -2,8 +2,10 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
-import { cars, carImages } from '@/data/cars';
-import { contacts } from '@/data/contacts';
+import { carImages } from '@/data/cars';
+import { getCars, getAgents } from '@/lib/store';
+
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params,
@@ -27,9 +29,10 @@ export default async function AboutPage({
   setRequestLocale(locale);
   const t = await getTranslations('about');
   const tc = await getTranslations('contacts');
+  const cars = await getCars();
+  const contacts = (await getAgents()).filter((a) => a.public !== false);
 
-  // Founder + the two CEOs. Titles for the CEOs are derived from the shared
-  // contacts territories so the About page can never drift out of sync.
+  // Founder + the partners. Titles are derived from each agent's territory.
   const team = [
     { name: 'Cem Köse', img: 1, role: t('roles.founder'), bio: t('bios.founder') },
     ...contacts.map((c) => ({

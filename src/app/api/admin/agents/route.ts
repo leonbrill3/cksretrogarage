@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'node:crypto';
 import { ADMIN_COOKIE, verifySessionToken } from '@/lib/admin-auth';
-import { commitFiles, getRepoJson } from '@/lib/github';
+import { commitFiles } from '@/lib/github';
+import { getAgents, saveAgents } from '@/lib/store';
 import { sendEmail, welcomeEmail } from '@/lib/email';
 import type { Agent } from '@/data/agents';
 
@@ -71,26 +72,20 @@ export async function POST(req: NextRequest) {
 
   let list: AgentRecord[];
   try {
-    list = await getRepoJson<AgentRecord[]>('content/agents.json');
+    list = (await getAgents()) as unknown as AgentRecord[];
   } catch (e) {
-    return NextResponse.json(
-      { error: 'Could not read agents.json from GitHub. Is GITHUB_TOKEN/GITHUB_REPO set?', detail: String(e) },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Could not read agents from the database.', detail: String(e) }, { status: 500 });
   }
 
   // ----- Delete -----
   if (deleteAgent && originalId) {
     const existing = list.find((a) => a.id === originalId);
     const next = list.filter((a) => a.id !== originalId);
-    const deletePaths = existing?.photo ? [`public/agents/${existing.photo}`] : [];
-    const { commitSha } = await commitFiles({
-      message: `admin: delete agent ${originalId}`,
-      textFiles: [{ path: 'content/agents.json', content: JSON.stringify(next, null, 2) + '\n' }],
-      deletePaths,
-    });
-    await triggerRedeploy();
-    return NextResponse.json({ ok: true, commitSha, deleted: originalId });
+    await saveAgents(next as unknown as Agent[]);
+    if (existing?.photo) {
+      await commitFiles({ message: `admin: delete agent ${originalId} photo`, deletePaths: [`public/agents/${existing.photo}`] }).catch(() => {});
+    }
+    return NextResponse.json({ ok: true, deleted: originalId });
   }
 
   // ----- Validate -----
@@ -137,12 +132,12 @@ export async function POST(req: NextRequest) {
     : list.map((a) => (a.id === (originalId || id) ? record : a));
 
   try {
-    const { commitSha } = await commitFiles({
-      message: `admin: ${isNew ? 'add' : 'update'} agent ${id}`,
-      textFiles: [{ path: 'content/agents.json', content: JSON.stringify(next, null, 2) + '\n' }],
-      binaryFiles,
-    });
-    await triggerRedeploy();
+    // Agent data → database (instant). Photo file (if any) → repo + redeploy.
+    await saveAgents(next as unknown as Agent[]);
+    if (binaryFiles.length) {
+      await commitFiles({ message: `admin: ${id} photo`, binaryFiles });
+      await triggerRedeploy();
+    }
 
     // Welcome a brand-new agent with their private dashboard link.
     let welcomed: boolean | undefined;
@@ -152,8 +147,8 @@ export async function POST(req: NextRequest) {
       const r = await sendEmail({ to: record.email, subject: tpl.subject, html: tpl.html, text: tpl.text });
       welcomed = r.ok;
     }
-    return NextResponse.json({ ok: true, commitSha, id, token: record.token, welcomed });
+    return NextResponse.json({ ok: true, id, token: record.token, welcomed });
   } catch (e) {
-    return NextResponse.json({ error: 'Commit failed', detail: String(e) }, { status: 500 });
+    return NextResponse.json({ error: 'Save failed', detail: String(e) }, { status: 500 });
   }
 }

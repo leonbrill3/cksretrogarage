@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
-import { contacts } from '@/data/contacts';
+import { getAgents } from '@/lib/store';
+
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params,
@@ -22,6 +24,7 @@ export default async function ContactPage({
   setRequestLocale(locale);
   const t = await getTranslations('contact');
   const tc = await getTranslations('contacts');
+  const contacts = (await getAgents()).filter((a) => a.public !== false);
 
   return (
     <div className="pt-28">

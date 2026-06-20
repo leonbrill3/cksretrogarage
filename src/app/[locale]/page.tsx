@@ -1,9 +1,12 @@
 import Image from 'next/image';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
-import { cars, carImages } from '@/data/cars';
+import { carImages } from '@/data/cars';
+import { getCars } from '@/lib/store';
 import CarCard from '@/components/CarCard';
 import ShowReel from '@/components/ShowReel';
+
+export const dynamic = 'force-dynamic';
 
 export default async function Home({
   params,
@@ -14,6 +17,7 @@ export default async function Home({
   setRequestLocale(locale);
   const t = await getTranslations('home');
 
+  const cars = await getCars();
   const hero = carImages(cars[0])[1] ?? carImages(cars[0])[0];
   const featured = cars.filter((c) => c.featured).slice(0, 3);
 

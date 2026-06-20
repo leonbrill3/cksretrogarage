@@ -2,25 +2,15 @@ import { notFound } from 'next/navigation';
 import { headers } from 'next/headers';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { getCar, carImages, carTitle, carText, carList, specEntries, formatMoney, type Car } from '@/data/cars';
-import { getAgent, type Agent } from '@/data/agents';
-import { getRepoJson } from '@/lib/github';
+import { carImages, carTitle, carText, carList, specEntries, formatMoney } from '@/data/cars';
+import { getCars, getAgents } from '@/lib/store';
 import { verifyQuote } from '@/lib/quote';
 import Gallery from '@/components/Gallery';
 import AgentCard from '@/components/AgentCard';
 
-// Read car + agent live from GitHub so saved changes appear on the quote page
-// immediately (no redeploy). Falls back to the bundled copy.
-async function loadLive(carSlug: string, agentId: string): Promise<{ car?: Car; agent?: Agent }> {
-  try {
-    const [cars, agents] = await Promise.all([
-      getRepoJson<Car[]>('content/cars.json'),
-      getRepoJson<Agent[]>('content/agents.json'),
-    ]);
-    return { car: cars.find((c) => c.slug === carSlug), agent: agents.find((a) => a.id === agentId) };
-  } catch {
-    return { car: getCar(carSlug), agent: getAgent(agentId) };
-  }
+async function loadLive(carSlug: string, agentId: string) {
+  const [cars, agents] = await Promise.all([getCars(), getAgents()]);
+  return { car: cars.find((c) => c.slug === carSlug), agent: agents.find((a) => a.id === agentId) };
 }
 
 // Private quote pages must never be indexed.

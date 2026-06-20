@@ -1,26 +1,15 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { cars as bundledCars, carImages, carTitle, type Car } from '@/data/cars';
-import { agents as bundledAgents, agentPhoto, type Agent } from '@/data/agents';
-import { getRepoJson } from '@/lib/github';
+import { carImages, carTitle } from '@/data/cars';
+import { agentPhoto } from '@/data/agents';
+import { getCars, getAgents } from '@/lib/store';
 import LogoutButton from '@/components/admin/LogoutButton';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
   const configured = !!process.env.GITHUB_TOKEN && !!process.env.GITHUB_REPO;
-
-  // Show the latest committed data, not the build-time bundle.
-  let cars: Car[] = bundledCars;
-  let agents: Agent[] = bundledAgents;
-  try {
-    [cars, agents] = await Promise.all([
-      getRepoJson<Car[]>('content/cars.json'),
-      getRepoJson<Agent[]>('content/agents.json'),
-    ]);
-  } catch {
-    /* fall back to bundle */
-  }
+  const [cars, agents] = await Promise.all([getCars(), getAgents()]);
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-12">

@@ -1,25 +1,11 @@
 import { notFound } from 'next/navigation';
-import { agents as bundledAgents, agentByToken, agentPhoto, type Agent } from '@/data/agents';
-import { cars as bundledCars, carImages, carTitle, type Car } from '@/data/cars';
-import { getRepoJson } from '@/lib/github';
+import { agentPhoto } from '@/data/agents';
+import { carImages, carTitle } from '@/data/cars';
+import { getCars, getAgents } from '@/lib/store';
 import QuoteBuilder from '@/components/agent/QuoteBuilder';
 import AgreementGate from '@/components/agent/AgreementGate';
 
 export const dynamic = 'force-dynamic';
-
-// Read live data from GitHub so newly-sellable cars / agent edits show up
-// immediately, not only after the next redeploy. Falls back to the bundle.
-async function liveData(): Promise<{ agents: Agent[]; cars: Car[] }> {
-  try {
-    const [agents, cars] = await Promise.all([
-      getRepoJson<Agent[]>('content/agents.json'),
-      getRepoJson<Car[]>('content/cars.json'),
-    ]);
-    return { agents, cars };
-  } catch {
-    return { agents: bundledAgents, cars: bundledCars };
-  }
-}
 
 export default async function AgentDashboard({
   params,
@@ -27,8 +13,8 @@ export default async function AgentDashboard({
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
-  const { agents, cars } = await liveData();
-  const agent = agents.find((a) => a.token && a.token === token) || agentByToken(token);
+  const [agents, cars] = await Promise.all([getAgents(), getCars()]);
+  const agent = agents.find((a) => a.token && a.token === token);
   if (!agent) notFound();
 
   // Must accept the agreement before using the dashboard.

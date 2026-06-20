@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ADMIN_COOKIE, verifySessionToken } from '@/lib/admin-auth';
-import { getRepoJson } from '@/lib/github';
+import { getCars, getAgents } from '@/lib/store';
 import { sendEmail, newCarEmail } from '@/lib/email';
 import type { Car } from '@/data/cars';
 import type { Agent } from '@/data/agents';
@@ -34,10 +34,7 @@ export async function POST(req: NextRequest) {
   let cars: Car[];
   let agents: Agent[];
   try {
-    [cars, agents] = await Promise.all([
-      getRepoJson<Car[]>('content/cars.json'),
-      getRepoJson<Agent[]>('content/agents.json'),
-    ]);
+    [cars, agents] = await Promise.all([getCars(), getAgents()]);
   } catch (e) {
     return NextResponse.json({ error: 'Could not read data', detail: String(e) }, { status: 500 });
   }

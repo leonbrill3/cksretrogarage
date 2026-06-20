@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { agentByToken } from '@/data/agents';
-import { getCar } from '@/data/cars';
+import { getCars, getAgents } from '@/lib/store';
 import { signQuote, commissionFor } from '@/lib/quote';
 
 export const runtime = 'nodejs';
@@ -27,10 +26,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
-  const agent = agentByToken(body.token);
+  const [agents, cars] = await Promise.all([getAgents(), getCars()]);
+  const agent = agents.find((a) => a.token && a.token === body.token);
   if (!agent) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const car = getCar(body.slug || '');
+  const car = cars.find((c) => c.slug === (body.slug || ''));
   if (!car || !car.sellable || typeof car.minPrice !== 'number') {
     return NextResponse.json({ error: 'Car is not sellable' }, { status: 400 });
   }

@@ -2,16 +2,12 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
-import { cars, getCar, carImages, carTitle, carText, carList } from '@/data/cars';
-import { routing } from '@/i18n/routing';
+import { carImages, carTitle, carText, carList } from '@/data/cars';
+import { getCars } from '@/lib/store';
 import Gallery from '@/components/Gallery';
 import FilmPlayer from '@/components/FilmPlayer';
 
-export function generateStaticParams() {
-  return routing.locales.flatMap((locale) =>
-    cars.map((car) => ({ locale, slug: car.slug })),
-  );
-}
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params,
@@ -19,7 +15,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
   const { locale, slug } = await params;
-  const car = getCar(slug);
+  const car = (await getCars()).find((c) => c.slug === slug);
   if (!car) return {};
   return { title: carTitle(car), description: carText(car.tagline, locale) };
 }
@@ -31,7 +27,7 @@ export default async function CarPage({
 }) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
-  const car = getCar(slug);
+  const car = (await getCars()).find((c) => c.slug === slug);
   if (!car) notFound();
   const t = await getTranslations('car');
   const images = carImages(car);

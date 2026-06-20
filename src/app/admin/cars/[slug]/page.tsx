@@ -1,20 +1,14 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getCar, type Car } from '@/data/cars';
-import { getRepoJson } from '@/lib/github';
+import { type Car } from '@/data/cars';
+import { getCars } from '@/lib/store';
 import CarEditor from '@/components/admin/CarEditor';
 
 export const dynamic = 'force-dynamic';
 
-// Load the latest committed car straight from GitHub so the editor never shows
-// stale (pre-redeploy) data — otherwise a re-save can wipe just-saved fields.
 async function loadCar(slug: string): Promise<Car | undefined> {
-  try {
-    const list = await getRepoJson<Car[]>('content/cars.json');
-    return list.find((c) => c.slug === slug);
-  } catch {
-    return getCar(slug); // fall back to the bundled copy
-  }
+  const list = await getCars();
+  return list.find((c) => c.slug === slug);
 }
 
 const EMPTY: Car = {

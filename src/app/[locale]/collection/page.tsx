@@ -1,7 +1,9 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
-import { cars } from '@/data/cars';
+import { getCars } from '@/lib/store';
 import CarCard from '@/components/CarCard';
+
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params,
@@ -21,6 +23,7 @@ export default async function CollectionPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('collection');
+  const cars = await getCars();
 
   return (
     <div className="container-site pb-28 pt-36">

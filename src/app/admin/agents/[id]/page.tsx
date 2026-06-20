@@ -1,20 +1,14 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getAgent, type Agent } from '@/data/agents';
-import { getRepoJson } from '@/lib/github';
+import { type Agent } from '@/data/agents';
+import { getAgents } from '@/lib/store';
 import AgentEditor from '@/components/admin/AgentEditor';
 
 export const dynamic = 'force-dynamic';
 
-// Load the latest committed agent from GitHub so the editor never shows stale
-// (pre-redeploy) data and a re-save can't wipe just-saved fields.
 async function loadAgent(id: string): Promise<Agent | undefined> {
-  try {
-    const list = await getRepoJson<Agent[]>('content/agents.json');
-    return list.find((a) => a.id === id);
-  } catch {
-    return getAgent(id);
-  }
+  const list = await getAgents();
+  return list.find((a) => a.id === id);
 }
 
 const EMPTY: Agent = {

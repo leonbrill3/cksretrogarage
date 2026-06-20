@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { routeEmailFor } from '@/data/contacts';
-import { getAgent } from '@/data/agents';
+import { getAgents } from '@/lib/store';
 import { sendEmail } from '@/lib/email';
 
 const HOUSE_INBOX = 'contact@cksretrogarage.com';
@@ -93,8 +92,13 @@ export async function POST(req: NextRequest) {
 
     // An attributed agent (from a co-branded listing) takes priority over
     // country-based routing; otherwise fall back to the territory router.
-    const agent = getAgent(data.agent);
-    const to = agent?.email || routeEmailFor(data.country);
+    const agents = await getAgents();
+    const agent = data.agent ? agents.find((a) => a.id === data.agent) : undefined;
+    const country = String(data.country || '').trim().toLowerCase();
+    const territory = country
+      ? agents.find((a) => (a.match || []).some((m) => country.includes(m)))
+      : undefined;
+    const to = agent?.email || territory?.email || HOUSE_INBOX;
 
     const { text, html } = buildEmail(data, {
       car: String(car),

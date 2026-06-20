@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ADMIN_COOKIE, verifySessionToken } from '@/lib/admin-auth';
-import { commitFiles, getRepoJson } from '@/lib/github';
+import { commitFiles } from '@/lib/github';
+import { getCars, saveCars } from '@/lib/store';
+import type { Car } from '@/data/cars';
 
 export const runtime = 'nodejs';
 
@@ -79,26 +81,24 @@ export async function POST(req: NextRequest) {
 
   let list: CarRecord[];
   try {
-    list = await getRepoJson<CarRecord[]>('content/cars.json');
+    list = (await getCars()) as unknown as CarRecord[];
   } catch (e) {
-    return NextResponse.json(
-      { error: 'Could not read cars.json from GitHub. Is GITHUB_TOKEN/GITHUB_REPO set?', detail: String(e) },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Could not read cars from the database.', detail: String(e) }, { status: 500 });
   }
 
   // ----- Delete a car -----
   if (deleteCar && originalSlug) {
     const existing = list.find((c) => c.slug === originalSlug);
-    const deletePaths = (existing?.images || []).map((n) => `public/cars/${originalSlug}/${n}`);
     const next = list.filter((c) => c.slug !== originalSlug);
-    const { commitSha } = await commitFiles({
-      message: `admin: delete ${originalSlug}`,
-      textFiles: [{ path: 'content/cars.json', content: JSON.stringify(next, null, 2) + '\n' }],
-      deletePaths,
-    });
-    await triggerRedeploy();
-    return NextResponse.json({ ok: true, commitSha, deleted: originalSlug });
+    await saveCars(next as unknown as Car[]);
+    // Remove the car's image files from the repo (best-effort).
+    const deletePaths = (existing?.images || [])
+      .filter((n) => !/^https?:\/\//.test(n))
+      .map((n) => `public/cars/${originalSlug}/${n}`);
+    if (deletePaths.length) {
+      await commitFiles({ message: `admin: delete ${originalSlug} images`, deletePaths }).catch(() => {});
+    }
+    return NextResponse.json({ ok: true, deleted: originalSlug });
   }
 
   // ----- Validate slug -----
@@ -196,16 +196,24 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { commitSha } = await commitFiles({
-      message: `admin: ${isNew ? 'add' : 'update'} ${slug}`,
-      textFiles: [{ path: 'content/cars.json', content: JSON.stringify(next, null, 2) + '\n' }],
-      binaryFiles,
-      deletePaths,
-    });
-    await triggerRedeploy();
-    return NextResponse.json({ ok: true, commitSha, slug });
+    // Car data → database (instant, no redeploy).
+    await saveCars(next as unknown as Car[]);
+
+    // Image files still live in the repo, so commit any new/removed images and
+    // trigger one redeploy only when images actually changed.
+    let imagesChanged = false;
+    if (binaryFiles.length || deletePaths.length) {
+      await commitFiles({
+        message: `admin: ${isNew ? 'add' : 'update'} ${slug} images`,
+        binaryFiles,
+        deletePaths,
+      });
+      await triggerRedeploy();
+      imagesChanged = true;
+    }
+    return NextResponse.json({ ok: true, slug, imagesChanged });
   } catch (e) {
-    return NextResponse.json({ error: 'Commit failed', detail: String(e) }, { status: 500 });
+    return NextResponse.json({ error: 'Save failed', detail: String(e) }, { status: 500 });
   }
 }
 

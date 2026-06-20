@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { commitFiles, getRepoJson } from '@/lib/github';
+import { getAgents, saveAgents } from '@/lib/store';
 import { AGREEMENT_VERSION } from '@/lib/agent-agreement';
 import type { Agent } from '@/data/agents';
 
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
 
   let list: Agent[];
   try {
-    list = await getRepoJson<Agent[]>('content/agents.json');
+    list = await getAgents();
   } catch (e) {
     return NextResponse.json({ error: 'Could not read agents', detail: String(e) }, { status: 500 });
   }
@@ -29,13 +29,9 @@ export async function POST(req: NextRequest) {
   agent.acceptedTermsVersion = AGREEMENT_VERSION;
 
   try {
-    await commitFiles({
-      message: `agent: ${agent.id} accepted agreement ${AGREEMENT_VERSION}`,
-      textFiles: [{ path: 'content/agents.json', content: JSON.stringify(list, null, 2) + '\n' }],
-    });
-    // No redeploy needed — the dashboard reads agents.json live from GitHub.
+    await saveAgents(list);
     return NextResponse.json({ ok: true });
   } catch (e) {
-    return NextResponse.json({ error: 'Commit failed', detail: String(e) }, { status: 500 });
+    return NextResponse.json({ error: 'Save failed', detail: String(e) }, { status: 500 });
   }
 }

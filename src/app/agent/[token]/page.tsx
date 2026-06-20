@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { agentPhoto } from '@/data/agents';
-import { carImages, carTitle } from '@/data/cars';
+import { carImages, carTitle, specEntries } from '@/data/cars';
 import { getCars, getAgents } from '@/lib/store';
 import QuoteBuilder from '@/components/agent/QuoteBuilder';
 import AgreementGate from '@/components/agent/AgreementGate';
@@ -92,6 +92,8 @@ export default async function AgentDashboard({
               cover={carImages(car)[0]}
               minPrice={car.minPrice as number}
               currency={car.currency || 'EUR'}
+              location={car.location || ''}
+              specs={specEntries(car.specs)}
             />
           ))}
         </div>

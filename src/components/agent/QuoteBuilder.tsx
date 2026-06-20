@@ -21,6 +21,14 @@ function fmt(n: number, cur: string): string {
 
 // Per-car quoting row in an agent's dashboard: set an asking price, see the
 // live commission, pick the customer's language, and mint a signed quote link.
+const SPEC_LABELS: Record<string, string> = {
+  mileage: 'Mileage',
+  transmission: 'Transmission',
+  engine: 'Engine',
+  exterior: 'Exterior',
+  interior: 'Interior',
+};
+
 export default function QuoteBuilder({
   token,
   slug,
@@ -28,6 +36,8 @@ export default function QuoteBuilder({
   cover,
   minPrice,
   currency,
+  location = '',
+  specs = [],
 }: {
   token: string;
   slug: string;
@@ -35,6 +45,8 @@ export default function QuoteBuilder({
   cover: string;
   minPrice: number;
   currency: string;
+  location?: string;
+  specs?: [string, string][];
 }) {
   const [asking, setAsking] = useState(String(minPrice));
   const [lang, setLang] = useState('en');
@@ -96,6 +108,17 @@ export default function QuoteBuilder({
         <div className="mt-0.5 text-xs text-bone-dim">
           Your minimum (private): <span className="text-bone">{fmt(minPrice, currency)}</span>
         </div>
+
+        {(specs.length > 0 || location) && (
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-bone-dim">
+            {location && <span>📍 {location}</span>}
+            {specs.map(([k, v]) => (
+              <span key={k}>
+                <span className="text-bone-dim/70">{SPEC_LABELS[k] || k}:</span> <span className="text-bone-muted">{v}</span>
+              </span>
+            ))}
+          </div>
+        )}
 
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <div>

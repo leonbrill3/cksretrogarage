@@ -193,19 +193,26 @@ export default function QuoteBuilder({
           )}
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-3">
-          <button
-            onClick={create}
-            disabled={!valid || status === 'working'}
-            className="btn-primary !py-2 !px-4 text-xs disabled:opacity-40"
-          >
-            {status === 'working' ? 'Creating…' : 'Create quote link'}
-          </button>
-          {error && <span className="text-xs text-oxblood-light">{error}</span>}
-        </div>
+        {!url && (
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <button
+              onClick={create}
+              disabled={!valid || status === 'working'}
+              className="btn-primary !py-2 !px-4 text-xs disabled:opacity-40"
+            >
+              {status === 'working' ? 'Creating…' : 'Create quote → send it'}
+            </button>
+            <span className="text-[11px] text-bone-dim">Then send by Email, WhatsApp, or copy the link.</span>
+            {error && <span className="text-xs text-oxblood-light">{error}</span>}
+          </div>
+        )}
 
         {url && (
           <div className="mt-3 space-y-2 border-t border-bone/10 pt-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] uppercase tracking-label text-brass">✓ Quote ready — send it</span>
+              <button onClick={() => { setUrl(''); setEmailOpen(false); }} className="text-[11px] text-bone-dim hover:text-bone">change price ↻</button>
+            </div>
             <a
               href={url}
               target="_blank"

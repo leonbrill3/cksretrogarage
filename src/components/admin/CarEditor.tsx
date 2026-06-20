@@ -360,6 +360,40 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
         </label>
       </section>
 
+      {/* Specification — entered once per car, shown on every quote */}
+      <section>
+        <h2 className="font-serif text-lg">Specification</h2>
+        <p className="mb-4 mt-1 text-xs text-bone-dim">
+          Entered once when you add the car. Automatically shown to agents and on every quote.
+        </p>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label className={label}>Mileage</label>
+            <input value={mileage} onChange={(e) => setMileage(e.target.value)} className={field} placeholder="42,000 km" />
+          </div>
+          <div>
+            <label className={label}>Transmission</label>
+            <input value={transmission} onChange={(e) => setTransmission(e.target.value)} className={field} placeholder="5-speed manual" />
+          </div>
+          <div>
+            <label className={label}>Engine</label>
+            <input value={engine} onChange={(e) => setEngine(e.target.value)} className={field} placeholder="3.0L V8" />
+          </div>
+          <div>
+            <label className={label}>Location</label>
+            <input value={location} onChange={(e) => setLocation(e.target.value)} className={field} placeholder="Miami, FL" />
+          </div>
+          <div>
+            <label className={label}>Exterior</label>
+            <input value={exterior} onChange={(e) => setExterior(e.target.value)} className={field} placeholder="Rosso Corsa" />
+          </div>
+          <div>
+            <label className={label}>Interior</label>
+            <input value={interior} onChange={(e) => setInterior(e.target.value)} className={field} placeholder="Nero leather" />
+          </div>
+        </div>
+      </section>
+
       {/* Selling (internal only) */}
       <section className="border border-bone/10 bg-ink-800/40 p-5">
         <label className="flex items-center gap-3">
@@ -378,7 +412,7 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
               🔒 The minimum price is <strong>internal only</strong> — agents see it, customers never
               do. Agents quote above it and earn 70% of the difference.
             </div>
-            <div className="grid gap-5 sm:grid-cols-3">
+            <div className="grid gap-5 sm:grid-cols-2">
               <div>
                 <label className={label}>Minimum price (your floor)</label>
                 <input
@@ -394,41 +428,6 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
                 <select value={currency} onChange={(e) => setCurrency(e.target.value)} className={field}>
                   {CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
-              </div>
-              <div>
-                <label className={label}>Location</label>
-                <input
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className={field}
-                  placeholder="Istanbul, Türkiye"
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="mb-2 text-[11px] uppercase tracking-[0.22em] text-bone-dim">Spec sheet (optional)</div>
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div>
-                  <label className={label}>Mileage</label>
-                  <input value={mileage} onChange={(e) => setMileage(e.target.value)} className={field} placeholder="42,000 km" />
-                </div>
-                <div>
-                  <label className={label}>Transmission</label>
-                  <input value={transmission} onChange={(e) => setTransmission(e.target.value)} className={field} placeholder="5-speed manual" />
-                </div>
-                <div>
-                  <label className={label}>Engine</label>
-                  <input value={engine} onChange={(e) => setEngine(e.target.value)} className={field} placeholder="3.0L V8" />
-                </div>
-                <div>
-                  <label className={label}>Exterior</label>
-                  <input value={exterior} onChange={(e) => setExterior(e.target.value)} className={field} placeholder="Rosso Corsa" />
-                </div>
-                <div>
-                  <label className={label}>Interior</label>
-                  <input value={interior} onChange={(e) => setInterior(e.target.value)} className={field} placeholder="Nero leather" />
-                </div>
               </div>
             </div>
           </div>

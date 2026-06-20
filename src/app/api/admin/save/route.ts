@@ -145,14 +145,17 @@ export async function POST(req: NextRequest) {
     description: normLoc(car.description, previous?.description),
     inspection: normList(car.inspection, previous?.inspection),
   };
+  // Specs + location belong to the car itself — always saved, so they're ready
+  // for agents/quotes whether or not the car is currently sellable.
+  const loc = (car.location || '').trim();
+  if (loc) record.location = loc;
+  const specs = cleanSpecs(car.specs);
+  if (specs) record.specs = specs;
+
   if (car.sellable) {
     record.sellable = true;
     if (typeof car.minPrice === 'number' && car.minPrice > 0) record.minPrice = car.minPrice;
     record.currency = (car.currency as string) || 'EUR';
-    const loc = (car.location || '').trim();
-    if (loc) record.location = loc;
-    const specs = cleanSpecs(car.specs);
-    if (specs) record.specs = specs;
   }
   // ----- Resolve the vertical clip (upload / URL / remove / keep) -----
   const clipInput = body.clip;

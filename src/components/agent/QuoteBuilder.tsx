@@ -147,12 +147,21 @@ export default function QuoteBuilder({
 
         {url && (
           <div className="mt-3 space-y-2 border-t border-bone/10 pt-3">
-            <div className="truncate text-[11px] text-brass">{url}</div>
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 border border-brass bg-brass/10 px-3 py-2.5 text-[12px] uppercase tracking-label text-brass transition-colors hover:bg-brass hover:text-ink-900"
+            >
+              👁 Preview what your client will see ↗
+            </a>
+            <div className="truncate text-[11px] text-bone-dim">{url}</div>
             <div className="grid grid-cols-3 gap-2">
               <button onClick={copy} className={action}>{copied ? '✓ Copied' : 'Copy'}</button>
               <a href={waHref} target="_blank" rel="noopener noreferrer" className={action}>WhatsApp</a>
               <a href={mailHref} className={action}>Email</a>
             </div>
+            <p className="text-[11px] text-bone-dim">Preview opens the exact page your client sees — no price or details are hidden from you, but your minimum and commission never appear there.</p>
           </div>
         )}
       </div>

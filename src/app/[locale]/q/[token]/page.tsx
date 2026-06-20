@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { headers } from 'next/headers';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getCar, carImages, carTitle, carText, carList, specEntries, formatMoney } from '@/data/cars';
@@ -6,8 +7,6 @@ import { getAgent } from '@/data/agents';
 import { verifyQuote } from '@/lib/quote';
 import Gallery from '@/components/Gallery';
 import AgentCard from '@/components/AgentCard';
-
-const SITE = 'https://cksretrogarage.com';
 
 // Private quote pages must never be indexed.
 export const metadata: Metadata = {
@@ -34,7 +33,9 @@ export default async function QuotePage({
   const images = carImages(car);
   const specs = specEntries(car.specs);
   const price = formatMoney(quote.p, car.currency || 'EUR');
-  const shareUrl = `${SITE}/${locale}/q/${token}`;
+  const h = await headers();
+  const host = h.get('x-forwarded-host') || h.get('host') || 'cksretrogarage.onrender.com';
+  const shareUrl = `https://${host}/${locale}/q/${token}`;
 
   return (
     <article className="pt-28">

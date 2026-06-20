@@ -5,8 +5,17 @@ import { signQuote, commissionFor } from '@/lib/quote';
 
 export const runtime = 'nodejs';
 
-const SITE = 'https://cksretrogarage.com';
 const LOCALES = ['en', 'tr', 'es', 'de', 'nl'];
+
+// Build links from the host the request actually came in on, so they work on
+// the live domain (onrender now, custom domain later) — never a hardcoded host.
+function baseUrl(req: NextRequest): string {
+  const origin = req.headers.get('origin');
+  if (origin) return origin.replace(/\/$/, '');
+  const host = req.headers.get('x-forwarded-host') || req.headers.get('host');
+  if (host) return `https://${host}`;
+  return req.nextUrl.origin;
+}
 
 // Mint a signed, co-branded quote link. Authenticated by the agent's secret
 // token (the same one that gates their dashboard).
@@ -39,7 +48,7 @@ export async function POST(req: NextRequest) {
 
   const locale = LOCALES.includes(body.locale || '') ? body.locale : 'en';
   const quoteToken = await signQuote({ c: car.slug, a: agent.id, p: asking });
-  const url = `${SITE}/${locale}/q/${quoteToken}`;
+  const url = `${baseUrl(req)}/${locale}/q/${quoteToken}`;
 
   return NextResponse.json({
     ok: true,

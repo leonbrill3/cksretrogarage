@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 
 type Item = { type: 'image' | 'video'; src: string };
@@ -25,7 +25,23 @@ export default function Gallery({
 
   const [current, setCurrent] = useState(0);
   const [full, setFull] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const fgRef = useRef<HTMLVideoElement>(null);
+  const bgRef = useRef<HTMLVideoElement>(null);
   const cur = items[current] || items[0];
+
+  // Reset the play overlay whenever the active slide changes.
+  useEffect(() => setPlaying(false), [current]);
+
+  function playVideo() {
+    const fg = fgRef.current;
+    if (fg) {
+      fg.muted = false; // user gesture → sound is allowed
+      fg.play();
+    }
+    bgRef.current?.play();
+    setPlaying(true);
+  }
 
   const go = useCallback(
     (dir: number) => setCurrent((i) => (i + dir + items.length) % items.length),
@@ -59,24 +75,37 @@ export default function Gallery({
           <>
             {/* blurred backdrop fills the width behind a vertical clip */}
             <video
+              ref={bgRef}
               key={`bg-${cur.src}`}
               src={cur.src}
-              autoPlay
               muted
               loop
               playsInline
+              preload="metadata"
               className="absolute inset-0 h-full w-full scale-110 object-cover opacity-40 blur-2xl"
             />
             <video
+              ref={fgRef}
               key={`fg-${cur.src}`}
               src={cur.src}
-              autoPlay
-              muted
-              loop
               controls
+              loop
               playsInline
+              preload="metadata"
+              onPlay={() => setPlaying(true)}
               className="absolute inset-0 z-10 h-full w-full object-contain"
             />
+            {!playing && (
+              <button
+                onClick={playVideo}
+                className="absolute inset-0 z-20 flex items-center justify-center"
+                aria-label="Play video with sound"
+              >
+                <span className="flex h-20 w-20 items-center justify-center rounded-full bg-bone/90 text-ink-900 shadow-xl transition-transform hover:scale-105">
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                </span>
+              </button>
+            )}
           </>
         ) : (
           <Image

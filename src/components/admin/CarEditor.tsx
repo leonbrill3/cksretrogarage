@@ -48,6 +48,15 @@ function resizeFile(file: File, max = 1920, quality = 0.82): Promise<string> {
   });
 }
 
+function readFileAsDataURL(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result as string);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
 export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -87,6 +96,16 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
   const [viewer, setViewer] = useState<number | null>(null);
   const [dragging, setDragging] = useState(false);
 
+  // Vertical video clip (upload a file or paste a hosted URL)
+  const videoRef = useRef<HTMLInputElement>(null);
+  const existingClipPath = car.clip && car.clip.startsWith('/cars/') ? car.clip : '';
+  const initialClipIsUrl = !!car.clip && !car.clip.startsWith('/cars/');
+  const [clipData, setClipData] = useState<string | null>(null);
+  const [clipExt, setClipExt] = useState('mp4');
+  const [clipUrl, setClipUrl] = useState(initialClipIsUrl ? car.clip! : '');
+  const [clipRemoved, setClipRemoved] = useState(false);
+  const clipPreview = clipData || clipUrl.trim() || (!clipRemoved ? existingClipPath : '');
+
   function autoSlug(nextYear = year, nextMake = make, nextModel = model) {
     if (isNew && !slugTouched) setSlug(slugify(`${nextYear} ${nextMake} ${nextModel}`));
   }
@@ -117,6 +136,26 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
     await addFiles(Array.from(e.dataTransfer?.files || []));
   }
 
+  async function onPickVideo(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (file.size > 60 * 1024 * 1024) {
+      alert('That clip is over 60MB. Please use a smaller file, or paste a hosted video URL instead.');
+      return;
+    }
+    setClipExt((file.name.split('.').pop() || 'mp4').toLowerCase());
+    setClipData(await readFileAsDataURL(file));
+    setClipUrl('');
+    setClipRemoved(false);
+  }
+
+  function removeClip() {
+    setClipData(null);
+    setClipUrl('');
+    setClipRemoved(true);
+  }
+
   function move(i: number, dir: -1 | 1) {
     setImages((prev) => {
       const next = [...prev];
@@ -141,9 +180,19 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
   async function save() {
     setStatus('saving');
     setMessage('');
+    // clip: undefined = keep, null = remove, {data}/{url} = set
+    const clip = clipData
+      ? { data: clipData, ext: clipExt }
+      : clipUrl.trim()
+        ? { url: clipUrl.trim() }
+        : clipRemoved
+          ? null
+          : undefined;
+
     const payload = {
       isNew,
       originalSlug: car.slug || undefined,
+      clip,
       car: {
         slug: slug.trim(),
         year: Number(year),
@@ -366,6 +415,58 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
             <span className="text-2xl leading-none">+</span>
             <span className="px-2 text-center">Drop photos here<br />or click to add</span>
           </button>
+        </div>
+      </section>
+
+      {/* Video clip */}
+      <section>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-serif text-lg">Video clip (vertical reel)</h2>
+          <button onClick={() => videoRef.current?.click()} className="btn-ghost !py-2">
+            {clipPreview ? 'Replace video' : 'Upload video'}
+          </button>
+          <input ref={videoRef} type="file" accept="video/*" hidden onChange={onPickVideo} />
+        </div>
+        <p className="mb-4 text-xs text-bone-dim">
+          Upload a clip from your desktop (up to 60MB) or paste a hosted video URL. Plays muted on a
+          loop on the car page.
+        </p>
+
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+          {clipPreview ? (
+            <video
+              src={clipPreview}
+              className="aspect-[9/16] w-40 shrink-0 bg-ink-700 object-cover"
+              muted
+              controls
+              playsInline
+            />
+          ) : (
+            <button
+              onClick={() => videoRef.current?.click()}
+              className="flex aspect-[9/16] w-40 shrink-0 flex-col items-center justify-center gap-1 border-2 border-dashed border-bone/20 text-xs text-bone-dim hover:border-brass/60 hover:text-bone"
+            >
+              <span className="text-2xl leading-none">+</span>
+              <span>Upload clip</span>
+            </button>
+          )}
+
+          <div className="flex-1 space-y-3">
+            <div>
+              <label className={label}>…or paste a video URL</label>
+              <input
+                value={clipUrl}
+                onChange={(e) => { setClipUrl(e.target.value); setClipData(null); setClipRemoved(false); }}
+                className={field}
+                placeholder="https://… .mp4"
+              />
+            </div>
+            {clipPreview && (
+              <button onClick={removeClip} className="text-sm text-oxblood-light hover:text-bone">
+                Remove video
+              </button>
+            )}
+          </div>
         </div>
       </section>
 

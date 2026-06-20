@@ -58,9 +58,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  // clip: undefined = keep as-is, null = remove, {url} = external link, {data} = uploaded file
+  type VideoEntry = { url?: string; data?: string; ext?: string } | null;
+
   let body: {
     car?: Partial<CarRecord>;
     images?: ImageEntry[];
+    clip?: VideoEntry;
     isNew?: boolean;
     originalSlug?: string;
     deleteCar?: boolean;
@@ -159,7 +163,27 @@ export async function POST(req: NextRequest) {
     const specs = cleanSpecs(car.specs);
     if (specs) record.specs = specs;
   }
-  if (previous?.clip) record.clip = previous.clip;
+  // ----- Resolve the vertical clip (upload / URL / remove / keep) -----
+  const clipInput = body.clip;
+  const wasLocalClip = !!previous?.clip && previous.clip.startsWith('/cars/');
+  if (clipInput === undefined) {
+    if (previous?.clip) record.clip = previous.clip; // keep
+  } else if (clipInput === null) {
+    if (wasLocalClip) deletePaths.push(`public${previous!.clip}`); // remove
+  } else if (clipInput.url && clipInput.url.trim()) {
+    record.clip = clipInput.url.trim();
+    if (wasLocalClip && previous!.clip !== record.clip) deletePaths.push(`public${previous!.clip}`);
+  } else if (clipInput.data) {
+    const ext = (clipInput.ext || 'mp4').replace(/[^a-z0-9]/gi, '').toLowerCase() || 'mp4';
+    const name = `clip-${Date.now().toString(36)}.${ext}`;
+    const base64 = clipInput.data.includes(',') ? clipInput.data.split(',')[1] : clipInput.data;
+    binaryFiles.push({ path: `public/cars/${slug}/${name}`, base64 });
+    record.clip = `/cars/${slug}/${name}`;
+    if (wasLocalClip) deletePaths.push(`public${previous!.clip}`);
+  } else if (previous?.clip) {
+    record.clip = previous.clip;
+  }
+
   if (previous?.film) record.film = previous.film;
   if (previous?.filmPoster) record.filmPoster = previous.filmPoster;
 

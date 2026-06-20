@@ -59,6 +59,17 @@ export default async function QuotePage({
         </header>
       </div>
 
+      {car.clip && (
+        <div className="container-site pt-14">
+          <div className="eyebrow mb-6 text-center">{t('inMotion')}</div>
+          <div className="mx-auto w-full max-w-[380px]">
+            <div className="relative aspect-[9/16] overflow-hidden bg-ink-900">
+              <video src={car.clip} autoPlay muted loop playsInline className="h-full w-full object-cover" />
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="container-site py-14">
         <Gallery images={images} title={carTitle(car)} />
       </div>

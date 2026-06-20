@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
-import { type Agent, agentPhoto, defaultEmail } from '@/data/agents';
+import { type Agent, agentPhoto } from '@/data/agents';
 import ListingInquiryForm from './ListingInquiryForm';
 
 function initials(name: string): string {
@@ -29,13 +29,10 @@ export default async function AgentCard({
 }) {
   const t = await getTranslations({ locale, namespace: 'agent' });
 
-  const email = agent?.email || defaultEmail;
   const photo = agent ? agentPhoto(agent) : null;
   const waText = encodeURIComponent(
     `${agent ? `Hi ${agent.name}, ` : ''}I'm interested in the ${carTitle}. ${shareUrl}`,
   );
-  const mailSubject = encodeURIComponent(`Enquiry — ${carTitle}`);
-  const mailBody = encodeURIComponent(`I'm interested in the ${carTitle}.\n${shareUrl}\n\n`);
 
   const actionBtn =
     'flex flex-1 items-center justify-center gap-2 border border-bone/20 px-4 py-3 text-[12px] uppercase tracking-label text-bone-muted transition-colors hover:border-brass hover:text-bone';
@@ -84,13 +81,13 @@ export default async function AgentCard({
             {t('call')}
           </a>
         )}
-        <a href={`mailto:${email}?subject=${mailSubject}&body=${mailBody}`} className={actionBtn}>
+        <a href="#enquire" className={actionBtn}>
           {t('email')}
         </a>
       </div>
 
       {/* Logged inquiry form */}
-      <div className="mt-8 border-t border-bone/10 pt-7">
+      <div id="enquire" className="mt-8 scroll-mt-28 border-t border-bone/10 pt-7">
         <ListingInquiryForm carTitle={carTitle} carSlug={carSlug} agentId={agent?.id} />
       </div>
     </div>

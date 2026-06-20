@@ -1,9 +1,24 @@
 import { notFound } from 'next/navigation';
-import { agentByToken, agentPhoto } from '@/data/agents';
-import { sellableCars, carImages, carTitle } from '@/data/cars';
+import { agents as bundledAgents, agentByToken, agentPhoto, type Agent } from '@/data/agents';
+import { cars as bundledCars, carImages, carTitle, type Car } from '@/data/cars';
+import { getRepoJson } from '@/lib/github';
 import QuoteBuilder from '@/components/agent/QuoteBuilder';
 
 export const dynamic = 'force-dynamic';
+
+// Read live data from GitHub so newly-sellable cars / agent edits show up
+// immediately, not only after the next redeploy. Falls back to the bundle.
+async function liveData(): Promise<{ agents: Agent[]; cars: Car[] }> {
+  try {
+    const [agents, cars] = await Promise.all([
+      getRepoJson<Agent[]>('content/agents.json'),
+      getRepoJson<Car[]>('content/cars.json'),
+    ]);
+    return { agents, cars };
+  } catch {
+    return { agents: bundledAgents, cars: bundledCars };
+  }
+}
 
 export default async function AgentDashboard({
   params,
@@ -11,10 +26,11 @@ export default async function AgentDashboard({
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
-  const agent = agentByToken(token);
+  const { agents, cars } = await liveData();
+  const agent = agents.find((a) => a.token && a.token === token) || agentByToken(token);
   if (!agent) notFound();
 
-  const listings = sellableCars();
+  const listings = cars.filter((c) => c.sellable && typeof c.minPrice === 'number');
   const photo = agentPhoto(agent);
 
   return (

@@ -131,7 +131,7 @@ export default function QuoteBuilder({
   return (
     <div className="flex flex-col gap-4 border border-bone/10 bg-ink-800 p-4 sm:flex-row">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={cover} alt="" className="h-28 w-full shrink-0 object-cover sm:h-auto sm:w-40" />
+      <img src={cover} alt="" className="h-32 w-full shrink-0 object-cover sm:h-32 sm:w-44 sm:self-start" />
 
       <div className="min-w-0 flex-1">
         <div className="font-serif text-lg text-bone">{title}</div>
@@ -229,7 +229,18 @@ export default function QuoteBuilder({
             </div>
 
             {emailOpen && (
-              <div className="space-y-3 border border-bone/15 bg-ink-900/50 p-3">
+              <div
+                className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-ink-900/85 p-4"
+                onClick={() => setEmailOpen(false)}
+              >
+                <div
+                  className="my-6 w-full max-w-md space-y-3 border border-bone/15 bg-ink-800 p-4"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] uppercase tracking-label text-bone-dim">Send a branded email</span>
+                  <button onClick={() => setEmailOpen(false)} className="text-lg leading-none text-bone-dim hover:text-bone">✕</button>
+                </div>
                 <div>
                   <label className="mb-1 block text-[10px] uppercase tracking-label text-bone-dim">Send to (client email)</label>
                   <input
@@ -292,6 +303,7 @@ export default function QuoteBuilder({
                   <p className={`text-[11px] ${emailStatus === 'error' ? 'text-oxblood-light' : 'text-brass'}`}>{emailMsg}</p>
                 )}
                 <p className="text-[11px] text-bone-dim">This is exactly what your client receives. Replies come straight to you.</p>
+                </div>
               </div>
             )}
 

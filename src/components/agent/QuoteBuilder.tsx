@@ -110,14 +110,20 @@ export default function QuoteBuilder({
         </div>
 
         {(specs.length > 0 || location) && (
-          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-bone-dim">
-            {location && <span>📍 {location}</span>}
+          <dl className="mt-3 grid grid-cols-2 gap-x-5 gap-y-2.5 border-y border-bone/10 py-3 sm:grid-cols-3">
+            {location && (
+              <div>
+                <dt className="text-[10px] uppercase tracking-label text-bone-dim/70">Location</dt>
+                <dd className="mt-0.5 text-sm text-bone">{location}</dd>
+              </div>
+            )}
             {specs.map(([k, v]) => (
-              <span key={k}>
-                <span className="text-bone-dim/70">{SPEC_LABELS[k] || k}:</span> <span className="text-bone-muted">{v}</span>
-              </span>
+              <div key={k}>
+                <dt className="text-[10px] uppercase tracking-label text-bone-dim/70">{SPEC_LABELS[k] || k}</dt>
+                <dd className="mt-0.5 text-sm text-bone">{v}</dd>
+              </div>
             ))}
-          </div>
+          </dl>
         )}
 
         <div className="mt-3 grid gap-3 sm:grid-cols-2">

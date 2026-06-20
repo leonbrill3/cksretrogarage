@@ -64,26 +64,8 @@ export default async function CarPage({
         </header>
       </div>
 
-      {car.clip && (
-        <div className="container-site pt-14">
-          <div className="eyebrow mb-6 text-center">{t('inMotion')}</div>
-          <div className="mx-auto w-full max-w-[420px]">
-            <div className="relative aspect-[9/16] overflow-hidden bg-ink-900">
-              <video
-                src={car.clip}
-                autoPlay
-                muted
-                loop
-                playsInline
-                className="h-full w-full object-cover"
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className="container-site py-14">
-        <Gallery images={images} title={carTitle(car)} />
+        <Gallery images={images} title={carTitle(car)} clip={car.clip} />
       </div>
 
       {car.film && car.filmPoster && (

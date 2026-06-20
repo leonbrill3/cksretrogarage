@@ -23,6 +23,7 @@ export default function Gallery({
     ...(clip ? [{ type: 'video' as const, src: clip }] : []),
   ];
 
+  const cover = images[0]; // used as the video poster/thumbnail so it's never black
   const [current, setCurrent] = useState(0);
   const [full, setFull] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -78,6 +79,7 @@ export default function Gallery({
               ref={bgRef}
               key={`bg-${cur.src}`}
               src={cur.src}
+              poster={cover}
               muted
               loop
               playsInline
@@ -88,6 +90,7 @@ export default function Gallery({
               ref={fgRef}
               key={`fg-${cur.src}`}
               src={cur.src}
+              poster={cover}
               controls
               loop
               playsInline
@@ -150,8 +153,8 @@ export default function Gallery({
             >
               {it.type === 'video' ? (
                 <>
-                  <video src={it.src} muted playsInline preload="metadata" className="h-full w-full object-cover" />
-                  <span className="absolute inset-0 flex items-center justify-center bg-ink-900/30">
+                  <Image src={cover} alt="" fill sizes="96px" className="object-cover" />
+                  <span className="absolute inset-0 flex items-center justify-center bg-ink-900/40">
                     <span className="flex h-7 w-7 items-center justify-center rounded-full bg-bone/90 text-[10px] text-ink-900">▶</span>
                   </span>
                 </>

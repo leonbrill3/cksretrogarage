@@ -23,6 +23,9 @@ export type Agent = {
   // When false, the agent has a working share dashboard but is NOT shown
   // publicly (About / Contact / Footer). Defaults to true when omitted.
   public?: boolean;
+  // Set when the agent accepts the Independent Sales Agent Agreement.
+  acceptedTermsAt?: string;
+  acceptedTermsVersion?: string;
   // Lowercase substrings matched against a user-supplied country to
   // route a lead to this agent.
   match: string[];

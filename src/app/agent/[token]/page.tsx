@@ -3,6 +3,7 @@ import { agents as bundledAgents, agentByToken, agentPhoto, type Agent } from '@
 import { cars as bundledCars, carImages, carTitle, type Car } from '@/data/cars';
 import { getRepoJson } from '@/lib/github';
 import QuoteBuilder from '@/components/agent/QuoteBuilder';
+import AgreementGate from '@/components/agent/AgreementGate';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,6 +30,11 @@ export default async function AgentDashboard({
   const { agents, cars } = await liveData();
   const agent = agents.find((a) => a.token && a.token === token) || agentByToken(token);
   if (!agent) notFound();
+
+  // Must accept the agreement before using the dashboard.
+  if (!agent.acceptedTermsAt) {
+    return <AgreementGate token={token} agentName={agent.name} />;
+  }
 
   const listings = cars.filter((c) => c.sellable && typeof c.minPrice === 'number');
   const photo = agentPhoto(agent);

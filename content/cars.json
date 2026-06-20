@@ -294,7 +294,11 @@
         "Ownership chain and service history documented"
       ],
       "tr": []
-    }
+    },
+    "sellable": true,
+    "minPrice": 220000,
+    "currency": "USD",
+    "location": "Miami, FL"
   },
   {
     "slug": "ferrari-599",

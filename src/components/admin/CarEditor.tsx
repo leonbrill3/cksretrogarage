@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Car } from '@/data/cars';
 
@@ -96,6 +96,15 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
   const [viewer, setViewer] = useState<number | null>(null);
   const [dragging, setDragging] = useState(false);
   const [notify, setNotify] = useState<{ busy: boolean; msg: string }>({ busy: false, msg: '' });
+  const [dirty, setDirty] = useState(false);
+
+  // Warn before leaving with unsaved edits.
+  useEffect(() => {
+    if (!dirty) return;
+    const h = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ''; };
+    window.addEventListener('beforeunload', h);
+    return () => window.removeEventListener('beforeunload', h);
+  }, [dirty]);
 
   // Vertical video clip (upload a file or paste a hosted URL)
   const videoRef = useRef<HTMLInputElement>(null);
@@ -123,7 +132,7 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
         /* skip unreadable */
       }
     }
-    if (added.length) setImages((prev) => [...prev, ...added]);
+    if (added.length) { setImages((prev) => [...prev, ...added]); setDirty(true); }
   }
 
   async function onPick(e: React.ChangeEvent<HTMLInputElement>) {
@@ -152,6 +161,7 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
     setClipData(await readFileAsDataURL(file));
     setClipUrl('');
     setClipRemoved(false);
+    setDirty(true);
   }
 
   async function onPickVideo(e: React.ChangeEvent<HTMLInputElement>) {
@@ -171,9 +181,11 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
     setClipData(null);
     setClipUrl('');
     setClipRemoved(true);
+    setDirty(true);
   }
 
   function move(i: number, dir: -1 | 1) {
+    setDirty(true);
     setImages((prev) => {
       const next = [...prev];
       const j = i + dir;
@@ -183,6 +195,7 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
     });
   }
   function setCover(i: number) {
+    setDirty(true);
     setImages((prev) => {
       const next = [...prev];
       const [item] = next.splice(i, 1);
@@ -191,6 +204,7 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
     });
   }
   function remove(i: number) {
+    setDirty(true);
     setImages((prev) => prev.filter((_, idx) => idx !== i));
   }
 
@@ -256,8 +270,14 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
     const d = await res.json().catch(() => ({}));
     if (res.ok) {
       setStatus('done');
-      setMessage('Saved. The live site will update in ~2 minutes.');
-      setTimeout(() => router.push('/admin'), 1500);
+      setDirty(false);
+      if (isNew) {
+        setMessage('Created ✓ — opening…');
+        router.replace(`/admin/cars/${payload.car.slug}`);
+      } else {
+        setMessage('Saved ✓ — live now for agents & quotes.');
+        router.refresh();
+      }
     } else {
       setStatus('error');
       setMessage(d.error || 'Save failed' + (d.detail ? `: ${d.detail}` : ''));
@@ -305,7 +325,7 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
   const label = 'mb-1.5 block text-[11px] uppercase tracking-[0.22em] text-bone-dim';
 
   return (
-    <div className="mt-8 space-y-10 pb-24">
+    <div className="mt-8 space-y-10 pb-24" onInput={() => setDirty(true)} onChange={() => setDirty(true)}>
       {/* Basics */}
       <section className="grid gap-5 sm:grid-cols-3">
         <div>
@@ -544,6 +564,9 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
           <button onClick={del} disabled={status === 'saving'} className="text-sm text-oxblood-light hover:text-bone">
             Delete car
           </button>
+        )}
+        {dirty && status !== 'saving' && (
+          <span className="text-sm text-oxblood-light">● Unsaved changes</span>
         )}
         {message && (
           <span className={`text-sm ${status === 'error' ? 'text-oxblood-light' : 'text-brass'}`}>{message}</span>

@@ -120,7 +120,7 @@ export default function AgentEditor({ agent, isNew }: { agent: Agent; isNew: boo
     if (res.ok) {
       setStatus('done');
       if (d.token) setToken(d.token);
-      setMessage('Saved. The live site will update in ~2 minutes.');
+      setMessage('Saved ✓ — live now.');
       if (isNew) setTimeout(() => router.push(`/admin/agents/${d.id}`), 1200);
     } else {
       setStatus('error');

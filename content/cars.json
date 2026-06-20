@@ -329,6 +329,17 @@
       ],
       "tr": []
     },
+    "sellable": true,
+    "minPrice": 250000,
+    "currency": "USD",
+    "location": "Miami, USA",
+    "specs": {
+      "mileage": "5,000 miles",
+      "transmission": "6-speed manual",
+      "engine": "6.0-liter F140 V12",
+      "exterior": "Grigio Silverstone",
+      "interior": "Nero leather"
+    },
     "clip": "/cars/ferrari-599/clip-mqln0byz.mp4"
   }
 ]

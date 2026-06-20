@@ -2,8 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'node:crypto';
 import { ADMIN_COOKIE, verifySessionToken } from '@/lib/admin-auth';
 import { commitFiles, getRepoJson } from '@/lib/github';
+import { sendEmail, welcomeEmail } from '@/lib/email';
+import type { Agent } from '@/data/agents';
 
 export const runtime = 'nodejs';
+
+function baseUrl(req: NextRequest): string {
+  const origin = req.headers.get('origin');
+  if (origin) return origin.replace(/\/$/, '');
+  const host = req.headers.get('x-forwarded-host') || req.headers.get('host');
+  return host ? `https://${host}` : req.nextUrl.origin;
+}
 
 async function triggerRedeploy(): Promise<void> {
   const hook = process.env.RENDER_DEPLOY_HOOK;
@@ -134,7 +143,16 @@ export async function POST(req: NextRequest) {
       binaryFiles,
     });
     await triggerRedeploy();
-    return NextResponse.json({ ok: true, commitSha, id, token: record.token });
+
+    // Welcome a brand-new agent with their private dashboard link.
+    let welcomed: boolean | undefined;
+    if (isNew && record.email) {
+      const dashUrl = `${baseUrl(req)}/agent/${record.token}`;
+      const tpl = welcomeEmail(record as Agent, dashUrl);
+      const r = await sendEmail({ to: record.email, subject: tpl.subject, html: tpl.html, text: tpl.text });
+      welcomed = r.ok;
+    }
+    return NextResponse.json({ ok: true, commitSha, id, token: record.token, welcomed });
   } catch (e) {
     return NextResponse.json({ error: 'Commit failed', detail: String(e) }, { status: 500 });
   }

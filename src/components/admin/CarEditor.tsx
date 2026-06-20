@@ -95,6 +95,7 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
   const [message, setMessage] = useState('');
   const [viewer, setViewer] = useState<number | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [notify, setNotify] = useState<{ busy: boolean; msg: string }>({ busy: false, msg: '' });
 
   // Vertical video clip (upload a file or paste a hosted URL)
   const videoRef = useRef<HTMLInputElement>(null);
@@ -260,6 +261,24 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
     } else {
       setStatus('error');
       setMessage(d.error || 'Save failed' + (d.detail ? `: ${d.detail}` : ''));
+    }
+  }
+
+  async function notifyAgents() {
+    if (!confirm('Email all agents that this car is available to sell?')) return;
+    setNotify({ busy: true, msg: '' });
+    const res = await fetch('/api/admin/notify-agents', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug: car.slug }),
+    });
+    const d = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setNotify({ busy: false, msg: d.error || 'Failed' });
+    } else if (d.sent > 0) {
+      setNotify({ busy: false, msg: `Sent to ${d.sent} agent${d.sent === 1 ? '' : 's'}.` });
+    } else {
+      setNotify({ busy: false, msg: `Email isn't connected yet — would notify ${d.agents} agent(s). Add RESEND_API_KEY to send for real.` });
     }
   }
 
@@ -516,6 +535,11 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
         <button onClick={save} disabled={status === 'saving'} className="btn-primary disabled:opacity-50">
           {status === 'saving' ? 'Saving…' : isNew ? 'Create car' : 'Save changes'}
         </button>
+        {!isNew && sellable && (
+          <button onClick={notifyAgents} disabled={notify.busy} className="btn-ghost !py-2.5 disabled:opacity-50">
+            {notify.busy ? 'Notifying…' : '✉ Notify agents'}
+          </button>
+        )}
         {!isNew && (
           <button onClick={del} disabled={status === 'saving'} className="text-sm text-oxblood-light hover:text-bone">
             Delete car
@@ -524,6 +548,7 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
         {message && (
           <span className={`text-sm ${status === 'error' ? 'text-oxblood-light' : 'text-brass'}`}>{message}</span>
         )}
+        {notify.msg && <span className="text-sm text-brass">{notify.msg}</span>}
       </section>
 
       {/* Full-screen photo viewer */}

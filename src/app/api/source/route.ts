@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { routeEmailFor } from '@/data/contacts';
 import { getAgent } from '@/data/agents';
+import { sendEmail } from '@/lib/email';
 
 const HOUSE_INBOX = 'contact@cksretrogarage.com';
 
@@ -101,30 +102,12 @@ export async function POST(req: NextRequest) {
       isEnquiry: !!agent,
     });
 
-    const apiKey = process.env.RESEND_API_KEY;
-    if (apiKey) {
-      // When routed to a specific agent, copy the house inbox so every lead is logged.
-      const cc = agent && to !== HOUSE_INBOX ? [HOUSE_INBOX] : undefined;
-      const subject = agent
-        ? `New enquiry — ${car} (via ${agent.name})`
-        : `New sourcing request — ${car}`;
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          from: 'CK Retro Garage <leads@cksretrogarage.com>',
-          to: [to],
-          ...(cc ? { cc } : {}),
-          reply_to: email,
-          subject,
-          text,
-          html,
-        }),
-      });
-    } else {
-      // No email provider configured — log so nothing is silently lost.
-      console.log('[source-lead] (RESEND_API_KEY not set)', JSON.stringify({ ...data, routedTo: to }, null, 2));
-    }
+    // When routed to a specific agent, copy the house inbox so every lead is logged.
+    const cc = agent && to !== HOUSE_INBOX ? [HOUSE_INBOX] : undefined;
+    const subject = agent
+      ? `New enquiry — ${car} (via ${agent.name})`
+      : `New sourcing request — ${car}`;
+    await sendEmail({ to, cc, replyTo: email, subject, html, text });
 
     return NextResponse.json({ ok: true });
   } catch (err) {

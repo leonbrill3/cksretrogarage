@@ -25,8 +25,11 @@ export async function POST(req: NextRequest) {
   }
 
   let slug = '';
+  let agentIds: string[] | undefined;
   try {
-    ({ slug } = await req.json());
+    const b = await req.json();
+    slug = b.slug;
+    agentIds = Array.isArray(b.agentIds) ? b.agentIds : undefined;
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
@@ -44,9 +47,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Car is not sellable (set a minimum price first).' }, { status: 400 });
   }
 
-  const recipients = agents.filter((a) => a.email && a.token);
+  const recipients = agents.filter(
+    (a) => a.email && a.token && (!agentIds || agentIds.includes(a.id)),
+  );
   if (recipients.length === 0) {
-    return NextResponse.json({ error: 'No agents to notify.' }, { status: 400 });
+    return NextResponse.json({ error: 'Select at least one agent to notify.' }, { status: 400 });
   }
 
   const base = baseUrl(req);

@@ -57,7 +57,15 @@ function readFileAsDataURL(file: File): Promise<string> {
   });
 }
 
-export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) {
+export default function CarEditor({
+  car,
+  isNew,
+  agents = [],
+}: {
+  car: Car;
+  isNew: boolean;
+  agents?: { id: string; name: string; email: string }[];
+}) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -100,6 +108,8 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
   const [viewer, setViewer] = useState<number | null>(null);
   const [dragging, setDragging] = useState(false);
   const [notify, setNotify] = useState<{ busy: boolean; msg: string }>({ busy: false, msg: '' });
+  const [notifyOpen, setNotifyOpen] = useState(false);
+  const [notifyPick, setNotifyPick] = useState<string[]>(agents.map((a) => a.id));
   const [dirty, setDirty] = useState(false);
 
   // Warn before leaving with unsaved edits.
@@ -288,13 +298,14 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
     }
   }
 
-  async function notifyAgents() {
-    if (!confirm('Email all agents that this car is available to sell?')) return;
+  async function sendNotifications() {
+    if (notifyPick.length === 0) return;
     setNotify({ busy: true, msg: '' });
+    setNotifyOpen(false);
     const res = await fetch('/api/admin/notify-agents', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug: car.slug }),
+      body: JSON.stringify({ slug: car.slug, agentIds: notifyPick }),
     });
     const d = await res.json().catch(() => ({}));
     if (!res.ok) {
@@ -302,7 +313,7 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
     } else if (d.sent > 0) {
       setNotify({ busy: false, msg: `Sent to ${d.sent} agent${d.sent === 1 ? '' : 's'}.` });
     } else {
-      setNotify({ busy: false, msg: `Email isn't connected yet — would notify ${d.agents} agent(s). Add RESEND_API_KEY to send for real.` });
+      setNotify({ busy: false, msg: `Email isn't connected yet — would notify ${d.agents} agent(s).` });
     }
   }
 
@@ -559,7 +570,11 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
           {status === 'saving' ? 'Saving…' : isNew ? 'Create car' : 'Save changes'}
         </button>
         {!isNew && sellable && (
-          <button onClick={notifyAgents} disabled={notify.busy} className="btn-ghost !py-2.5 disabled:opacity-50">
+          <button
+            onClick={() => { setNotifyPick(agents.map((a) => a.id)); setNotifyOpen(true); }}
+            disabled={notify.busy}
+            className="btn-ghost !py-2.5 disabled:opacity-50"
+          >
             {notify.busy ? 'Notifying…' : '✉ Notify agents'}
           </button>
         )}
@@ -617,6 +632,62 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
           )}
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs tracking-label text-bone-dim">
             {viewer + 1} / {images.length}
+          </div>
+        </div>
+      )}
+
+      {/* Notify-agents picker */}
+      {notifyOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink-900/80 p-4" onClick={() => setNotifyOpen(false)}>
+          <div className="w-full max-w-md border border-bone/15 bg-ink-800 p-6" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-serif text-lg text-bone">Notify agents</h3>
+            <p className="mt-1 text-xs text-bone-dim">
+              Choose who gets the “new car to sell” email for {car.year} {car.make} {car.model}.
+            </p>
+
+            <div className="mt-4 flex items-center justify-between text-[11px] uppercase tracking-label text-bone-dim">
+              <span>{notifyPick.length} of {agents.length} selected</span>
+              <button
+                onClick={() => setNotifyPick(notifyPick.length === agents.length ? [] : agents.map((a) => a.id))}
+                className="text-brass hover:text-bone"
+              >
+                {notifyPick.length === agents.length ? 'Clear all' : 'Select all'}
+              </button>
+            </div>
+
+            <div className="mt-3 max-h-72 space-y-1 overflow-y-auto">
+              {agents.length === 0 && <p className="text-sm text-bone-dim">No agents available.</p>}
+              {agents.map((a) => {
+                const on = notifyPick.includes(a.id);
+                return (
+                  <label key={a.id} className="flex cursor-pointer items-center gap-3 border border-bone/10 bg-ink-900/40 px-3 py-2.5 hover:border-bone/30">
+                    <input
+                      type="checkbox"
+                      checked={on}
+                      onChange={() =>
+                        setNotifyPick((prev) => (on ? prev.filter((id) => id !== a.id) : [...prev, a.id]))
+                      }
+                      className="accent-oxblood"
+                    />
+                    <span className="min-w-0">
+                      <span className="block text-sm text-bone">{a.name}</span>
+                      <span className="block truncate text-xs text-bone-dim">{a.email}</span>
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+
+            <div className="mt-5 flex items-center justify-end gap-4">
+              <button onClick={() => setNotifyOpen(false)} className="text-sm text-bone-dim hover:text-bone">Cancel</button>
+              <button
+                onClick={sendNotifications}
+                disabled={notifyPick.length === 0}
+                className="btn-primary !py-2.5 disabled:opacity-40"
+              >
+                Notify {notifyPick.length} agent{notifyPick.length === 1 ? '' : 's'}
+              </button>
+            </div>
           </div>
         </div>
       )}

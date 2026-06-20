@@ -329,6 +329,9 @@
       ],
       "tr": []
     },
+    "sellable": true,
+    "minPrice": 250000,
+    "currency": "EUR",
     "clip": "/cars/ferrari-599/clip-mqln0byz.mp4"
   }
 ]

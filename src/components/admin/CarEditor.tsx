@@ -104,6 +104,7 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
   const [clipExt, setClipExt] = useState('mp4');
   const [clipUrl, setClipUrl] = useState(initialClipIsUrl ? car.clip! : '');
   const [clipRemoved, setClipRemoved] = useState(false);
+  const [draggingVideo, setDraggingVideo] = useState(false);
   const clipPreview = clipData || clipUrl.trim() || (!clipRemoved ? existingClipPath : '');
 
   function autoSlug(nextYear = year, nextMake = make, nextModel = model) {
@@ -136,10 +137,12 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
     await addFiles(Array.from(e.dataTransfer?.files || []));
   }
 
-  async function onPickVideo(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    e.target.value = '';
+  async function setVideoFile(file: File | undefined) {
     if (!file) return;
+    if (!file.type.startsWith('video/')) {
+      alert('That doesn’t look like a video file.');
+      return;
+    }
     if (file.size > 60 * 1024 * 1024) {
       alert('That clip is over 60MB. Please use a smaller file, or paste a hosted video URL instead.');
       return;
@@ -148,6 +151,19 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
     setClipData(await readFileAsDataURL(file));
     setClipUrl('');
     setClipRemoved(false);
+  }
+
+  async function onPickVideo(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    await setVideoFile(file);
+  }
+
+  async function onDropVideo(e: React.DragEvent) {
+    e.preventDefault();
+    setDraggingVideo(false);
+    const file = Array.from(e.dataTransfer?.files || []).find((f) => f.type.startsWith('video/'));
+    await setVideoFile(file);
   }
 
   function removeClip() {
@@ -419,7 +435,12 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
       </section>
 
       {/* Video clip */}
-      <section>
+      <section
+        onDragOver={(e) => { e.preventDefault(); if (!draggingVideo) setDraggingVideo(true); }}
+        onDragLeave={(e) => { if (e.currentTarget === e.target) setDraggingVideo(false); }}
+        onDrop={onDropVideo}
+        className={`rounded p-3 transition-colors ${draggingVideo ? 'bg-brass/10 ring-2 ring-brass' : 'ring-1 ring-transparent'}`}
+      >
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-serif text-lg">Video clip (vertical reel)</h2>
           <button onClick={() => videoRef.current?.click()} className="btn-ghost !py-2">
@@ -428,8 +449,8 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
           <input ref={videoRef} type="file" accept="video/*" hidden onChange={onPickVideo} />
         </div>
         <p className="mb-4 text-xs text-bone-dim">
-          Upload a clip from your desktop (up to 60MB) or paste a hosted video URL. Plays muted on a
-          loop on the car page.
+          Drag a video here from your desktop, click “Upload video”, or paste a hosted URL (up to
+          60MB). Plays muted on a loop on the car page.
         </p>
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
@@ -444,10 +465,12 @@ export default function CarEditor({ car, isNew }: { car: Car; isNew: boolean }) 
           ) : (
             <button
               onClick={() => videoRef.current?.click()}
-              className="flex aspect-[9/16] w-40 shrink-0 flex-col items-center justify-center gap-1 border-2 border-dashed border-bone/20 text-xs text-bone-dim hover:border-brass/60 hover:text-bone"
+              className={`flex aspect-[9/16] w-40 shrink-0 flex-col items-center justify-center gap-1 border-2 border-dashed text-xs transition-colors ${
+                draggingVideo ? 'border-brass text-brass' : 'border-bone/20 text-bone-dim hover:border-brass/60 hover:text-bone'
+              }`}
             >
               <span className="text-2xl leading-none">+</span>
-              <span>Upload clip</span>
+              <span className="px-2 text-center">Drop video here<br />or click to upload</span>
             </button>
           )}
 

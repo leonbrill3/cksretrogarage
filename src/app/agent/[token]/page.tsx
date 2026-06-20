@@ -94,6 +94,9 @@ export default async function AgentDashboard({
               currency={car.currency || 'EUR'}
               location={car.location || ''}
               specs={specEntries(car.specs)}
+              agentName={agent.name}
+              agentEmail={agent.email}
+              agentPhone={agent.phone || ''}
             />
           ))}
         </div>

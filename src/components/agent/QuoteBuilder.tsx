@@ -38,6 +38,9 @@ export default function QuoteBuilder({
   currency,
   location = '',
   specs = [],
+  agentName = '',
+  agentEmail = '',
+  agentPhone = '',
 }: {
   token: string;
   slug: string;
@@ -47,6 +50,9 @@ export default function QuoteBuilder({
   currency: string;
   location?: string;
   specs?: [string, string][];
+  agentName?: string;
+  agentEmail?: string;
+  agentPhone?: string;
 }) {
   const [asking, setAsking] = useState(String(minPrice));
   const [lang, setLang] = useState('en');
@@ -216,33 +222,69 @@ export default function QuoteBuilder({
             </div>
 
             {emailOpen && (
-              <div className="space-y-2 border border-bone/15 bg-ink-900/50 p-3">
-                <div className="text-[11px] uppercase tracking-label text-bone-dim">Send a branded email</div>
-                <input
-                  value={custEmail}
-                  onChange={(e) => setCustEmail(e.target.value)}
-                  placeholder="client@email.com"
-                  className={fieldCls}
-                  type="email"
-                />
-                <textarea
-                  value={custMsg}
-                  onChange={(e) => setCustMsg(e.target.value)}
-                  rows={3}
-                  placeholder="Add a personal note (optional)…"
-                  className={fieldCls}
-                />
+              <div className="space-y-3 border border-bone/15 bg-ink-900/50 p-3">
+                <div>
+                  <label className="mb-1 block text-[10px] uppercase tracking-label text-bone-dim">Send to (client email)</label>
+                  <input
+                    value={custEmail}
+                    onChange={(e) => setCustEmail(e.target.value)}
+                    placeholder="client@email.com"
+                    className={fieldCls}
+                    type="email"
+                  />
+                </div>
+
+                <div className="text-[10px] uppercase tracking-label text-bone-dim">Email preview — edit your note below</div>
+
+                {/* Editable branded email preview (mirrors what the client receives) */}
+                <div className="overflow-hidden border border-bone/15 bg-[#161617]">
+                  <div className="border-b border-bone/10 px-5 py-4">
+                    <div className="font-serif text-lg text-bone">CK Retro Garage</div>
+                    <div className="text-[9px] uppercase tracking-[0.3em] text-brass">Connoisseur Acquisitions</div>
+                  </div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={cover} alt="" className="h-40 w-full object-cover" />
+                  <div className="space-y-3 px-5 py-4">
+                    <textarea
+                      value={custMsg}
+                      onChange={(e) => setCustMsg(e.target.value)}
+                      rows={3}
+                      placeholder="Add a personal note to your client… (e.g. “Thought of you for this one — happy to arrange a viewing.”)"
+                      className="w-full resize-none border border-dashed border-bone/20 bg-ink-900/40 px-2 py-1.5 text-sm text-bone-muted focus:border-brass focus:outline-none"
+                    />
+                    <div className="text-[10px] uppercase tracking-label text-brass">A car selected for you</div>
+                    <div className="font-serif text-xl text-bone">{title}</div>
+                    <div className="font-serif text-lg text-brass">{fmt(askingNum, currency)}</div>
+                    {location && <div className="text-xs text-bone-dim">{location}</div>}
+                    {specs.length > 0 && (
+                      <dl className="grid grid-cols-2 gap-x-4 gap-y-1.5 border-t border-bone/10 pt-3 text-xs">
+                        {specs.slice(0, 4).map(([k, v]) => (
+                          <div key={k}>
+                            <dt className="text-bone-dim/70">{SPEC_LABELS[k] || k}</dt>
+                            <dd className="text-bone">{v}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    )}
+                    <div className="inline-block bg-oxblood px-4 py-2 text-[11px] uppercase tracking-label text-bone">View full details &amp; photos →</div>
+                    <div className="border-t border-bone/10 pt-3 text-xs text-bone-dim">
+                      <span className="text-bone">{agentName}</span> · CK Retro Garage<br />
+                      {agentEmail}{agentPhone ? ` · ${agentPhone}` : ''}
+                    </div>
+                  </div>
+                </div>
+
                 <button
                   onClick={sendBrandedEmail}
                   disabled={emailStatus === 'sending'}
                   className="btn-primary !py-2 !px-4 text-xs disabled:opacity-40"
                 >
-                  {emailStatus === 'sending' ? 'Sending…' : 'Send branded email'}
+                  {emailStatus === 'sending' ? 'Sending…' : 'Send this email'}
                 </button>
                 {emailMsg && (
                   <p className={`text-[11px] ${emailStatus === 'error' ? 'text-oxblood-light' : 'text-brass'}`}>{emailMsg}</p>
                 )}
-                <p className="text-[11px] text-bone-dim">Sends a designed CK Retro Garage email with your note, photos, price, and a button to view the car. Replies come to you.</p>
+                <p className="text-[11px] text-bone-dim">This is exactly what your client receives. Replies come straight to you.</p>
               </div>
             )}
 

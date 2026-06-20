@@ -5,7 +5,9 @@
 import { formatMoney, type Car } from '@/data/cars';
 import type { Agent } from '@/data/agents';
 
-const FROM = 'CK Retro Garage <leads@cksretrogarage.com>';
+// Sender is configurable so we can use a verified domain now (aivacations.com)
+// and switch to leads@cksretrogarage.com once that domain is verified.
+const FROM = process.env.RESEND_FROM || 'CK Retro Garage <onboarding@resend.dev>';
 
 export type SendResult = { ok: boolean; skipped?: boolean; error?: string };
 

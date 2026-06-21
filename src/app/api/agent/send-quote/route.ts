@@ -16,7 +16,7 @@ function baseUrl(req: NextRequest): string {
 
 // Send a branded quote email to a client, on the agent's behalf.
 export async function POST(req: NextRequest) {
-  let body: { token?: string; slug?: string; askingPrice?: number | string; locale?: string; to?: string; message?: string };
+  let body: { token?: string; slug?: string; askingPrice?: number | string; locale?: string; to?: string; message?: string; signature?: string };
   try {
     body = await req.json();
   } catch {
@@ -54,6 +54,7 @@ export async function POST(req: NextRequest) {
     currency: car.currency || 'EUR',
     url,
     message: String(body.message || ''),
+    signature: String(body.signature || ''),
     baseUrl: base,
   });
 

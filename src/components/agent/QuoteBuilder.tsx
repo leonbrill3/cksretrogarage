@@ -65,6 +65,9 @@ export default function QuoteBuilder({
   const [custMsg, setCustMsg] = useState('');
   const [emailStatus, setEmailStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [emailMsg, setEmailMsg] = useState('');
+  const [signature, setSignature] = useState(
+    `${agentName}\nCK Retro Garage\n${agentEmail}${agentPhone ? ` · ${agentPhone}` : ''}`,
+  );
 
   const askingNum = Number(asking.replace(/[^0-9.]/g, ''));
   const valid = Number.isFinite(askingNum) && askingNum >= minPrice;
@@ -112,7 +115,7 @@ export default function QuoteBuilder({
       const res = await fetch('/api/agent/send-quote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, slug, askingPrice: askingNum, locale: lang, to: custEmail.trim(), message: custMsg }),
+        body: JSON.stringify({ token, slug, askingPrice: askingNum, locale: lang, to: custEmail.trim(), message: custMsg, signature }),
       });
       const d = await res.json();
       if (!res.ok) throw new Error(d.error || 'Failed');
@@ -285,9 +288,14 @@ export default function QuoteBuilder({
                       </dl>
                     )}
                     <a href={url} target="_blank" rel="noopener noreferrer" className="inline-block bg-oxblood px-4 py-2 text-[11px] uppercase tracking-label text-bone transition-opacity hover:opacity-90">View full details &amp; photos →</a>
-                    <div className="border-t border-bone/10 pt-3 text-xs text-bone-dim">
-                      <span className="text-bone">{agentName}</span> · CK Retro Garage<br />
-                      {agentEmail}{agentPhone ? ` · ${agentPhone}` : ''}
+                    <div className="border-t border-bone/10 pt-3">
+                      <label className="mb-1 block text-[10px] uppercase tracking-label text-bone-dim/70">Signature (editable)</label>
+                      <textarea
+                        value={signature}
+                        onChange={(e) => setSignature(e.target.value)}
+                        rows={3}
+                        className="w-full resize-none border border-dashed border-bone/20 bg-ink-900/40 px-2 py-1.5 text-xs text-bone-muted focus:border-brass focus:outline-none"
+                      />
                     </div>
                   </div>
                 </div>

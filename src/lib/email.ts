@@ -155,6 +155,10 @@ export function quoteEmail(opts: {
     : '';
   const specs = specEntries(car.specs).slice(0, 4);
   const phone = (agent.phone || '').trim();
+  const signature =
+    opts.signature && opts.signature.trim()
+      ? opts.signature.trim()
+      : `${agent.name}\nCK Retro Garage\n${agent.email}${phone ? ` · ${phone}` : ''}`;
 
   const specsHtml = specs.length
     ? `<table style="width:100%;border-collapse:collapse;font-size:13px;color:#ece6da;margin-top:8px;">${specs
@@ -178,12 +182,9 @@ export function quoteEmail(opts: {
     ${car.location ? `<div style="font-size:13px;color:#9a948a;">${esc(car.location)}</div>` : ''}
     ${specsHtml}
     ${btn(url, 'View full details & photos →')}
-    <div style="margin-top:28px;border-top:1px solid #2a2a2c;padding-top:18px;font-size:13px;color:#9a948a;line-height:1.6;">
-      <strong style="color:#ece6da;">${esc(agent.name)}</strong> · CK Retro Garage<br />
-      <a href="mailto:${esc(agent.email)}" style="color:#c8a96a;text-decoration:none;">${esc(agent.email)}</a>${phone ? ` · <a href="tel:${esc(phone)}" style="color:#c8a96a;text-decoration:none;">${esc(phone)}</a>` : ''}
-    </div>
+    <div style="margin-top:28px;border-top:1px solid #2a2a2c;padding-top:18px;font-size:13px;color:#9a948a;line-height:1.6;white-space:pre-wrap;">${esc(signature)}</div>
   </div>`;
 
-  const text = `${message.trim() ? message.trim() + '\n\n' : ''}${title}\n${price}${car.location ? `\n${car.location}` : ''}\n\nView full details & photos:\n${url}\n\n${agent.name} · CK Retro Garage\n${agent.email}${phone ? ` · ${phone}` : ''}`;
+  const text = `${message.trim() ? message.trim() + '\n\n' : ''}${title}\n${price}${car.location ? `\n${car.location}` : ''}\n\nView full details & photos:\n${url}\n\n${signature}`;
   return { subject, html: shell(inner), text };
 }

@@ -284,7 +284,7 @@ export default function QuoteBuilder({
                         ))}
                       </dl>
                     )}
-                    <div className="inline-block bg-oxblood px-4 py-2 text-[11px] uppercase tracking-label text-bone">View full details &amp; photos →</div>
+                    <a href={url} target="_blank" rel="noopener noreferrer" className="inline-block bg-oxblood px-4 py-2 text-[11px] uppercase tracking-label text-bone transition-opacity hover:opacity-90">View full details &amp; photos →</a>
                     <div className="border-t border-bone/10 pt-3 text-xs text-bone-dim">
                       <span className="text-bone">{agentName}</span> · CK Retro Garage<br />
                       {agentEmail}{agentPhone ? ` · ${agentPhone}` : ''}

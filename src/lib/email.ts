@@ -141,6 +141,7 @@ export function quoteEmail(opts: {
   url: string;
   message: string;
   baseUrl: string;
+  signature?: string;
 }) {
   const { car, agent, asking, currency, url, message, baseUrl } = opts;
   const title = `${car.year} ${car.make} ${car.model}`;

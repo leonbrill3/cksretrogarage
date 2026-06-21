@@ -9,7 +9,8 @@
     "storage": "Custodia",
     "about": "Quiénes Somos",
     "contact": "Contacto",
-    "cta": "Encuentre Mi Auto"
+    "cta": "Encuentre Mi Auto",
+    "sell": "Vender Mi Auto"
   },
   "footer": {
     "blurb": "Una casa privada de adquisición de automóviles excepcionales. Cada auto buscado, inspeccionado y entregado con tres décadas de experiencia.",
@@ -72,7 +73,14 @@
     "cta": {
       "title": "Díganos qué auto desea.",
       "body": "Cualquier marca, cualquier época, en cualquier lugar del mundo. Comparta su requerimiento y comenzaremos la búsqueda.",
-      "button": "Iniciar una Solicitud de Búsqueda"
+      "button": "Iniciar una Solicitud de Búsqueda",
+      "eyebrow": "¿Busca un auto?"
+    },
+    "sell": {
+      "eyebrow": "¿Vende un auto?",
+      "title": "¿Tiene un automóvil excepcional para vender?",
+      "body": "Colocamos automóviles importantes con los propietarios adecuados — con discreción y en todo el mundo.",
+      "button": "Cuéntenos sobre su auto"
     }
   },
   "collection": {
@@ -316,5 +324,49 @@
   },
   "quote": {
     "priceLabel": "Precio"
+  },
+  "sell": {
+    "metaTitle": "Vender Mi Auto",
+    "eyebrow": "Venta Privada",
+    "title": "¿Tiene un automóvil excepcional para vender?",
+    "intro": "Ya sea venta directa o consignación, colocamos automóviles importantes con los propietarios adecuados — con discreción y en todo el mundo. Cuéntenos sobre su auto y el equipo se pondrá en contacto personalmente.",
+    "assurances": {
+      "reach": {
+        "title": "Los Compradores Adecuados",
+        "body": "Una red construida durante décadas en las Américas, Europa y más allá — incluidos coleccionistas que nunca consultan listados públicos."
+      },
+      "discreet": {
+        "title": "Discreto y Confidencial",
+        "body": "Su venta se gestiona de forma privada. Nada se hace público sin su consentimiento."
+      },
+      "handled": {
+        "title": "Gestionado de Principio a Fin",
+        "body": "Valoración, presentación, verificación y entrega — gestionamos todo el proceso por usted."
+      }
+    },
+    "fields": {
+      "name": "Nombre Completo",
+      "email": "Correo electrónico",
+      "phone": "Teléfono / WhatsApp",
+      "country": "País",
+      "car": "El auto que vende",
+      "price": "Precio solicitado (opcional)",
+      "details": "Detalles y estado"
+    },
+    "ph": {
+      "name": "Su nombre",
+      "email": "usted@correo.com",
+      "phone": "+1 …",
+      "country": "Su país",
+      "car": "p. ej. Ferrari 308 GTSi 1985, 42.000 km",
+      "price": "p. ej. USD 95,000",
+      "details": "Año, kilometraje, historial, estado, titularidad, plazos…"
+    },
+    "consent": "Acepto ser contactado sobre mi auto y acepto la política de privacidad.",
+    "errorMsg": "Algo salió mal. Inténtelo de nuevo o escríbanos directamente.",
+    "sending": "Enviando…",
+    "submit": "Enviar Datos",
+    "successTitle": "Datos recibidos.",
+    "successBody": "Gracias. El miembro adecuado de nuestro equipo se pondrá en contacto personalmente, muy pronto."
   }
 }

@@ -14,25 +14,29 @@ function esc(v: unknown): string {
 // Clean, branded enquiry email (drops internal fields).
 function buildEmail(
   data: Record<string, unknown>,
-  opts: { car: string; agentName: string; isEnquiry: boolean },
+  opts: { car: string; agentName: string; isEnquiry: boolean; isSell?: boolean },
 ) {
   const message = String(data.details || data.message || '').trim();
   const fields: [string, string, ('mailto' | 'tel' | '')?][] = [
-    ['Customer', String(data.name || '').trim()],
+    [opts.isSell ? 'Owner' : 'Customer', String(data.name || '').trim()],
     ['Email', String(data.email || '').trim(), 'mailto'],
     ['Phone', String(data.phone || '').trim(), 'tel'],
     ['Country', String(data.country || '').trim()],
     ['Budget', String(data.budget || '').trim()],
+    ['Asking', String(data.price || '').trim()],
   ];
   const rows = fields.filter(([, v]) => v);
 
-  const intro = opts.isEnquiry
-    ? 'A buyer just enquired through your link.'
-    : 'A new sourcing request just came in.';
+  const label = opts.isSell ? 'New Car Offered' : opts.isEnquiry ? 'New Enquiry' : 'New Sourcing Request';
+  const intro = opts.isSell
+    ? 'An owner wants to sell or consign a car through us.'
+    : opts.isEnquiry
+      ? 'A buyer just enquired through your link.'
+      : 'A new sourcing request just came in.';
 
   // Plain-text fallback
   const text = [
-    `${opts.isEnquiry ? 'New enquiry' : 'New sourcing request'} — ${opts.car}`,
+    `${label} — ${opts.car}`,
     '',
     intro,
     '',
@@ -67,7 +71,7 @@ function buildEmail(
       <div style="font-size:10px;letter-spacing:.3em;color:#c8a96a;text-transform:uppercase;margin-top:4px;">Connoisseur Acquisitions</div>
     </div>
     <div style="padding:30px;">
-      <div style="font-size:11px;letter-spacing:.2em;color:#c8a96a;text-transform:uppercase;margin-bottom:10px;">${opts.isEnquiry ? 'New Enquiry' : 'New Sourcing Request'}</div>
+      <div style="font-size:11px;letter-spacing:.2em;color:#c8a96a;text-transform:uppercase;margin-bottom:10px;">${esc(label)}</div>
       <div style="font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1.2;color:#ece6da;margin-bottom:8px;">${esc(opts.car)}</div>
       <div style="font-size:14px;color:#9a948a;margin-bottom:26px;">${esc(intro)}</div>
       <table style="width:100%;border-collapse:collapse;font-size:14px;color:#ece6da;">${rowsHtml}</table>
@@ -90,12 +94,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // An attributed agent (from a co-branded listing) takes priority over
-    // country-based routing; otherwise fall back to the territory router.
+    const isSell = data.intent === 'sell';
+
+    // Seller submissions go straight to the house inbox (CK handles acquisitions).
+    // Otherwise: an attributed agent (from a co-branded listing) takes priority
+    // over country-based routing; fall back to the territory router.
     const agents = await getAgents();
-    const agent = data.agent ? agents.find((a) => a.id === data.agent) : undefined;
+    const agent = !isSell && data.agent ? agents.find((a) => a.id === data.agent) : undefined;
     const country = String(data.country || '').trim().toLowerCase();
-    const territory = country
+    const territory = !isSell && country
       ? agents.find((a) => (a.match || []).some((m) => country.includes(m)))
       : undefined;
     const to = agent?.email || territory?.email || HOUSE_INBOX;
@@ -104,13 +111,16 @@ export async function POST(req: NextRequest) {
       car: String(car),
       agentName: agent?.name || '',
       isEnquiry: !!agent,
+      isSell,
     });
 
     // When routed to a specific agent, copy the house inbox so every lead is logged.
     const cc = agent && to !== HOUSE_INBOX ? [HOUSE_INBOX] : undefined;
-    const subject = agent
-      ? `New enquiry — ${car} (via ${agent.name})`
-      : `New sourcing request — ${car}`;
+    const subject = isSell
+      ? `New car offered for sale — ${car}`
+      : agent
+        ? `New enquiry — ${car} (via ${agent.name})`
+        : `New sourcing request — ${car}`;
     await sendEmail({ to, cc, replyTo: email, subject, html, text });
 
     return NextResponse.json({ ok: true });

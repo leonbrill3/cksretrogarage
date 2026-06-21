@@ -167,17 +167,33 @@ export default async function Home({
         </div>
       </section>
 
-      {/* FINAL CTA */}
+      {/* FINAL CTA — two-sided: buy a car / sell a car */}
       <section className="border-t border-bone/10 bg-oxblood-deep">
-        <div className="container-site flex flex-col items-center gap-8 py-24 text-center">
-          <h2 className="h-display max-w-3xl text-3xl text-bone md:text-5xl">{t('cta.title')}</h2>
-          <p className="max-w-xl text-base leading-relaxed text-bone/80">{t('cta.body')}</p>
-          <Link
-            href="/source"
-            className="inline-flex items-center justify-center gap-2 bg-bone px-8 py-4 text-[12px] font-medium uppercase tracking-label text-ink-900 transition-opacity hover:opacity-90"
-          >
-            {t('cta.button')}
-          </Link>
+        <div className="container-site grid gap-12 py-20 md:grid-cols-2 md:gap-0">
+          {/* Buy */}
+          <div className="flex flex-col items-center gap-5 px-2 text-center md:px-10 md:[&:not(:last-child)]:border-r md:border-bone/15">
+            <div className="text-[11px] uppercase tracking-label text-bone/60">{t('cta.eyebrow')}</div>
+            <h2 className="h-display text-2xl text-bone md:text-4xl">{t('cta.title')}</h2>
+            <p className="max-w-sm text-sm leading-relaxed text-bone/75">{t('cta.body')}</p>
+            <Link
+              href="/source"
+              className="mt-2 inline-flex items-center justify-center gap-2 bg-bone px-8 py-4 text-[12px] font-medium uppercase tracking-label text-ink-900 transition-opacity hover:opacity-90"
+            >
+              {t('cta.button')}
+            </Link>
+          </div>
+          {/* Sell */}
+          <div className="flex flex-col items-center gap-5 px-2 text-center md:px-10">
+            <div className="text-[11px] uppercase tracking-label text-bone/60">{t('sell.eyebrow')}</div>
+            <h2 className="h-display text-2xl text-bone md:text-4xl">{t('sell.title')}</h2>
+            <p className="max-w-sm text-sm leading-relaxed text-bone/75">{t('sell.body')}</p>
+            <Link
+              href="/sell"
+              className="mt-2 inline-flex items-center justify-center gap-2 border border-bone/40 px-8 py-4 text-[12px] font-medium uppercase tracking-label text-bone transition-colors hover:bg-bone hover:text-ink-900"
+            >
+              {t('sell.button')}
+            </Link>
+          </div>
         </div>
       </section>
     </>

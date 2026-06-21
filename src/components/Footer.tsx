@@ -22,7 +22,7 @@ export default async function Footer({ locale }: { locale: string }) {
           <div>
             <div className="eyebrow mb-5">{t('explore')}</div>
             <ul className="space-y-3 text-sm text-bone-muted">
-              {['collection', 'process', 'storage', 'about', 'contact'].map((k) => (
+              {['collection', 'process', 'sell', 'storage', 'about', 'contact'].map((k) => (
                 <li key={k}>
                   <Link href={`/${k}`} className="link-underline hover:text-bone">
                     {tn(k)}

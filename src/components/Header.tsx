@@ -8,6 +8,7 @@ import LanguageSwitcher from './LanguageSwitcher';
 const NAV = [
   { href: '/collection', key: 'collection' },
   { href: '/process', key: 'process' },
+  { href: '/sell', key: 'sell' },
   { href: '/storage', key: 'storage' },
   { href: '/about', key: 'about' },
   { href: '/contact', key: 'contact' },

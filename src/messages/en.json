@@ -9,7 +9,8 @@
     "storage": "Custody",
     "about": "About",
     "contact": "Contact",
-    "cta": "Source My Car"
+    "cta": "Source My Car",
+    "sell": "Sell a Car"
   },
   "footer": {
     "blurb": "A private acquisition house for exceptional automobiles. Every car sourced, inspected and delivered with three decades of expertise.",
@@ -72,7 +73,14 @@
     "cta": {
       "title": "Tell us the car you want.",
       "body": "Any make, any era, anywhere in the world. Share your brief and we will begin the search.",
-      "button": "Start a Sourcing Request"
+      "button": "Start a Sourcing Request",
+      "eyebrow": "Looking for a car?"
+    },
+    "sell": {
+      "eyebrow": "Selling a car?",
+      "title": "Have an exceptional car to sell?",
+      "body": "We place significant automobiles with the right owners — discreetly, and across the world.",
+      "button": "Tell Us About Your Car"
     }
   },
   "collection": {
@@ -316,5 +324,49 @@
   },
   "quote": {
     "priceLabel": "Price"
+  },
+  "sell": {
+    "metaTitle": "Sell a Car",
+    "eyebrow": "Private Sale",
+    "title": "Have an exceptional car to sell?",
+    "intro": "Whether you are selling outright or consigning, we place significant automobiles with the right owners — discreetly, and across the world. Tell us about your car and the team will be in touch personally.",
+    "assurances": {
+      "reach": {
+        "title": "The Right Buyers",
+        "body": "A network built over decades across the Americas, Europe and beyond — including collectors who never browse public listings."
+      },
+      "discreet": {
+        "title": "Discreet & Confidential",
+        "body": "Your sale is handled privately. Nothing is made public without your say."
+      },
+      "handled": {
+        "title": "Handled End to End",
+        "body": "Valuation, presentation, vetting and delivery — we manage the entire process for you."
+      }
+    },
+    "fields": {
+      "name": "Full Name",
+      "email": "Email",
+      "phone": "Phone / WhatsApp",
+      "country": "Country",
+      "car": "The car you're selling",
+      "price": "Asking price (optional)",
+      "details": "Details & condition"
+    },
+    "ph": {
+      "name": "Your name",
+      "email": "you@email.com",
+      "phone": "+1 …",
+      "country": "Your country",
+      "car": "e.g. 1985 Ferrari 308 GTSi, 42,000 km",
+      "price": "e.g. USD 95,000",
+      "details": "Year, mileage, history, condition, ownership, timeline…"
+    },
+    "consent": "I agree to be contacted about my car and accept the privacy policy.",
+    "errorMsg": "Something went wrong. Please try again or email us directly.",
+    "sending": "Sending…",
+    "submit": "Submit Details",
+    "successTitle": "Details received.",
+    "successBody": "Thank you. The right member of our team will be in touch personally, very soon."
   }
 }

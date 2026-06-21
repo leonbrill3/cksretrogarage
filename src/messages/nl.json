@@ -9,7 +9,8 @@
     "storage": "Bewaring",
     "about": "Over ons",
     "contact": "Contact",
-    "cta": "Vind Mijn Auto"
+    "cta": "Vind Mijn Auto",
+    "sell": "Verkoop Mijn Auto"
   },
   "footer": {
     "blurb": "Een privé-acquisitiehuis voor uitzonderlijke automobielen. Elke auto gezocht, gekeurd en geleverd met drie decennia aan expertise.",
@@ -72,7 +73,14 @@
     "cta": {
       "title": "Vertel ons welke auto u zoekt.",
       "body": "Elk merk, elk tijdperk, waar ook ter wereld. Deel uw wensen en wij starten de zoektocht.",
-      "button": "Start een Zoekopdracht"
+      "button": "Start een Zoekopdracht",
+      "eyebrow": "Op zoek naar een auto?"
+    },
+    "sell": {
+      "eyebrow": "Een auto verkopen?",
+      "title": "Heeft u een uitzonderlijke auto te koop?",
+      "body": "Wij brengen bijzondere automobielen onder bij de juiste eigenaren — discreet en wereldwijd.",
+      "button": "Vertel ons over uw auto"
     }
   },
   "collection": {
@@ -316,5 +324,49 @@
   },
   "quote": {
     "priceLabel": "Prijs"
+  },
+  "sell": {
+    "metaTitle": "Verkoop Mijn Auto",
+    "eyebrow": "Privéverkoop",
+    "title": "Heeft u een uitzonderlijke auto te koop?",
+    "intro": "Of het nu om directe verkoop of consignatie gaat, wij brengen bijzondere automobielen onder bij de juiste eigenaren — discreet en wereldwijd. Vertel ons over uw auto en het team neemt persoonlijk contact met u op.",
+    "assurances": {
+      "reach": {
+        "title": "De juiste kopers",
+        "body": "Een netwerk opgebouwd over decennia in Noord- en Zuid-Amerika, Europa en daarbuiten — inclusief verzamelaars die nooit openbare advertenties bekijken."
+      },
+      "discreet": {
+        "title": "Discreet & Vertrouwelijk",
+        "body": "Uw verkoop wordt privé afgehandeld. Niets wordt openbaar gemaakt zonder uw toestemming."
+      },
+      "handled": {
+        "title": "Volledig verzorgd",
+        "body": "Taxatie, presentatie, controle en levering — wij beheren het hele proces voor u."
+      }
+    },
+    "fields": {
+      "name": "Volledige naam",
+      "email": "E-mail",
+      "phone": "Telefoon / WhatsApp",
+      "country": "Land",
+      "car": "De auto die u verkoopt",
+      "price": "Vraagprijs (optioneel)",
+      "details": "Details & staat"
+    },
+    "ph": {
+      "name": "Uw naam",
+      "email": "u@email.com",
+      "phone": "+31 …",
+      "country": "Uw land",
+      "car": "bijv. 1985 Ferrari 308 GTSi, 42.000 km",
+      "price": "bijv. USD 95.000",
+      "details": "Bouwjaar, kilometerstand, historie, staat, eigendom, tijdlijn…"
+    },
+    "consent": "Ik ga ermee akkoord om over mijn auto te worden gecontacteerd en accepteer het privacybeleid.",
+    "errorMsg": "Er ging iets mis. Probeer het opnieuw of mail ons rechtstreeks.",
+    "sending": "Verzenden…",
+    "submit": "Gegevens verzenden",
+    "successTitle": "Gegevens ontvangen.",
+    "successBody": "Dank u. Het juiste teamlid neemt zeer binnenkort persoonlijk contact met u op."
   }
 }

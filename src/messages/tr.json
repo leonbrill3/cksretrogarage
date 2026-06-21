@@ -9,7 +9,8 @@
     "storage": "Muhafaza",
     "about": "Hakkımızda",
     "contact": "İletişim",
-    "cta": "Aracımı Buldur"
+    "cta": "Aracımı Buldur",
+    "sell": "Aracımı Sat"
   },
   "footer": {
     "blurb": "Olağanüstü otomobiller için özel bir tedarik kuruluşu. Her otomobil, otuz yıllık uzmanlıkla bulunur, incelenir ve teslim edilir.",
@@ -72,7 +73,14 @@
     "cta": {
       "title": "Aradığınız otomobili bize anlatın.",
       "body": "Her marka, her dönem, dünyanın her yerinde. Taleplerinizi paylaşın, aramaya başlayalım.",
-      "button": "Tedarik Talebi Başlat"
+      "button": "Tedarik Talebi Başlat",
+      "eyebrow": "Araç mı arıyorsunuz?"
+    },
+    "sell": {
+      "eyebrow": "Aracınızı mı satıyorsunuz?",
+      "title": "Satılık özel bir aracınız mı var?",
+      "body": "Önemli otomobilleri doğru sahipleriyle buluşturuyoruz — gizlilik içinde ve dünya genelinde.",
+      "button": "Aracınızı Anlatın"
     }
   },
   "collection": {
@@ -316,5 +324,49 @@
   },
   "quote": {
     "priceLabel": "Fiyat"
+  },
+  "sell": {
+    "metaTitle": "Aracımı Sat",
+    "eyebrow": "Özel Satış",
+    "title": "Satılık özel bir aracınız mı var?",
+    "intro": "İster doğrudan satış ister konsinye olsun, önemli otomobilleri doğru sahipleriyle buluşturuyoruz — gizlilik içinde ve dünya genelinde. Aracınızı bize anlatın, ekibimiz sizinle bizzat iletişime geçsin.",
+    "assurances": {
+      "reach": {
+        "title": "Doğru Alıcılar",
+        "body": "Amerika, Avrupa ve ötesinde onlarca yılda kurulmuş bir ağ — hiçbir zaman herkese açık ilanlara bakmayan koleksiyonerler dahil."
+      },
+      "discreet": {
+        "title": "Gizli ve Mahrem",
+        "body": "Satışınız gizlilikle yürütülür. Onayınız olmadan hiçbir şey kamuya açıklanmaz."
+      },
+      "handled": {
+        "title": "Baştan Sona Yönetilir",
+        "body": "Değerleme, sunum, inceleme ve teslimat — tüm süreci sizin için biz yönetiriz."
+      }
+    },
+    "fields": {
+      "name": "Ad Soyad",
+      "email": "E-posta",
+      "phone": "Telefon / WhatsApp",
+      "country": "Ülke",
+      "car": "Sattığınız araç",
+      "price": "İstenen fiyat (isteğe bağlı)",
+      "details": "Detaylar ve durum"
+    },
+    "ph": {
+      "name": "Adınız",
+      "email": "siz@eposta.com",
+      "phone": "+90 …",
+      "country": "Ülkeniz",
+      "car": "örn. 1985 Ferrari 308 GTSi, 42.000 km",
+      "price": "örn. 95.000 USD",
+      "details": "Yıl, kilometre, geçmiş, durum, sahiplik, zaman çizelgesi…"
+    },
+    "consent": "Aracım hakkında benimle iletişime geçilmesini kabul ediyor ve gizlilik politikasını onaylıyorum.",
+    "errorMsg": "Bir şeyler yanlış gitti. Lütfen tekrar deneyin veya bize doğrudan e-posta gönderin.",
+    "sending": "Gönderiliyor…",
+    "submit": "Bilgileri Gönder",
+    "successTitle": "Bilgiler alındı.",
+    "successBody": "Teşekkürler. Ekibimizden doğru kişi çok yakında sizinle bizzat iletişime geçecek."
   }
 }

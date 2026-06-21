@@ -9,7 +9,8 @@
     "storage": "Verwahrung",
     "about": "Über uns",
     "contact": "Kontakt",
-    "cta": "Fahrzeug finden lassen"
+    "cta": "Fahrzeug finden lassen",
+    "sell": "Fahrzeug verkaufen"
   },
   "footer": {
     "blurb": "Ein privates Akquisitionshaus für aussergewöhnliche Automobile. Jedes Fahrzeug beschafft, geprüft und geliefert mit drei Jahrzehnten Erfahrung.",
@@ -72,7 +73,14 @@
     "cta": {
       "title": "Nennen Sie uns das Fahrzeug, das Sie suchen.",
       "body": "Jede Marke, jede Epoche, überall auf der Welt. Teilen Sie uns Ihre Vorgaben mit und wir beginnen die Suche.",
-      "button": "Suchanfrage starten"
+      "button": "Suchanfrage starten",
+      "eyebrow": "Suchen Sie ein Fahrzeug?"
+    },
+    "sell": {
+      "eyebrow": "Verkaufen Sie ein Fahrzeug?",
+      "title": "Haben Sie ein außergewöhnliches Fahrzeug zu verkaufen?",
+      "body": "Wir vermitteln bedeutende Automobile an die richtigen Eigentümer — diskret und weltweit.",
+      "button": "Erzählen Sie uns von Ihrem Fahrzeug"
     }
   },
   "collection": {
@@ -316,5 +324,49 @@
   },
   "quote": {
     "priceLabel": "Preis"
+  },
+  "sell": {
+    "metaTitle": "Fahrzeug verkaufen",
+    "eyebrow": "Privatverkauf",
+    "title": "Haben Sie ein außergewöhnliches Fahrzeug zu verkaufen?",
+    "intro": "Ob Direktverkauf oder Kommission — wir vermitteln bedeutende Automobile an die richtigen Eigentümer, diskret und weltweit. Erzählen Sie uns von Ihrem Fahrzeug, und das Team meldet sich persönlich bei Ihnen.",
+    "assurances": {
+      "reach": {
+        "title": "Die richtigen Käufer",
+        "body": "Ein über Jahrzehnte aufgebautes Netzwerk in Amerika, Europa und darüber hinaus — einschließlich Sammler, die nie öffentliche Inserate durchsehen."
+      },
+      "discreet": {
+        "title": "Diskret & Vertraulich",
+        "body": "Ihr Verkauf wird privat abgewickelt. Ohne Ihre Zustimmung wird nichts veröffentlicht."
+      },
+      "handled": {
+        "title": "Komplett betreut",
+        "body": "Bewertung, Präsentation, Prüfung und Lieferung — wir übernehmen den gesamten Prozess für Sie."
+      }
+    },
+    "fields": {
+      "name": "Vollständiger Name",
+      "email": "E-Mail",
+      "phone": "Telefon / WhatsApp",
+      "country": "Land",
+      "car": "Das Fahrzeug, das Sie verkaufen",
+      "price": "Preisvorstellung (optional)",
+      "details": "Details & Zustand"
+    },
+    "ph": {
+      "name": "Ihr Name",
+      "email": "sie@email.com",
+      "phone": "+49 …",
+      "country": "Ihr Land",
+      "car": "z. B. 1985 Ferrari 308 GTSi, 42.000 km",
+      "price": "z. B. 95.000 USD",
+      "details": "Baujahr, Laufleistung, Historie, Zustand, Eigentum, Zeitrahmen…"
+    },
+    "consent": "Ich bin damit einverstanden, bezüglich meines Fahrzeugs kontaktiert zu werden, und akzeptiere die Datenschutzrichtlinie.",
+    "errorMsg": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut oder schreiben Sie uns direkt.",
+    "sending": "Wird gesendet…",
+    "submit": "Angaben senden",
+    "successTitle": "Angaben erhalten.",
+    "successBody": "Vielen Dank. Das richtige Teammitglied wird sich sehr bald persönlich bei Ihnen melden."
   }
 }

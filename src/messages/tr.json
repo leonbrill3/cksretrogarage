@@ -110,7 +110,8 @@
       "engine": "Motor",
       "exterior": "Dış Renk",
       "interior": "İç Mekan"
-    }
+    },
+    "soldValue": "Satıldı"
   },
   "process": {
     "metaTitle": "Sürecimiz",

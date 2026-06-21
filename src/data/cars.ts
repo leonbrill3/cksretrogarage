@@ -36,6 +36,9 @@ export type Car = {
   currency?: string; // ISO code, e.g. "EUR", "USD", "GBP"
   location?: string;
   specs?: CarSpecs;
+  // Public availability: a sold car stays in the collection but shows "Sold"
+  // with no Inquire button (only available cars can be inquired about).
+  sold?: boolean;
 };
 
 export const cars: Car[] = carsData as Car[];

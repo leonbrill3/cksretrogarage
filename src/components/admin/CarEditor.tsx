@@ -74,6 +74,7 @@ export default function CarEditor({
   const [model, setModel] = useState(car.model);
   const [category, setCategory] = useState(car.category);
   const [featured, setFeatured] = useState(!!car.featured);
+  const [sold, setSold] = useState(!!car.sold);
   const [slug, setSlug] = useState(car.slug);
   const [slugTouched, setSlugTouched] = useState(!isNew);
 
@@ -252,6 +253,7 @@ export default function CarEditor({
         model: model.trim(),
         category,
         featured,
+        sold,
         sellable,
         minPrice: minPrice.trim() ? Number(minPrice.replace(/[^0-9.]/g, '')) : undefined,
         currency,
@@ -368,6 +370,10 @@ export default function CarEditor({
         <label className="flex items-end gap-2 pb-2.5">
           <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} className="accent-oxblood" />
           <span className="text-sm">Featured on homepage</span>
+        </label>
+        <label className="flex items-end gap-2 pb-2.5">
+          <input type="checkbox" checked={sold} onChange={(e) => setSold(e.target.checked)} className="accent-oxblood" />
+          <span className="text-sm">Sold (shows “Sold”, hides Inquire)</span>
         </label>
       </section>
 

@@ -110,7 +110,8 @@
       "engine": "Motor",
       "exterior": "Exterior",
       "interior": "Interior"
-    }
+    },
+    "soldValue": "Vendido"
   },
   "process": {
     "metaTitle": "Nuestro Proceso",

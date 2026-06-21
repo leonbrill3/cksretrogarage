@@ -52,10 +52,14 @@ export default async function CarPage({
           </div>
           <div className="md:text-right">
             <div className="text-sm text-bone-dim">{t('priceLabel')}</div>
-            <div className="mt-1 font-serif text-2xl text-brass">{t('priceValue')}</div>
-            <Link href="/source" className="btn-primary mt-5">
-              {t('inquire')}
-            </Link>
+            <div className={`mt-1 font-serif text-2xl ${car.sold ? 'text-bone-dim' : 'text-brass'}`}>
+              {car.sold ? t('soldValue') : t('priceValue')}
+            </div>
+            {!car.sold && (
+              <Link href="/source" className="btn-primary mt-5">
+                {t('inquire')}
+              </Link>
+            )}
           </div>
         </header>
       </div>

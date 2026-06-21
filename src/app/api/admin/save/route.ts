@@ -45,6 +45,7 @@ type CarRecord = {
   currency?: string;
   location?: string;
   specs?: Record<string, string>;
+  sold?: boolean;
 };
 
 type ImageEntry =
@@ -159,6 +160,13 @@ export async function POST(req: NextRequest) {
   if (loc) record.location = loc;
   const specs = car.specs !== undefined ? cleanSpecs(car.specs) : previous?.specs;
   if (specs) record.specs = specs;
+
+  // Public availability: honor an explicit `sold` flag; otherwise keep previous.
+  if ('sold' in car) {
+    if (car.sold) record.sold = true;
+  } else if (previous?.sold) {
+    record.sold = true;
+  }
 
   // Selling fields: honor an explicit `sellable` in the payload; otherwise keep
   // whatever the car already had.

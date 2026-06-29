@@ -78,7 +78,7 @@ export default function InventoryEditor({
 }: {
   record: InventoryRecord;
   isNew: boolean;
-  listings: { slug: string; title: string }[];
+  listings: { slug: string; title: string; make: string; model: string; year: number; color?: string; mileage?: string }[];
 }) {
   const router = useRouter();
 
@@ -113,6 +113,19 @@ export default function InventoryEditor({
   const addOns = costs.reduce((s, c) => s + num(String(c.amount)), 0);
   const total = num(purchaseCost) + addOns;
   const prof = salePrice.trim() ? num(salePrice) - total : null;
+
+  // Selecting an existing website listing pulls its details across so they
+  // don't have to be re-typed.
+  function pickListing(slug: string) {
+    setListingSlug(slug);
+    const l = listings.find((x) => x.slug === slug);
+    if (!l) return;
+    setMake(l.make || '');
+    setModel(l.model || '');
+    setYear(l.year ? String(l.year) : '');
+    if (l.color) setColor(l.color);
+    if (l.mileage) setMileage(l.mileage);
+  }
 
   function newCostId() {
     try { return crypto.randomUUID().replace(/-/g, ''); } catch { return `c${costs.length}-${Date.now()}`; }
@@ -185,6 +198,20 @@ export default function InventoryEditor({
 
   return (
     <div className="mt-6 pb-24">
+      {/* Pull from an existing website listing */}
+      <section className="mb-8 border border-brass/25 bg-ink-800/50 p-5">
+        <label className={lbl}>Already on the website? Select it to auto-fill the details</label>
+        <select value={listingSlug} onChange={(e) => pickListing(e.target.value)} className={`${field} bg-ink-800`}>
+          <option value="">— not on the website / enter manually —</option>
+          {listings.map((l) => <option key={l.slug} value={l.slug}>{l.title}</option>)}
+        </select>
+        {listingSlug && (
+          <p className="mt-2 text-[11px] text-bone-dim">
+            Linked to <span className="text-brass">{listings.find((l) => l.slug === listingSlug)?.title}</span> — make, model & year filled in below. You can still edit them.
+          </p>
+        )}
+      </section>
+
       {/* Identity */}
       <section>
         <div className="grid gap-5 sm:grid-cols-2">
@@ -208,13 +235,6 @@ export default function InventoryEditor({
             {status === 'sold' && !billOfSale && (
               <p className="mt-1.5 text-[11px] text-oxblood-light">Requires a Bill of Sale (in the Sale section below).</p>
             )}
-          </div>
-          <div className="sm:col-span-2">
-            <label className={lbl}>Linked public listing (optional)</label>
-            <select value={listingSlug} onChange={(e) => setListingSlug(e.target.value)} className={`${field} bg-ink-800`}>
-              <option value="">— none —</option>
-              {listings.map((l) => <option key={l.slug} value={l.slug}>{l.title}</option>)}
-            </select>
           </div>
         </div>
       </section>

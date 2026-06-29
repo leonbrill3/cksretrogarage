@@ -27,7 +27,15 @@ export default async function EditInventoryPage({
   const record = isNew ? EMPTY : list.find((r) => r.id === id);
   if (!record) notFound();
 
-  const listings = cars.map((c) => ({ slug: c.slug, title: `${c.year} ${c.make} ${c.model}` }));
+  const listings = cars.map((c) => ({
+    slug: c.slug,
+    title: `${c.year} ${c.make} ${c.model}`,
+    make: c.make,
+    model: c.model,
+    year: c.year,
+    color: c.specs?.exterior || '',
+    mileage: c.specs?.mileage || '',
+  }));
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-10">

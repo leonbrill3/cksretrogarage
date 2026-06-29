@@ -108,6 +108,63 @@ export default function InventoryEditor({
 
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState('');
+  const [reading, setReading] = useState<string | null>(null); // 'purchase' | cost id
+  const [aiNote, setAiNote] = useState('');
+
+  // Read an uploaded invoice with Claude and return structured fields to pre-fill.
+  async function extractInvoice(
+    dataUrl: string,
+    kind: 'cost' | 'purchase',
+  ): Promise<{ amount?: number; date?: string; category?: string; description?: string; vendor?: string; invoiceNumber?: string } | null> {
+    if (!dataUrl.startsWith('data:')) return null;
+    try {
+      const res = await fetch('/api/admin/extract-invoice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fileData: dataUrl, kind }),
+      });
+      const data = await res.json();
+      if (data.error === 'not_configured') {
+        setAiNote('Auto-fill from invoices is off until an Anthropic API key is added. Enter the values manually for now.');
+        return null;
+      }
+      if (!data.ok) return null;
+      return data.fields || null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function onPurchaseInvoice(v: FileRef | null) {
+    setPurchaseInvoice(v);
+    if (!v?.url?.startsWith('data:')) return;
+    setReading('purchase');
+    const f = await extractInvoice(v.url, 'purchase');
+    if (f) {
+      if (f.amount) setPurchaseCost(String(f.amount));
+      if (f.date) setPurchaseDate(f.date);
+      if (f.invoiceNumber) setPurchaseInvoiceNo(f.invoiceNumber);
+      if (f.vendor) setSeller(f.vendor);
+    }
+    setReading(null);
+  }
+
+  async function onCostInvoice(id: string, v: FileRef | null) {
+    updateCost(id, { invoice: v });
+    if (!v?.url?.startsWith('data:')) return;
+    setReading(id);
+    const f = await extractInvoice(v.url, 'cost');
+    if (f) {
+      const patch: Partial<CostItem> = {};
+      if (f.amount) patch.amount = f.amount;
+      if (f.date) patch.date = f.date;
+      if (f.category && (COST_CATEGORIES as readonly string[]).includes(f.category)) patch.category = f.category;
+      const desc = [f.description, f.vendor].filter(Boolean).join(' — ');
+      if (desc) patch.description = desc;
+      updateCost(id, patch);
+    }
+    setReading(null);
+  }
 
   const num = (s: string) => Number(String(s).replace(/[^0-9.-]/g, '')) || 0;
   const addOns = costs.reduce((s, c) => s + num(String(c.amount)), 0);
@@ -247,7 +304,10 @@ export default function InventoryEditor({
           <div><label className={lbl}>Purchase Date</label><input type="date" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} className={`${field} bg-ink-800`} /></div>
           <div><label className={lbl}>Invoice # (optional)</label><input value={purchaseInvoiceNo} onChange={(e) => setPurchaseInvoiceNo(e.target.value)} className={field} /></div>
           <div><label className={lbl}>Seller / Source (optional)</label><input value={seller} onChange={(e) => setSeller(e.target.value)} className={field} /></div>
-          <div className="sm:col-span-2"><FileField label="Purchase Invoice" value={purchaseInvoice} onChange={setPurchaseInvoice} /></div>
+          <div className="sm:col-span-2">
+            <FileField label="Purchase Invoice" value={purchaseInvoice} onChange={onPurchaseInvoice} />
+            {reading === 'purchase' && <p className="mt-1.5 text-[11px] text-brass">✦ Reading invoice with Claude…</p>}
+          </div>
         </div>
       </section>
 
@@ -257,6 +317,7 @@ export default function InventoryEditor({
           <div className="text-[11px] uppercase tracking-[0.22em] text-brass">Add-on Costs</div>
           <button type="button" onClick={addCost} className="border border-bone/20 px-3 py-1.5 text-[11px] uppercase tracking-label text-bone-muted hover:border-brass hover:text-bone">+ Add cost</button>
         </div>
+        <p className="mb-4 -mt-2 text-xs text-bone-dim">Upload an invoice and Claude fills in the amount, date, category & description automatically — then edit anything that needs fixing.</p>
         {costs.length === 0 && <p className="text-sm text-bone-dim/60">No add-on costs yet — parts, repairs, shipping, etc.</p>}
         <div className="space-y-5">
           {costs.map((c) => (
@@ -274,7 +335,10 @@ export default function InventoryEditor({
               </div>
               <div className="mt-4 grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
                 <div><label className={lbl}>Description (optional)</label><input value={c.description || ''} onChange={(e) => updateCost(c.id, { description: e.target.value })} className={field} placeholder="e.g. new clutch, transport from Italy…" /></div>
-                <FileField label="Invoice" value={c.invoice} onChange={(v) => updateCost(c.id, { invoice: v })} />
+                <div>
+                  <FileField label="Invoice" value={c.invoice} onChange={(v) => onCostInvoice(c.id, v)} />
+                  {reading === c.id && <p className="mt-1.5 text-[11px] text-brass">✦ Reading invoice with Claude…</p>}
+                </div>
               </div>
             </div>
           ))}
@@ -314,6 +378,7 @@ export default function InventoryEditor({
         </div>
       </section>
 
+      {aiNote && <p className="mt-6 text-xs text-bone-dim">{aiNote}</p>}
       {msg && <p className="mt-6 text-sm text-oxblood-light">{msg}</p>}
 
       <div className="mt-8 flex items-center gap-4">

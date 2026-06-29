@@ -34,6 +34,19 @@ export default async function AdminDashboard() {
         </div>
       )}
 
+      <Link
+        href="/admin/inventory"
+        className="mb-10 flex items-center justify-between border border-brass/30 bg-ink-800 p-5 transition-colors hover:border-brass"
+      >
+        <div>
+          <div className="font-serif text-lg text-bone">Inventory Ledger →</div>
+          <div className="mt-0.5 text-xs text-bone-dim">
+            Private buy/sell records — purchase cost, add-ons, invoices, sale & profit (USD)
+          </div>
+        </div>
+        <span className="text-[11px] uppercase tracking-label text-brass">Confidential</span>
+      </Link>
+
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-serif text-xl">{cars.length} cars</h1>
         <Link href="/admin/cars/new" className="btn-primary !py-2.5">

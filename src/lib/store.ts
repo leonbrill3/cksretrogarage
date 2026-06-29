@@ -8,6 +8,7 @@ import bundledCars from '../../content/cars.json';
 import bundledAgents from '../../content/agents.json';
 import type { Car } from '@/data/cars';
 import type { Agent } from '@/data/agents';
+import type { InventoryRecord } from '@/data/inventory';
 
 function makePool(): Pool | null {
   const cs = process.env.DATABASE_URL;
@@ -73,6 +74,14 @@ export async function getAgents(): Promise<Agent[]> {
 }
 export async function saveAgents(agents: Agent[]): Promise<void> {
   return setCollection('agents', agents);
+}
+
+// Internal buy/sell ledger (confidential). No bundled seed — starts empty.
+export async function getInventory(): Promise<InventoryRecord[]> {
+  return getCollection<InventoryRecord[]>('inventory', []);
+}
+export async function saveInventory(records: InventoryRecord[]): Promise<void> {
+  return setCollection('inventory', records);
 }
 
 // ----- Media (images) stored in the DB, served via /api/media/[id] -----

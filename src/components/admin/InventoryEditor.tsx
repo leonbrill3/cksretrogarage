@@ -24,6 +24,7 @@ const field =
   'w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900';
 const lbl = 'block text-xs font-medium uppercase tracking-wide text-neutral-500 mb-1';
 
+// Plain upload (Bill of Sale / Sale Invoice) — no AI auto-fill.
 function FileField({
   label,
   value,
@@ -71,6 +72,69 @@ function FileField({
   );
 }
 
+// Invoice upload that reads the file with Claude and auto-fills the fields.
+// Drag-and-drop, prominent copy, reading state, and a "filled" confirmation.
+function InvoiceDropzone({
+  value,
+  reading,
+  filled,
+  onFile,
+}: {
+  value: FileRef | null | undefined;
+  reading: boolean;
+  filled: boolean;
+  onFile: (v: FileRef | null) => void;
+}) {
+  const [drag, setDrag] = useState(false);
+  const isUploaded = value?.url && !value.url.startsWith('data:');
+
+  return (
+    <div>
+      <div
+        onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
+        onDragLeave={() => setDrag(false)}
+        onDrop={async (e) => {
+          e.preventDefault();
+          setDrag(false);
+          const f = e.dataTransfer.files?.[0];
+          if (f) onFile(await readFile(f));
+        }}
+        className={`rounded-lg border-2 border-dashed transition-colors ${
+          drag ? 'border-neutral-900 bg-neutral-50' : filled ? 'border-green-400 bg-green-50' : 'border-neutral-300 bg-white'
+        }`}
+      >
+        {reading ? (
+          <div className="px-4 py-6 text-center text-sm font-medium text-neutral-700">✦ Reading invoice with Claude…</div>
+        ) : value ? (
+          <div className="flex items-center justify-between gap-3 px-4 py-4">
+            <div className="min-w-0 text-sm">
+              {isUploaded ? (
+                <a href={value.url} target="_blank" rel="noopener noreferrer" className="truncate text-blue-700 hover:underline">{value.name || 'View invoice'}</a>
+              ) : (
+                <span className="truncate text-neutral-600">{value.name} (will upload on save)</span>
+              )}
+            </div>
+            <div className="flex shrink-0 items-center gap-3">
+              <label className="cursor-pointer rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-700 hover:border-neutral-900">
+                Replace
+                <input type="file" accept="application/pdf,image/*" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) onFile(await readFile(f)); e.target.value = ''; }} />
+              </label>
+              <button type="button" onClick={() => onFile(null)} className="text-sm text-neutral-400 hover:text-red-600">Remove</button>
+            </div>
+          </div>
+        ) : (
+          <label className="block cursor-pointer px-4 py-6 text-center">
+            <input type="file" accept="application/pdf,image/*" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) onFile(await readFile(f)); e.target.value = ''; }} />
+            <div className="text-sm font-semibold text-neutral-900">✨ Upload invoice — auto-fills the fields</div>
+            <div className="mt-1 text-xs text-neutral-500">Drag a PDF or photo here, or click to choose. Claude reads it and fills in the details for you.</div>
+          </label>
+        )}
+      </div>
+      {filled && <p className="mt-2 text-xs font-medium text-green-700">✨ Filled by Claude — please review the values below and fix anything that&apos;s off.</p>}
+    </div>
+  );
+}
+
 export default function InventoryEditor({
   record,
   isNew,
@@ -109,6 +173,7 @@ export default function InventoryEditor({
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState('');
   const [reading, setReading] = useState<string | null>(null); // 'purchase' | cost id
+  const [justFilled, setJustFilled] = useState<string | null>(null);
   const [aiNote, setAiNote] = useState('');
 
   const num = (s: string) => Number(String(s).replace(/[^0-9.-]/g, '')) || 0;
@@ -116,7 +181,13 @@ export default function InventoryEditor({
   const total = num(purchaseCost) + addOns;
   const prof = salePrice.trim() ? num(salePrice) - total : null;
 
-  // Read an uploaded invoice with Claude and return structured fields to pre-fill.
+  // Briefly highlight the fields the AI just populated.
+  const hl = (token: string) => (justFilled === token ? ' ring-2 ring-green-400 bg-green-50' : '');
+  function flash(token: string) {
+    setJustFilled(token);
+    setTimeout(() => setJustFilled((cur) => (cur === token ? null : cur)), 4500);
+  }
+
   async function extractInvoice(
     dataUrl: string,
     kind: 'cost' | 'purchase',
@@ -150,6 +221,7 @@ export default function InventoryEditor({
       if (f.date) setPurchaseDate(f.date);
       if (f.invoiceNumber) setPurchaseInvoiceNo(f.invoiceNumber);
       if (f.vendor) setSeller(f.vendor);
+      flash('purchase');
     }
     setReading(null);
   }
@@ -167,6 +239,7 @@ export default function InventoryEditor({
       const desc = [f.description, f.vendor].filter(Boolean).join(' — ');
       if (desc) patch.description = desc;
       updateCost(id, patch);
+      flash(id);
     }
     setReading(null);
   }
@@ -255,6 +328,11 @@ export default function InventoryEditor({
 
   return (
     <div className="mt-6 pb-24">
+      {/* AI tip banner */}
+      <div className="mb-8 rounded-lg border border-neutral-900/10 bg-neutral-100 px-4 py-3 text-sm text-neutral-700">
+        💡 <strong className="font-semibold text-neutral-900">Tip:</strong> Upload an invoice on the Purchase or any Add-on Cost and Claude fills in the details automatically — you just review them.
+      </div>
+
       {/* Pull from an existing website listing */}
       <section className="mb-8 rounded-lg border border-neutral-300 bg-neutral-50 p-5">
         <label className={lbl}>Already on the website? Select it to auto-fill the details</label>
@@ -264,7 +342,7 @@ export default function InventoryEditor({
         </select>
         {listingSlug && (
           <p className="mt-2 text-xs text-neutral-500">
-            Linked to <span className="font-medium text-neutral-900">{listings.find((l) => l.slug === listingSlug)?.title}</span> — make, model & year filled in below. You can still edit them.
+            Linked to <span className="font-medium text-neutral-900">{listings.find((l) => l.slug === listingSlug)?.title}</span> — make, model &amp; year filled in below. You can still edit them.
           </p>
         )}
       </section>
@@ -296,50 +374,46 @@ export default function InventoryEditor({
         </div>
       </section>
 
-      {/* Purchase */}
+      {/* Purchase — invoice first */}
       <section className={section}>
         <div className={heading}>Purchase</div>
-        <div className="grid gap-5 sm:grid-cols-2">
-          <div><label className={lbl}>Purchase Cost (USD)</label><input value={purchaseCost} onChange={(e) => setPurchaseCost(e.target.value)} className={field} placeholder="180000" /></div>
-          <div><label className={lbl}>Purchase Date</label><input type="date" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} className={field} /></div>
-          <div><label className={lbl}>Invoice # (optional)</label><input value={purchaseInvoiceNo} onChange={(e) => setPurchaseInvoiceNo(e.target.value)} className={field} /></div>
-          <div><label className={lbl}>Seller / Source (optional)</label><input value={seller} onChange={(e) => setSeller(e.target.value)} className={field} /></div>
-          <div className="sm:col-span-2">
-            <FileField label="Purchase Invoice" value={purchaseInvoice} onChange={onPurchaseInvoice} />
-            {reading === 'purchase' && <p className="mt-1.5 text-xs text-neutral-600">✦ Reading invoice with Claude…</p>}
-          </div>
+        <InvoiceDropzone value={purchaseInvoice} reading={reading === 'purchase'} filled={justFilled === 'purchase'} onFile={onPurchaseInvoice} />
+        <div className="mt-5 grid gap-5 sm:grid-cols-2">
+          <div><label className={lbl}>Purchase Cost (USD)</label><input value={purchaseCost} onChange={(e) => setPurchaseCost(e.target.value)} className={`${field}${hl('purchase')}`} placeholder="180000" /></div>
+          <div><label className={lbl}>Purchase Date</label><input type="date" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} className={`${field}${hl('purchase')}`} /></div>
+          <div><label className={lbl}>Invoice # (optional)</label><input value={purchaseInvoiceNo} onChange={(e) => setPurchaseInvoiceNo(e.target.value)} className={`${field}${hl('purchase')}`} /></div>
+          <div><label className={lbl}>Seller / Source (optional)</label><input value={seller} onChange={(e) => setSeller(e.target.value)} className={`${field}${hl('purchase')}`} /></div>
         </div>
       </section>
 
-      {/* Add-on costs */}
+      {/* Add-on costs — invoice first per row */}
       <section className={section}>
-        <div className="mb-3 flex items-center justify-between">
+        <div className="mb-4 flex items-center justify-between">
           <div className="text-sm font-semibold uppercase tracking-wide text-neutral-900">Add-on Costs</div>
           <button type="button" onClick={addCost} className={btnSecondary}>+ Add cost</button>
         </div>
-        <p className="mb-4 text-sm text-neutral-500">Upload an invoice and Claude fills in the amount, date, category &amp; description automatically — then edit anything that needs fixing.</p>
-        {costs.length === 0 && <p className="text-sm text-neutral-400">No add-on costs yet — parts, repairs, shipping, etc.</p>}
+        {costs.length === 0 && (
+          <button type="button" onClick={addCost} className="w-full rounded-lg border-2 border-dashed border-neutral-300 px-4 py-6 text-center hover:border-neutral-900">
+            <div className="text-sm font-semibold text-neutral-900">+ Add a cost</div>
+            <div className="mt-1 text-xs text-neutral-500">Parts, repairs, shipping, etc. — then upload the invoice and Claude fills it in.</div>
+          </button>
+        )}
         <div className="space-y-5">
           {costs.map((c) => (
             <div key={c.id} className="rounded-lg border border-neutral-200 bg-neutral-50 p-4">
-              <div className="grid gap-4 sm:grid-cols-[1fr_1fr_1fr_auto]">
+              <InvoiceDropzone value={c.invoice} reading={reading === c.id} filled={justFilled === c.id} onFile={(v) => onCostInvoice(c.id, v)} />
+              <div className="mt-4 grid gap-4 sm:grid-cols-[1fr_1fr_1fr_auto]">
                 <div>
                   <label className={lbl}>Category</label>
-                  <select value={c.category} onChange={(e) => updateCost(c.id, { category: e.target.value })} className={field}>
+                  <select value={c.category} onChange={(e) => updateCost(c.id, { category: e.target.value })} className={`${field}${hl(c.id)}`}>
                     {COST_CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
                   </select>
                 </div>
-                <div><label className={lbl}>Amount (USD)</label><input value={String(c.amount ?? '')} onChange={(e) => updateCost(c.id, { amount: e.target.value as unknown as number })} className={field} placeholder="0" /></div>
-                <div><label className={lbl}>Date</label><input type="date" value={c.date || ''} onChange={(e) => updateCost(c.id, { date: e.target.value })} className={field} /></div>
+                <div><label className={lbl}>Amount (USD)</label><input value={String(c.amount ?? '')} onChange={(e) => updateCost(c.id, { amount: e.target.value as unknown as number })} className={`${field}${hl(c.id)}`} placeholder="0" /></div>
+                <div><label className={lbl}>Date</label><input type="date" value={c.date || ''} onChange={(e) => updateCost(c.id, { date: e.target.value })} className={`${field}${hl(c.id)}`} /></div>
                 <div className="flex items-end pb-1"><button type="button" onClick={() => removeCost(c.id)} className="text-sm text-neutral-400 hover:text-red-600" title="Remove">Remove</button></div>
               </div>
-              <div className="mt-4 grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
-                <div><label className={lbl}>Description (optional)</label><input value={c.description || ''} onChange={(e) => updateCost(c.id, { description: e.target.value })} className={field} placeholder="e.g. new clutch, transport from Italy…" /></div>
-                <div>
-                  <FileField label="Invoice" value={c.invoice} onChange={(v) => onCostInvoice(c.id, v)} />
-                  {reading === c.id && <p className="mt-1.5 text-xs text-neutral-600">✦ Reading invoice with Claude…</p>}
-                </div>
-              </div>
+              <div className="mt-4"><label className={lbl}>Description (optional)</label><input value={c.description || ''} onChange={(e) => updateCost(c.id, { description: e.target.value })} className={`${field}${hl(c.id)}`} placeholder="e.g. new clutch, transport from Italy…" /></div>
             </div>
           ))}
         </div>

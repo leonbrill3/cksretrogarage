@@ -38,14 +38,16 @@ export default async function EditInventoryPage({
   }));
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-10">
-      <Link href="/admin/inventory" className="text-[11px] uppercase tracking-[0.22em] text-bone-dim hover:text-bone">
-        ← Back to ledger
-      </Link>
-      <h1 className="mt-4 font-serif text-2xl">
-        {isNew ? 'Add a car to the ledger' : `Edit — ${vehicleTitle(record)}`}
-      </h1>
-      <InventoryEditor record={record} isNew={isNew} listings={listings} />
+    <div className="min-h-screen bg-white text-neutral-900">
+      <div className="mx-auto max-w-3xl px-6 py-10">
+        <Link href="/admin/inventory" className="text-xs font-medium uppercase tracking-wide text-neutral-500 hover:text-neutral-900">
+          ← Back to ledger
+        </Link>
+        <h1 className="mt-4 text-2xl font-semibold">
+          {isNew ? 'Add a car to the ledger' : `Edit — ${vehicleTitle(record)}`}
+        </h1>
+        <InventoryEditor record={record} isNew={isNew} listings={listings} />
+      </div>
     </div>
   );
 }

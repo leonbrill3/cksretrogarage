@@ -21,8 +21,8 @@ function readFile(file: File): Promise<FileRef> {
 }
 
 const field =
-  'w-full border-b border-bone/20 bg-transparent py-2.5 text-bone placeholder:text-bone-dim/50 focus:border-brass focus:outline-none transition-colors';
-const lbl = 'block text-[11px] uppercase tracking-label text-bone-dim mb-1.5';
+  'w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900';
+const lbl = 'block text-xs font-medium uppercase tracking-wide text-neutral-500 mb-1';
 
 function FileField({
   label,
@@ -39,7 +39,7 @@ function FileField({
     <div>
       <span className={lbl}>{label}</span>
       <div className="flex items-center gap-3">
-        <label className="cursor-pointer border border-bone/20 px-3 py-2 text-[11px] uppercase tracking-label text-bone-muted hover:border-brass hover:text-bone">
+        <label className="cursor-pointer rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 hover:border-neutral-900">
           {value ? 'Replace' : 'Upload'}
           <input
             type="file"
@@ -53,18 +53,18 @@ function FileField({
           />
         </label>
         {value ? (
-          <div className="flex min-w-0 items-center gap-2 text-xs">
+          <div className="flex min-w-0 items-center gap-2 text-sm">
             {isUploaded ? (
-              <a href={value.url} target="_blank" rel="noopener noreferrer" className="truncate text-brass hover:underline">
+              <a href={value.url} target="_blank" rel="noopener noreferrer" className="truncate text-blue-700 hover:underline">
                 {value.name || 'View file'}
               </a>
             ) : (
-              <span className="truncate text-bone-muted">{value.name} {isPending ? '(will upload on save)' : ''}</span>
+              <span className="truncate text-neutral-600">{value.name} {isPending ? '(will upload on save)' : ''}</span>
             )}
-            <button type="button" onClick={() => onChange(null)} className="text-bone-dim hover:text-oxblood-light" title="Remove">×</button>
+            <button type="button" onClick={() => onChange(null)} className="text-neutral-400 hover:text-red-600" title="Remove">×</button>
           </div>
         ) : (
-          <span className="text-xs text-bone-dim/50">PDF or image</span>
+          <span className="text-sm text-neutral-400">PDF or image</span>
         )}
       </div>
     </div>
@@ -110,6 +110,11 @@ export default function InventoryEditor({
   const [msg, setMsg] = useState('');
   const [reading, setReading] = useState<string | null>(null); // 'purchase' | cost id
   const [aiNote, setAiNote] = useState('');
+
+  const num = (s: string) => Number(String(s).replace(/[^0-9.-]/g, '')) || 0;
+  const addOns = costs.reduce((s, c) => s + num(String(c.amount)), 0);
+  const total = num(purchaseCost) + addOns;
+  const prof = salePrice.trim() ? num(salePrice) - total : null;
 
   // Read an uploaded invoice with Claude and return structured fields to pre-fill.
   async function extractInvoice(
@@ -166,13 +171,7 @@ export default function InventoryEditor({
     setReading(null);
   }
 
-  const num = (s: string) => Number(String(s).replace(/[^0-9.-]/g, '')) || 0;
-  const addOns = costs.reduce((s, c) => s + num(String(c.amount)), 0);
-  const total = num(purchaseCost) + addOns;
-  const prof = salePrice.trim() ? num(salePrice) - total : null;
-
-  // Selecting an existing website listing pulls its details across so they
-  // don't have to be re-typed.
+  // Selecting an existing website listing pulls its details across.
   function pickListing(slug: string) {
     setListingSlug(slug);
     const l = listings.find((x) => x.slug === slug);
@@ -250,21 +249,22 @@ export default function InventoryEditor({
     router.refresh();
   }
 
-  const section = 'mt-10 border-t border-bone/10 pt-8';
-  const heading = 'mb-5 text-[11px] uppercase tracking-[0.22em] text-brass';
+  const section = 'mt-10 border-t border-neutral-200 pt-8';
+  const heading = 'mb-5 text-sm font-semibold uppercase tracking-wide text-neutral-900';
+  const btnSecondary = 'rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-700 hover:border-neutral-900';
 
   return (
     <div className="mt-6 pb-24">
       {/* Pull from an existing website listing */}
-      <section className="mb-8 border border-brass/25 bg-ink-800/50 p-5">
+      <section className="mb-8 rounded-lg border border-neutral-300 bg-neutral-50 p-5">
         <label className={lbl}>Already on the website? Select it to auto-fill the details</label>
-        <select value={listingSlug} onChange={(e) => pickListing(e.target.value)} className={`${field} bg-ink-800`}>
+        <select value={listingSlug} onChange={(e) => pickListing(e.target.value)} className={field}>
           <option value="">— not on the website / enter manually —</option>
           {listings.map((l) => <option key={l.slug} value={l.slug}>{l.title}</option>)}
         </select>
         {listingSlug && (
-          <p className="mt-2 text-[11px] text-bone-dim">
-            Linked to <span className="text-brass">{listings.find((l) => l.slug === listingSlug)?.title}</span> — make, model & year filled in below. You can still edit them.
+          <p className="mt-2 text-xs text-neutral-500">
+            Linked to <span className="font-medium text-neutral-900">{listings.find((l) => l.slug === listingSlug)?.title}</span> — make, model & year filled in below. You can still edit them.
           </p>
         )}
       </section>
@@ -284,13 +284,13 @@ export default function InventoryEditor({
           <div><label className={lbl}>Mileage (optional)</label><input value={mileage} onChange={(e) => setMileage(e.target.value)} className={field} /></div>
           <div>
             <label className={lbl}>Status</label>
-            <select value={status} onChange={(e) => setStatus(e.target.value as InventoryStatus)} className={`${field} bg-ink-800`}>
+            <select value={status} onChange={(e) => setStatus(e.target.value as InventoryStatus)} className={field}>
               <option value="in_stock">In Stock</option>
               <option value="for_sale">For Sale</option>
               <option value="sold">Sold</option>
             </select>
             {status === 'sold' && !billOfSale && (
-              <p className="mt-1.5 text-[11px] text-oxblood-light">Requires a Bill of Sale (in the Sale section below).</p>
+              <p className="mt-1.5 text-xs text-red-600">Requires a Bill of Sale (in the Sale section below).</p>
             )}
           </div>
         </div>
@@ -301,43 +301,43 @@ export default function InventoryEditor({
         <div className={heading}>Purchase</div>
         <div className="grid gap-5 sm:grid-cols-2">
           <div><label className={lbl}>Purchase Cost (USD)</label><input value={purchaseCost} onChange={(e) => setPurchaseCost(e.target.value)} className={field} placeholder="180000" /></div>
-          <div><label className={lbl}>Purchase Date</label><input type="date" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} className={`${field} bg-ink-800`} /></div>
+          <div><label className={lbl}>Purchase Date</label><input type="date" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} className={field} /></div>
           <div><label className={lbl}>Invoice # (optional)</label><input value={purchaseInvoiceNo} onChange={(e) => setPurchaseInvoiceNo(e.target.value)} className={field} /></div>
           <div><label className={lbl}>Seller / Source (optional)</label><input value={seller} onChange={(e) => setSeller(e.target.value)} className={field} /></div>
           <div className="sm:col-span-2">
             <FileField label="Purchase Invoice" value={purchaseInvoice} onChange={onPurchaseInvoice} />
-            {reading === 'purchase' && <p className="mt-1.5 text-[11px] text-brass">✦ Reading invoice with Claude…</p>}
+            {reading === 'purchase' && <p className="mt-1.5 text-xs text-neutral-600">✦ Reading invoice with Claude…</p>}
           </div>
         </div>
       </section>
 
       {/* Add-on costs */}
       <section className={section}>
-        <div className="mb-5 flex items-center justify-between">
-          <div className="text-[11px] uppercase tracking-[0.22em] text-brass">Add-on Costs</div>
-          <button type="button" onClick={addCost} className="border border-bone/20 px-3 py-1.5 text-[11px] uppercase tracking-label text-bone-muted hover:border-brass hover:text-bone">+ Add cost</button>
+        <div className="mb-3 flex items-center justify-between">
+          <div className="text-sm font-semibold uppercase tracking-wide text-neutral-900">Add-on Costs</div>
+          <button type="button" onClick={addCost} className={btnSecondary}>+ Add cost</button>
         </div>
-        <p className="mb-4 -mt-2 text-xs text-bone-dim">Upload an invoice and Claude fills in the amount, date, category & description automatically — then edit anything that needs fixing.</p>
-        {costs.length === 0 && <p className="text-sm text-bone-dim/60">No add-on costs yet — parts, repairs, shipping, etc.</p>}
+        <p className="mb-4 text-sm text-neutral-500">Upload an invoice and Claude fills in the amount, date, category &amp; description automatically — then edit anything that needs fixing.</p>
+        {costs.length === 0 && <p className="text-sm text-neutral-400">No add-on costs yet — parts, repairs, shipping, etc.</p>}
         <div className="space-y-5">
           {costs.map((c) => (
-            <div key={c.id} className="border border-bone/10 bg-ink-800/40 p-4">
+            <div key={c.id} className="rounded-lg border border-neutral-200 bg-neutral-50 p-4">
               <div className="grid gap-4 sm:grid-cols-[1fr_1fr_1fr_auto]">
                 <div>
                   <label className={lbl}>Category</label>
-                  <select value={c.category} onChange={(e) => updateCost(c.id, { category: e.target.value })} className={`${field} bg-ink-800`}>
+                  <select value={c.category} onChange={(e) => updateCost(c.id, { category: e.target.value })} className={field}>
                     {COST_CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
                   </select>
                 </div>
                 <div><label className={lbl}>Amount (USD)</label><input value={String(c.amount ?? '')} onChange={(e) => updateCost(c.id, { amount: e.target.value as unknown as number })} className={field} placeholder="0" /></div>
-                <div><label className={lbl}>Date</label><input type="date" value={c.date || ''} onChange={(e) => updateCost(c.id, { date: e.target.value })} className={`${field} bg-ink-800`} /></div>
-                <div className="flex items-end pb-1"><button type="button" onClick={() => removeCost(c.id)} className="text-bone-dim hover:text-oxblood-light" title="Remove">Remove</button></div>
+                <div><label className={lbl}>Date</label><input type="date" value={c.date || ''} onChange={(e) => updateCost(c.id, { date: e.target.value })} className={field} /></div>
+                <div className="flex items-end pb-1"><button type="button" onClick={() => removeCost(c.id)} className="text-sm text-neutral-400 hover:text-red-600" title="Remove">Remove</button></div>
               </div>
               <div className="mt-4 grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
                 <div><label className={lbl}>Description (optional)</label><input value={c.description || ''} onChange={(e) => updateCost(c.id, { description: e.target.value })} className={field} placeholder="e.g. new clutch, transport from Italy…" /></div>
                 <div>
                   <FileField label="Invoice" value={c.invoice} onChange={(v) => onCostInvoice(c.id, v)} />
-                  {reading === c.id && <p className="mt-1.5 text-[11px] text-brass">✦ Reading invoice with Claude…</p>}
+                  {reading === c.id && <p className="mt-1.5 text-xs text-neutral-600">✦ Reading invoice with Claude…</p>}
                 </div>
               </div>
             </div>
@@ -348,10 +348,10 @@ export default function InventoryEditor({
       {/* Sale */}
       <section className={section}>
         <div className={heading}>Sale</div>
-        <p className="mb-5 -mt-2 text-xs text-bone-dim">A car is only marked <strong className="text-bone-muted">Sold</strong> once the Bill of Sale is uploaded.</p>
+        <p className="mb-5 -mt-2 text-sm text-neutral-500">A car is only marked <strong className="text-neutral-700">Sold</strong> once the Bill of Sale is uploaded.</p>
         <div className="grid gap-5 sm:grid-cols-2">
           <div><label className={lbl}>Sale Price (USD)</label><input value={salePrice} onChange={(e) => setSalePrice(e.target.value)} className={field} placeholder="240000" /></div>
-          <div><label className={lbl}>Sale Date</label><input type="date" value={saleDate} onChange={(e) => setSaleDate(e.target.value)} className={`${field} bg-ink-800`} /></div>
+          <div><label className={lbl}>Sale Date</label><input type="date" value={saleDate} onChange={(e) => setSaleDate(e.target.value)} className={field} /></div>
           <div className="sm:col-span-2"><label className={lbl}>Buyer (optional)</label><input value={buyer} onChange={(e) => setBuyer(e.target.value)} className={field} /></div>
           <div><FileField label="Bill of Sale" value={billOfSale} onChange={setBillOfSale} /></div>
           <div><FileField label="Sale Invoice (optional)" value={saleInvoice} onChange={setSaleInvoice} /></div>
@@ -361,32 +361,32 @@ export default function InventoryEditor({
       {/* Totals */}
       <section className={section}>
         <div className="grid gap-4 sm:grid-cols-3">
-          <div className="border border-bone/10 bg-ink-800 p-4">
-            <div className="text-[11px] uppercase tracking-label text-bone-dim">Add-ons</div>
-            <div className="mt-1 font-serif text-xl text-bone">{formatUSD(addOns)}</div>
+          <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+            <div className="text-xs font-medium uppercase tracking-wide text-neutral-500">Add-ons</div>
+            <div className="mt-1 text-xl font-semibold text-neutral-900">{formatUSD(addOns)}</div>
           </div>
-          <div className="border border-bone/10 bg-ink-800 p-4">
-            <div className="text-[11px] uppercase tracking-label text-bone-dim">Total Cost</div>
-            <div className="mt-1 font-serif text-xl text-bone">{formatUSD(total)}</div>
+          <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+            <div className="text-xs font-medium uppercase tracking-wide text-neutral-500">Total Cost</div>
+            <div className="mt-1 text-xl font-semibold text-neutral-900">{formatUSD(total)}</div>
           </div>
-          <div className="border border-bone/10 bg-ink-800 p-4">
-            <div className="text-[11px] uppercase tracking-label text-bone-dim">Profit</div>
-            <div className={`mt-1 font-serif text-xl ${prof == null ? 'text-bone-dim' : prof >= 0 ? 'text-green-400' : 'text-oxblood-light'}`}>
+          <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+            <div className="text-xs font-medium uppercase tracking-wide text-neutral-500">Profit</div>
+            <div className={`mt-1 text-xl font-semibold ${prof == null ? 'text-neutral-400' : prof >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               {prof == null ? '—' : formatUSD(prof)}
             </div>
           </div>
         </div>
       </section>
 
-      {aiNote && <p className="mt-6 text-xs text-bone-dim">{aiNote}</p>}
-      {msg && <p className="mt-6 text-sm text-oxblood-light">{msg}</p>}
+      {aiNote && <p className="mt-6 text-sm text-neutral-500">{aiNote}</p>}
+      {msg && <p className="mt-6 text-sm text-red-600">{msg}</p>}
 
       <div className="mt-8 flex items-center gap-4">
-        <button onClick={save} disabled={busy} className="btn-primary disabled:opacity-50">
+        <button onClick={save} disabled={busy} className="rounded-md bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-neutral-700 disabled:opacity-50">
           {busy ? 'Saving…' : isNew ? 'Add to ledger' : 'Save changes'}
         </button>
         {!isNew && (
-          <button onClick={del} disabled={busy} className="text-sm text-bone-dim hover:text-oxblood-light">Delete</button>
+          <button onClick={del} disabled={busy} className="text-sm text-neutral-500 hover:text-red-600">Delete</button>
         )}
       </div>
     </div>

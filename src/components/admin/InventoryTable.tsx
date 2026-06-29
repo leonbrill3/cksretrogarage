@@ -13,9 +13,9 @@ import {
 } from '@/data/inventory';
 
 const STATUS_STYLE: Record<InventoryStatus, string> = {
-  in_stock: 'bg-bone/10 text-bone-muted',
-  for_sale: 'bg-brass/15 text-brass',
-  sold: 'bg-green-500/15 text-green-400',
+  in_stock: 'bg-neutral-200 text-neutral-700',
+  for_sale: 'bg-amber-100 text-amber-800',
+  sold: 'bg-green-100 text-green-700',
 };
 
 export default function InventoryTable({ records }: { records: InventoryRecord[] }) {
@@ -87,7 +87,7 @@ export default function InventoryTable({ records }: { records: InventoryRecord[]
     URL.revokeObjectURL(url);
   }
 
-  const docLink = 'rounded bg-ink-700 px-1.5 py-0.5 text-[10px] text-bone-dim hover:text-bone hover:bg-ink-600';
+  const docLink = 'rounded bg-neutral-100 px-1.5 py-0.5 text-[11px] text-neutral-600 hover:bg-neutral-200 hover:text-neutral-900';
 
   function Docs({ r }: { r: InventoryRecord }) {
     const links: { href: string; label: string }[] = [];
@@ -97,7 +97,7 @@ export default function InventoryTable({ records }: { records: InventoryRecord[]
     });
     if (r.sale?.billOfSale?.url) links.push({ href: r.sale.billOfSale.url, label: 'Bill of Sale' });
     if (r.sale?.saleInvoice?.url) links.push({ href: r.sale.saleInvoice.url, label: 'Sale Inv.' });
-    if (!links.length) return <span className="text-bone-dim/40">—</span>;
+    if (!links.length) return <span className="text-neutral-300">—</span>;
     return (
       <div className="flex flex-wrap gap-1">
         {links.map((l, i) => (
@@ -117,8 +117,9 @@ export default function InventoryTable({ records }: { records: InventoryRecord[]
     );
   }
 
-  const th = 'px-3 py-2 text-left text-[10px] font-medium uppercase tracking-label text-bone-dim whitespace-nowrap';
-  const td = 'px-3 py-2.5 text-sm text-bone-muted whitespace-nowrap';
+  const th = 'px-3 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wide text-neutral-500 whitespace-nowrap';
+  const td = 'px-3 py-3 text-sm text-neutral-700 whitespace-nowrap';
+  const inputBase = 'rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900';
 
   return (
     <div>
@@ -127,34 +128,30 @@ export default function InventoryTable({ records }: { records: InventoryRecord[]
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Search VIN, make, model, buyer…"
-          className="w-64 border-b border-bone/20 bg-transparent py-2 text-sm text-bone placeholder:text-bone-dim/60 focus:border-brass focus:outline-none"
+          className={`${inputBase} w-72 placeholder:text-neutral-400`}
         />
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value as 'all' | InventoryStatus)}
-          className="border border-bone/20 bg-ink-800 px-3 py-2 text-sm text-bone-muted focus:border-brass focus:outline-none"
-        >
+        <select value={status} onChange={(e) => setStatus(e.target.value as 'all' | InventoryStatus)} className={inputBase}>
           <option value="all">All statuses</option>
           <option value="in_stock">In Stock</option>
           <option value="for_sale">For Sale</option>
           <option value="sold">Sold</option>
         </select>
         <div className="ml-auto flex items-center gap-3">
-          <span className="text-xs text-bone-dim">{rows.length} of {records.length}</span>
-          <button onClick={exportCsv} className="border border-bone/20 px-3 py-2 text-[11px] uppercase tracking-label text-bone-muted hover:border-brass hover:text-bone">
+          <span className="text-sm text-neutral-500">{rows.length} of {records.length}</span>
+          <button onClick={exportCsv} className="rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 hover:border-neutral-900">
             Export CSV
           </button>
         </div>
       </div>
 
       {records.length === 0 ? (
-        <div className="border border-bone/10 bg-ink-800 p-12 text-center text-bone-dim">
-          No cars in the ledger yet. Click <span className="text-brass">+ Add Car</span> to record your first acquisition.
+        <div className="rounded-lg border border-dashed border-neutral-300 bg-neutral-50 p-12 text-center text-neutral-500">
+          No cars in the ledger yet. Click <span className="font-medium text-neutral-900">+ Add Car</span> to record your first acquisition.
         </div>
       ) : (
-        <div className="overflow-x-auto border border-bone/10">
+        <div className="overflow-x-auto rounded-lg border border-neutral-200">
           <table className="w-full border-collapse">
-            <thead className="bg-ink-800">
+            <thead className="border-b border-neutral-200 bg-neutral-50">
               <tr>
                 <th className={th}>VIN</th>
                 <th className={th}>Year</th>
@@ -176,22 +173,22 @@ export default function InventoryTable({ records }: { records: InventoryRecord[]
                   <tr
                     key={r.id}
                     onClick={() => router.push(`/admin/inventory/${r.id}`)}
-                    className="cursor-pointer border-t border-bone/8 transition-colors hover:bg-ink-800/60"
+                    className="cursor-pointer border-t border-neutral-100 transition-colors hover:bg-neutral-50"
                   >
                     <td className={`${td} font-mono text-xs`}>{r.vin || '—'}</td>
                     <td className={td}>{r.year || '—'}</td>
-                    <td className={`${td} text-bone`}>{r.make || '—'}</td>
-                    <td className={`${td} text-bone`}>{r.model || '—'}</td>
+                    <td className={`${td} font-medium text-neutral-900`}>{r.make || '—'}</td>
+                    <td className={`${td} font-medium text-neutral-900`}>{r.model || '—'}</td>
                     <td className={td}>
-                      <span className={`rounded px-2 py-0.5 text-[10px] uppercase tracking-label ${STATUS_STYLE[r.status]}`}>
+                      <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${STATUS_STYLE[r.status]}`}>
                         {STATUS_LABELS[r.status]}
                       </span>
                     </td>
                     <td className={`${td} text-right`}>{formatUSD(r.purchaseCost)}</td>
                     <td className={`${td} text-right`}>{formatUSD(addOnsTotal(r))}</td>
-                    <td className={`${td} text-right font-medium text-bone`}>{formatUSD(totalCost(r))}</td>
+                    <td className={`${td} text-right font-semibold text-neutral-900`}>{formatUSD(totalCost(r))}</td>
                     <td className={`${td} text-right`}>{r.sale?.price != null ? formatUSD(r.sale.price) : '—'}</td>
-                    <td className={`${td} text-right font-medium ${p == null ? '' : p >= 0 ? 'text-green-400' : 'text-oxblood-light'}`}>
+                    <td className={`${td} text-right font-semibold ${p == null ? '' : p >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                       {p == null ? '—' : formatUSD(p)}
                     </td>
                     <td className={td}><Docs r={r} /></td>
@@ -199,14 +196,14 @@ export default function InventoryTable({ records }: { records: InventoryRecord[]
                 );
               })}
             </tbody>
-            <tfoot className="bg-ink-800">
-              <tr className="border-t-2 border-bone/20 font-medium text-bone">
+            <tfoot className="border-t-2 border-neutral-300 bg-neutral-50">
+              <tr className="font-semibold text-neutral-900">
                 <td className={td} colSpan={5}>Totals ({rows.length})</td>
                 <td className={`${td} text-right`}>{formatUSD(totals.purchase)}</td>
                 <td className={`${td} text-right`}>{formatUSD(totals.addons)}</td>
                 <td className={`${td} text-right`}>{formatUSD(totals.cost)}</td>
                 <td className={`${td} text-right`}>{formatUSD(totals.sale)}</td>
-                <td className={`${td} text-right ${totals.prof >= 0 ? 'text-green-400' : 'text-oxblood-light'}`}>{formatUSD(totals.prof)}</td>
+                <td className={`${td} text-right ${totals.prof >= 0 ? 'text-green-600' : 'text-red-600'}`}>{formatUSD(totals.prof)}</td>
                 <td className={td}></td>
               </tr>
             </tfoot>

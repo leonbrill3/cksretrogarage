@@ -70,7 +70,7 @@ export default function InventoryTable({ records }: { records: InventoryRecord[]
   function exportCsv() {
     const header = [
       'VIN', 'Year', 'Make', 'Model', 'Status', 'Purchase Cost', 'Add-ons',
-      'Total Cost', 'Sale Price', 'Profit', 'Buyer', 'Purchase Date', 'Sale Date', 'Listing',
+      'Total Cost', 'Sale Price', 'Profit', 'Buyer', 'Purchase Date', 'Sale Date', 'Listing', 'Added', 'Updated',
     ];
     const esc = (v: unknown) => {
       const s = String(v ?? '');
@@ -85,6 +85,7 @@ export default function InventoryTable({ records }: { records: InventoryRecord[]
           r.purchaseCost || 0, addOnsTotal(r), totalCost(r),
           r.sale?.price ?? '', p ?? '', r.sale?.buyer ?? '',
           r.purchaseDate ?? '', r.sale?.date ?? '', r.listingSlug ?? '',
+          r.createdAt ?? '', r.updatedAt ?? '',
         ]
           .map(esc)
           .join(','),
@@ -97,6 +98,16 @@ export default function InventoryTable({ records }: { records: InventoryRecord[]
     a.download = 'ck-inventory.csv';
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  // Short "when added" label, e.g. "Jun 30, 2:15 PM" (full timestamp on hover).
+  function fmtAdded(iso?: string): { short: string; full: string } {
+    if (!iso) return { short: '—', full: '' };
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return { short: '—', full: '' };
+    const short = d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' });
+    const full = d.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/New_York' });
+    return { short, full };
   }
 
   const docLink = 'rounded bg-neutral-100 px-1.5 py-0.5 text-[11px] text-neutral-600 hover:bg-neutral-200 hover:text-neutral-900';
@@ -177,6 +188,7 @@ export default function InventoryTable({ records }: { records: InventoryRecord[]
                 <th className={th}>Make</th>
                 <th className={th}>Model</th>
                 <th className={th}>Status</th>
+                <th className={th}>Added</th>
                 <th className={th}>Purchased</th>
                 <th className={`${th} text-right`}>Purchase</th>
                 <th className={`${th} text-right`}>Add-ons</th>
@@ -204,6 +216,7 @@ export default function InventoryTable({ records }: { records: InventoryRecord[]
                         {STATUS_LABELS[r.status]}
                       </span>
                     </td>
+                    <td className={`${td} text-xs text-neutral-500`} title={fmtAdded(r.createdAt).full}>{fmtAdded(r.createdAt).short}</td>
                     <td className={td}>{r.purchaseDate || '—'}</td>
                     <td className={`${td} text-right`}>{formatUSD(r.purchaseCost)}</td>
                     <td className={`${td} text-right`}>{formatUSD(addOnsTotal(r))}</td>
@@ -219,7 +232,7 @@ export default function InventoryTable({ records }: { records: InventoryRecord[]
             </tbody>
             <tfoot className="border-t-2 border-neutral-300 bg-neutral-50">
               <tr className="font-semibold text-neutral-900">
-                <td className={td} colSpan={6}>Totals ({rows.length})</td>
+                <td className={td} colSpan={7}>Totals ({rows.length})</td>
                 <td className={`${td} text-right`}>{formatUSD(totals.purchase)}</td>
                 <td className={`${td} text-right`}>{formatUSD(totals.addons)}</td>
                 <td className={`${td} text-right`}>{formatUSD(totals.cost)}</td>

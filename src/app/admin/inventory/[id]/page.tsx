@@ -6,6 +6,17 @@ import InventoryEditor from '@/components/admin/InventoryEditor';
 
 export const dynamic = 'force-dynamic';
 
+// e.g. "Jun 30, 2026, 2:15 PM ET" — readable, with the zone so it's unambiguous.
+function fmtTimestamp(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+    hour: 'numeric', minute: '2-digit',
+    timeZone: 'America/New_York', timeZoneName: 'short',
+  });
+}
+
 const EMPTY: InventoryRecord = {
   id: '',
   vin: '',
@@ -46,6 +57,13 @@ export default async function EditInventoryPage({
         <h1 className="mt-4 text-2xl font-semibold">
           {isNew ? 'Add a car to the ledger' : `Edit — ${vehicleTitle(record)}`}
         </h1>
+        {!isNew && (record.createdAt || record.updatedAt) && (
+          <p className="mt-1 text-xs text-neutral-500">
+            {record.createdAt && <>Added {fmtTimestamp(record.createdAt)}</>}
+            {record.createdAt && record.updatedAt && ' · '}
+            {record.updatedAt && <>Last updated {fmtTimestamp(record.updatedAt)}</>}
+          </p>
+        )}
         {/* key forces a clean remount per record — without it, navigating
             between cars (or to "new") reuses the same client component and
             keeps the previous car's field/document state. */}

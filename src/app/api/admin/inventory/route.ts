@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ADMIN_COOKIE, verifySessionToken } from '@/lib/admin-auth';
 import { getInventory, saveInventory, putMedia } from '@/lib/store';
-import type { InventoryRecord, FileRef, CostItem } from '@/data/inventory';
+import type { InventoryRecord, FileRef, CostItem, Payment } from '@/data/inventory';
 import { randomUUID } from 'node:crypto';
 
 export const runtime = 'nodejs';
@@ -71,7 +71,6 @@ export async function POST(req: NextRequest) {
 
   // ----- Persist all file fields -----
   const purchaseInvoice = await persistFile(r.purchaseInvoice);
-  const purchasePayment = await persistFile(r.purchasePayment);
   const saleInvoice = await persistFile(r.sale?.saleInvoice);
   const costs: CostItem[] = [];
   for (const c of r.costs || []) {
@@ -86,9 +85,30 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  // Wire transfers / payments (purchase & sale sides).
+  async function buildPayments(input: Payment[] | undefined): Promise<Payment[]> {
+    const out: Payment[] = [];
+    for (const p of input || []) {
+      const file = await persistFile(p.file);
+      // Skip fully-empty rows.
+      if (!file && p.amount == null && !p.date && !p.reference && !p.counterparty) continue;
+      out.push({
+        id: p.id || randomUUID().replace(/-/g, ''),
+        file,
+        amount: p.amount != null ? num(p.amount) : undefined,
+        date: p.date || undefined,
+        reference: String(p.reference || '').trim() || undefined,
+        counterparty: String(p.counterparty || '').trim() || undefined,
+      });
+    }
+    return out;
+  }
+  const purchasePayments = await buildPayments(r.purchasePayments);
+  const salePayments = await buildPayments(r.sale?.payments);
+
   const hasSale =
     r.sale &&
-    (r.sale.price != null || r.sale.buyer || r.sale.date || billOfSale || saleInvoice);
+    (r.sale.price != null || r.sale.buyer || r.sale.date || billOfSale || saleInvoice || salePayments.length > 0);
 
   const now = new Date().toISOString();
   const record: InventoryRecord = {
@@ -107,7 +127,7 @@ export async function POST(req: NextRequest) {
     purchaseInvoiceNo: String(r.purchaseInvoiceNo || '').trim() || undefined,
     seller: String(r.seller || '').trim() || undefined,
     purchaseInvoice,
-    purchasePayment,
+    purchasePayments,
     costs,
     sale: hasSale
       ? {
@@ -116,6 +136,7 @@ export async function POST(req: NextRequest) {
           buyer: String(r.sale?.buyer || '').trim() || undefined,
           billOfSale,
           saleInvoice,
+          payments: salePayments,
         }
       : undefined,
     notes: String(r.notes || '').trim() || undefined,

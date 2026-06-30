@@ -6,6 +6,7 @@ import {
   type InventoryRecord,
   type CostItem,
   type FileRef,
+  type Payment,
   type InventoryStatus,
   COST_CATEGORIES,
   formatUSD,
@@ -161,7 +162,9 @@ export default function InventoryEditor({
   const [purchaseInvoiceNo, setPurchaseInvoiceNo] = useState(record.purchaseInvoiceNo || '');
   const [seller, setSeller] = useState(record.seller || '');
   const [purchaseInvoice, setPurchaseInvoice] = useState<FileRef | null>(record.purchaseInvoice || null);
-  const [purchasePayment, setPurchasePayment] = useState<FileRef | null>(record.purchasePayment || null);
+  const [purchasePayments, setPurchasePayments] = useState<Payment[]>(
+    record.purchasePayments || (record.purchasePayment ? [{ id: 'legacy', file: record.purchasePayment }] : []),
+  );
 
   const [costs, setCosts] = useState<CostItem[]>(record.costs || []);
 
@@ -170,6 +173,7 @@ export default function InventoryEditor({
   const [buyer, setBuyer] = useState(record.sale?.buyer || '');
   const [billOfSale, setBillOfSale] = useState<FileRef | null>(record.sale?.billOfSale || null);
   const [saleInvoice, setSaleInvoice] = useState<FileRef | null>(record.sale?.saleInvoice || null);
+  const [salePayments, setSalePayments] = useState<Payment[]>(record.sale?.payments || []);
 
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState('');
@@ -191,8 +195,8 @@ export default function InventoryEditor({
 
   async function extractInvoice(
     dataUrl: string,
-    kind: 'cost' | 'purchase',
-  ): Promise<{ amount?: number; date?: string; category?: string; description?: string; vendor?: string; invoiceNumber?: string; vin?: string; vehicleYear?: number; make?: string; model?: string; trim?: string; color?: string; mileage?: string } | null> {
+    kind: 'cost' | 'purchase' | 'wire',
+  ): Promise<{ amount?: number; date?: string; category?: string; description?: string; vendor?: string; invoiceNumber?: string; reference?: string; counterparty?: string; vin?: string; vehicleYear?: number; make?: string; model?: string; trim?: string; color?: string; mileage?: string } | null> {
     if (!dataUrl.startsWith('data:')) return null;
     try {
       const res = await fetch('/api/admin/extract-invoice', {
@@ -278,6 +282,83 @@ export default function InventoryEditor({
     setCosts((c) => c.filter((x) => x.id !== id));
   }
 
+  // ----- Payments (wire transfers) — purchase (out) & sale (in) -----
+  type SetPayments = React.Dispatch<React.SetStateAction<Payment[]>>;
+  function updatePayment(setList: SetPayments, id: string, patch: Partial<Payment>) {
+    setList((l) => l.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+  }
+  async function onPaymentWire(setList: SetPayments, id: string, v: FileRef | null) {
+    updatePayment(setList, id, { file: v });
+    if (!v?.url?.startsWith('data:')) return;
+    setReading(id);
+    const f = await extractInvoice(v.url, 'wire');
+    if (f) {
+      const patch: Partial<Payment> = {};
+      if (f.amount != null) patch.amount = f.amount;
+      if (f.date) patch.date = f.date;
+      if (f.reference) patch.reference = f.reference;
+      if (f.counterparty) patch.counterparty = f.counterparty;
+      updatePayment(setList, id, patch);
+      flash(id);
+    }
+    setReading(null);
+  }
+
+  function renderPayments(
+    payments: Payment[],
+    setList: SetPayments,
+    expectedNum: number,
+    direction: 'out' | 'in',
+  ) {
+    const sum = payments.reduce((s, p) => s + num(String(p.amount ?? '')), 0);
+    const diff = expectedNum - sum;
+    const partyLabel = direction === 'out' ? 'Beneficiary' : 'Sender';
+    const expectedLabel = direction === 'out' ? 'purchase cost' : 'sale price';
+    const addLabel = direction === 'out' ? '+ Add wire' : '+ Add payment';
+
+    let banner: React.ReactNode = null;
+    if (payments.length > 0) {
+      if (expectedNum <= 0) {
+        banner = <span className="text-neutral-600">Total recorded: <strong>{formatUSD(sum)}</strong> — enter the {expectedLabel} above to reconcile.</span>;
+      } else if (Math.abs(diff) < 1) {
+        banner = <span className="text-green-700">✓ {formatUSD(sum)} {direction === 'out' ? 'wired' : 'received'} — matches the {expectedLabel}.</span>;
+      } else if (diff > 0) {
+        banner = <span className="text-amber-700">⚠ {formatUSD(sum)} of {formatUSD(expectedNum)} — {formatUSD(diff)} still outstanding vs the {expectedLabel}.</span>;
+      } else {
+        banner = <span className="text-amber-700">⚠ {formatUSD(sum)} — {formatUSD(-diff)} more than the {expectedLabel} ({formatUSD(expectedNum)}). Please check.</span>;
+      }
+    }
+
+    return (
+      <div>
+        <div className="mb-3 flex items-center justify-between">
+          <div className="text-sm font-semibold uppercase tracking-wide text-neutral-900">
+            {direction === 'out' ? 'Wire Transfers / Proof of Payment' : 'Payments Received'}
+          </div>
+          <button type="button" onClick={() => setList((l) => [...l, { id: newCostId() }])} className={btnSecondary}>{addLabel}</button>
+        </div>
+        {payments.length === 0 && (
+          <p className="text-sm text-neutral-400">No {direction === 'out' ? 'wire transfers' : 'payments'} yet. Upload one and Claude reads the amount, date, reference &amp; counterparty.</p>
+        )}
+        <div className="space-y-5">
+          {payments.map((p) => (
+            <div key={p.id} className="rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+              <InvoiceDropzone value={p.file} reading={reading === p.id} filled={justFilled === p.id} onFile={(v) => onPaymentWire(setList, p.id, v)} />
+              <div className="mt-4 grid gap-4 sm:grid-cols-[1fr_1fr_1fr_auto]">
+                <div><label className={lbl}>Amount (USD)</label><input value={String(p.amount ?? '')} onChange={(e) => updatePayment(setList, p.id, { amount: e.target.value as unknown as number })} className={`${field}${hl(p.id)}`} placeholder="0" /></div>
+                <div><label className={lbl}>Date</label><input type="date" value={p.date || ''} onChange={(e) => updatePayment(setList, p.id, { date: e.target.value })} className={`${field}${hl(p.id)}`} /></div>
+                <div><label className={lbl}>Reference</label><input value={p.reference || ''} onChange={(e) => updatePayment(setList, p.id, { reference: e.target.value })} className={`${field}${hl(p.id)}`} placeholder="Wire / confirmation #" /></div>
+                <div className="flex items-end pb-1"><button type="button" onClick={() => setList((l) => l.filter((x) => x.id !== p.id))} className="text-sm text-neutral-400 hover:text-red-600">Remove</button></div>
+              </div>
+              <div className="mt-4"><label className={lbl}>{partyLabel} (optional)</label><input value={p.counterparty || ''} onChange={(e) => updatePayment(setList, p.id, { counterparty: e.target.value })} className={`${field}${hl(p.id)}`} /></div>
+            </div>
+          ))}
+        </div>
+        {banner && <p className="mt-3 text-sm font-medium">{banner}</p>}
+      </div>
+    );
+  }
+
   async function save() {
     if (status === 'sold' && !billOfSale) {
       setMsg('Upload the Bill of Sale before marking this car as Sold.');
@@ -285,19 +366,21 @@ export default function InventoryEditor({
     }
     setBusy(true);
     setMsg('');
-    const hasSale = !!(salePrice.trim() || buyer.trim() || saleDate || billOfSale || saleInvoice);
+    const hasSale = !!(salePrice.trim() || buyer.trim() || saleDate || billOfSale || saleInvoice || salePayments.length);
     const payload = {
       isNew,
       record: {
         id: record.id || undefined,
         vin, year: year ? Number(year) : undefined, make, model, trim, color, mileage,
         status, listingSlug: listingSlug || undefined,
-        purchaseCost: num(purchaseCost), purchaseDate, purchaseInvoiceNo, seller, purchaseInvoice, purchasePayment,
+        purchaseCost: num(purchaseCost), purchaseDate, purchaseInvoiceNo, seller, purchaseInvoice,
+        purchasePayments: purchasePayments.map((p) => ({ ...p, amount: p.amount != null ? num(String(p.amount)) : undefined })),
         costs: costs.map((c) => ({ ...c, amount: num(String(c.amount)) })),
         sale: hasSale
           ? {
               price: salePrice.trim() ? num(salePrice) : undefined,
               date: saleDate, buyer, billOfSale, saleInvoice,
+              payments: salePayments.map((p) => ({ ...p, amount: p.amount != null ? num(String(p.amount)) : undefined })),
             }
           : undefined,
         notes: record.notes,
@@ -394,8 +477,8 @@ export default function InventoryEditor({
           <div><label className={lbl}>Invoice # (optional)</label><input value={purchaseInvoiceNo} onChange={(e) => setPurchaseInvoiceNo(e.target.value)} className={`${field}${hl('purchase')}`} /></div>
           <div><label className={lbl}>Seller / Source (optional)</label><input value={seller} onChange={(e) => setSeller(e.target.value)} className={`${field}${hl('purchase')}`} /></div>
         </div>
-        <div className="mt-5">
-          <FileField label="Proof of Payment / Wire Transfer (optional)" value={purchasePayment} onChange={setPurchasePayment} />
+        <div className="mt-8 border-t border-neutral-200 pt-6">
+          {renderPayments(purchasePayments, setPurchasePayments, num(purchaseCost), 'out')}
         </div>
       </section>
 
@@ -442,6 +525,9 @@ export default function InventoryEditor({
           <div className="sm:col-span-2"><label className={lbl}>Buyer (optional)</label><input value={buyer} onChange={(e) => setBuyer(e.target.value)} className={field} /></div>
           <div><FileField label="Bill of Sale" value={billOfSale} onChange={setBillOfSale} /></div>
           <div><FileField label="Sale Invoice (optional)" value={saleInvoice} onChange={setSaleInvoice} /></div>
+        </div>
+        <div className="mt-8 border-t border-neutral-200 pt-6">
+          {renderPayments(salePayments, setSalePayments, num(salePrice), 'in')}
         </div>
       </section>
 

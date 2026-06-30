@@ -93,11 +93,17 @@ export default function InventoryTable({ records }: { records: InventoryRecord[]
     const links: { href: string; label: string }[] = [];
     if (r.purchaseInvoice?.url) links.push({ href: r.purchaseInvoice.url, label: 'Purchase' });
     if (r.purchasePayment?.url) links.push({ href: r.purchasePayment.url, label: 'Wire' });
+    (r.purchasePayments || []).forEach((p, i) => {
+      if (p.file?.url) links.push({ href: p.file.url, label: `Wire ${i + 1}` });
+    });
     (r.costs || []).forEach((c, i) => {
       if (c.invoice?.url) links.push({ href: c.invoice.url, label: c.category || `Cost ${i + 1}` });
     });
     if (r.sale?.billOfSale?.url) links.push({ href: r.sale.billOfSale.url, label: 'Bill of Sale' });
     if (r.sale?.saleInvoice?.url) links.push({ href: r.sale.saleInvoice.url, label: 'Sale Inv.' });
+    (r.sale?.payments || []).forEach((p, i) => {
+      if (p.file?.url) links.push({ href: p.file.url, label: `Payment ${i + 1}` });
+    });
     if (!links.length) return <span className="text-neutral-300">—</span>;
     return (
       <div className="flex flex-wrap gap-1">

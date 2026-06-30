@@ -16,12 +16,23 @@ export type CostItem = {
   invoice?: FileRef | null;
 };
 
+// A wire transfer / proof of payment (purchase side = money out, sale side = money in).
+export type Payment = {
+  id: string;
+  file?: FileRef | null;
+  amount?: number; // USD
+  date?: string; // YYYY-MM-DD
+  reference?: string; // wire reference / confirmation number
+  counterparty?: string; // beneficiary (out) or sender (in)
+};
+
 export type SaleInfo = {
   price?: number; // USD
   date?: string; // YYYY-MM-DD
   buyer?: string;
   billOfSale?: FileRef | null; // required to mark a car Sold
   saleInvoice?: FileRef | null;
+  payments?: Payment[]; // wires received
 };
 
 export type InventoryStatus = 'in_stock' | 'for_sale' | 'sold';
@@ -44,7 +55,8 @@ export type InventoryRecord = {
   purchaseInvoiceNo?: string;
   seller?: string;
   purchaseInvoice?: FileRef | null;
-  purchasePayment?: FileRef | null; // wire transfer / proof of payment
+  purchasePayment?: FileRef | null; // legacy single wire (kept for back-compat)
+  purchasePayments?: Payment[]; // wire transfers out
 
   // Add-on costs
   costs: CostItem[];
@@ -77,6 +89,10 @@ export const STATUS_LABELS: Record<InventoryStatus, string> = {
 // ----- Computed totals -----
 export function addOnsTotal(r: InventoryRecord): number {
   return (r.costs || []).reduce((sum, c) => sum + (Number(c.amount) || 0), 0);
+}
+
+export function paymentsTotal(list?: Payment[]): number {
+  return (list || []).reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
 }
 
 export function totalCost(r: InventoryRecord): number {

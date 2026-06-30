@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'not_configured' }, { status: 200 });
   }
 
-  let body: { fileData?: string; kind?: 'cost' | 'purchase' };
+  let body: { fileData?: string; kind?: 'cost' | 'purchase' | 'wire' };
   try {
     body = await req.json();
   } catch {
@@ -38,11 +38,13 @@ export async function POST(req: NextRequest) {
     ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } }
     : { type: 'image', source: { type: 'base64', media_type: mediaType, data: b64 } };
 
-  const kind = body.kind === 'purchase' ? 'purchase' : 'cost';
+  const kind = body.kind === 'purchase' ? 'purchase' : body.kind === 'wire' ? 'wire' : 'cost';
   const prompt =
     kind === 'purchase'
       ? 'This is a bill of sale / purchase invoice for BUYING a car. Extract: the total purchase amount, the date, the seller/vendor name, the invoice number, AND the vehicle details — VIN, year, make, model, trim, exterior color, and mileage/odometer reading if shown. Use the record_invoice tool. If a field is unknown, leave it empty.'
-      : 'This is an invoice/receipt for a cost spent on a car (parts, repairs, shipping, etc.). Extract the total amount, the date, the best-fit category, a short description of what it was for, and the vendor name. Use the record_invoice tool. If a field is unknown, leave it empty.';
+      : kind === 'wire'
+        ? 'This is a wire transfer / bank payment confirmation related to buying or selling a car. Extract: the amount transferred, the date, the wire reference / confirmation number, and the counterparty name (the beneficiary/recipient for an outgoing payment, or the sender for an incoming one). If a VIN or vehicle is referenced anywhere, include it in the description. Use the record_invoice tool. If a field is unknown, leave it empty.'
+        : 'This is an invoice/receipt for a cost spent on a car (parts, repairs, shipping, etc.). Extract the total amount, the date, the best-fit category, a short description of what it was for, and the vendor name. Use the record_invoice tool. If a field is unknown, leave it empty.';
 
   const tool = {
     name: 'record_invoice',
@@ -56,6 +58,8 @@ export async function POST(req: NextRequest) {
         description: { type: 'string', description: 'Short description of the goods/services' },
         vendor: { type: 'string', description: 'Vendor / seller / supplier name' },
         invoiceNumber: { type: 'string', description: 'Invoice or receipt number' },
+        reference: { type: 'string', description: 'Wire reference / payment confirmation number' },
+        counterparty: { type: 'string', description: 'Wire counterparty — beneficiary (outgoing) or sender (incoming)' },
         // Vehicle details (from a bill of purchase)
         vin: { type: 'string', description: 'Vehicle Identification Number (VIN)' },
         vehicleYear: { type: 'number', description: 'Model year of the vehicle' },

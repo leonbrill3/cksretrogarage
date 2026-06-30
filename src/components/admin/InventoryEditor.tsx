@@ -373,6 +373,17 @@ export default function InventoryEditor({
     );
   }
 
+  // Wipe every field back to blank. Called after a successful save so no data
+  // (or uploaded document) can carry into the next car you add or edit.
+  function resetForm() {
+    setVin(''); setYear(''); setMake(''); setModel(''); setTrim(''); setColor(''); setMileage('');
+    setStatus('in_stock'); setListingSlug('');
+    setPurchaseCost(''); setPurchaseDate(''); setPurchaseInvoiceNo(''); setSeller('');
+    setPurchaseInvoice(null); setPurchasePayments([]); setCosts([]);
+    setSalePrice(''); setSaleDate(''); setBuyer(''); setBillOfSale(null); setSaleInvoice(null); setSalePayments([]);
+    setReading(null); setJustFilled(null); setAiNote('');
+  }
+
   async function save() {
     if (status === 'sold' && !billOfSale) {
       setMsg('Upload the Bill of Sale before marking this car as Sold.');
@@ -408,6 +419,7 @@ export default function InventoryEditor({
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Save failed');
+      resetForm(); // clear so nothing carries into the next add/edit
       router.push('/admin/inventory');
       router.refresh();
     } catch (e) {

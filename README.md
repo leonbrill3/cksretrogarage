@@ -1,4 +1,4 @@
-# CK Retro Garage
+# CK’s Retro Garage
 
 Luxury classic-car acquisition website for **cksretrogarage.com**. A private acquisition house — sourcing, inspecting and safeguarding exceptional cars worldwide.
 

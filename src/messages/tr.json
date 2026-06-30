@@ -1,6 +1,6 @@
 {
   "meta": {
-    "titleDefault": "CK Retro Garage — Koleksiyoner Otomobil Tedariki",
+    "titleDefault": "CK’s Retro Garage — Koleksiyoner Otomobil Tedariki",
     "description": "30 yılı aşkın süredir Cem Köse, dünyanın dört bir yanındaki seçkin sahipler için olağanüstü otomobilleri bulup inceliyor ve teslim ediyor. Aradığınız otomobili bize anlatın."
   },
   "nav": {
@@ -40,7 +40,7 @@
       "p1": "Otuz yılı aşkın süredir Cem Köse, itibarını tek bir ilke üzerine inşa etti: asla taviz vermemek. Bir otomobilin koleksiyonumuzda yer almasına izin vermeden önce; mekanik, kozmetik ve tarihsel her yönünü bizzat inceler.",
       "p2": "Müşterilerimizin mutlak bir güvenle satın almasını sağlayan, işte bu ayrıntıya olan tutku ve kıtalar boyunca kanıtlanmış başarı geçmişidir.",
       "role": "Kurucu ve Baş Eksper",
-      "imageAlt": "CK Retro Garage koleksiyonundan olağanüstü bir otomobil",
+      "imageAlt": "CK’s Retro Garage koleksiyonundan olağanüstü bir otomobil",
       "link": "Ekibimizle tanışın"
     },
     "pillars": {
@@ -159,13 +159,13 @@
   },
   "about": {
     "metaTitle": "Hakkımızda",
-    "eyebrow": "CK Retro Garage Hakkında",
+    "eyebrow": "CK’s Retro Garage Hakkında",
     "title": "Dünya genelinde güvenilen özel bir tedarik kuruluşu.",
     "intro": "Bir insanın olağanüstü otomobillere olan tutkusu etrafında kurulmuş, küçük ve adanmış bir ekibiz — ve Amerika kıtası, Avrupa ile Türkiye'deki müşterilere hizmet eden küresel bir yapı.",
     "founderEyebrow": "Kurucu",
     "founderP1": "Cem Köse, otuz yılı aşkın süredir dünyanın en kaliteli otomobillerini buluyor. Bir tutku olarak başlayan şey, olağanüstü otomobillerin tedariki, incelenmesi ve doğrulanmasında eşsiz bir uzmanlığa dönüştü.",
     "founderP2": "Yöntemi tavizsizdir. Her otomobilin her yönünü kendisi inceler, her ayrıntısını kontrol eder — çünkü adı ve müşterilerinin güveni buna bağlıdır.",
-    "founderP3": "CK Retro Garage'ın üzerine inşa edildiği temel, işte bu standart ve kıtalar boyunca kanıtlanmış başarı geçmişidir.",
+    "founderP3": "CK’s Retro Garage'ın üzerine inşa edildiği temel, işte bu standart ve kıtalar boyunca kanıtlanmış başarı geçmişidir.",
     "teamEyebrow": "Liderlik",
     "teamTitle": "Küresel bir ekip.",
     "teamIntro": "Her pazarda tek bir standart — böylece nerede olursanız olun, dilinizi konuşan ve bölgenizi tanıyan birine sahip olursunuz.",
@@ -266,7 +266,7 @@
   },
   "privacy": {
     "title": "Gizlilik Politikası",
-    "intro": "Bu politika, CK Retro Garage'ın bilgilerinizi nasıl topladığını ve kullandığını açıklar. Lütfen yayına almadan önce hukuk danışmanınızla birlikte gözden geçirin.",
+    "intro": "Bu politika, CK’s Retro Garage'ın bilgilerinizi nasıl topladığını ve kullandığını açıklar. Lütfen yayına almadan önce hukuk danışmanınızla birlikte gözden geçirin.",
     "sections": {
       "collect": {
         "title": "Topladığımız bilgiler",

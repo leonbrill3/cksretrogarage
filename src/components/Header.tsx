@@ -40,7 +40,7 @@ export default function Header({ locale }: { locale: string }) {
       <div className="container-site flex h-[72px] items-center justify-between">
         <Link href="/" className="group flex flex-col leading-none">
           <span className="font-serif text-[19px] tracking-[0.02em] text-bone">
-            CK Retro Garage
+            CK’s Retro Garage
           </span>
           <span className="mt-0.5 text-[9px] uppercase tracking-[0.3em] text-brass">
             Connoisseur Acquisitions

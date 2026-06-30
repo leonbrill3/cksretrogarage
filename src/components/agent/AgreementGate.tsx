@@ -38,7 +38,7 @@ export default function AgreementGate({ token, agentName }: { token: string; age
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
-      <div className="mb-2 text-[11px] uppercase tracking-[0.22em] text-brass">CK Retro Garage</div>
+      <div className="mb-2 text-[11px] uppercase tracking-[0.22em] text-brass">CK’s Retro Garage</div>
       <h1 className="font-serif text-2xl text-bone">
         {agentName ? `Welcome, ${agentName}` : 'Welcome'}
       </h1>

@@ -5,7 +5,7 @@ import '../globals.css';
 const sans = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
-  title: 'Agent — CK Retro Garage',
+  title: 'Agent — CK’s Retro Garage',
   robots: { index: false, follow: false },
 };
 

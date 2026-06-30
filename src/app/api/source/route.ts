@@ -44,7 +44,7 @@ function buildEmail(
     ...(message ? ['', `Message: "${message}"`] : []),
     '',
     'Reply to this email to reach the customer directly.',
-    '— CK Retro Garage · Connoisseur Acquisitions',
+    '— CK’s Retro Garage · Connoisseur Acquisitions',
   ].join('\n');
 
   const rowsHtml = rows
@@ -67,7 +67,7 @@ function buildEmail(
   const html = `<div style="margin:0;padding:24px;background:#0d0d0e;font-family:Helvetica,Arial,sans-serif;">
   <div style="max-width:560px;margin:0 auto;background:#161617;border:1px solid #2a2a2c;border-radius:4px;overflow:hidden;">
     <div style="padding:26px 30px;border-bottom:1px solid #2a2a2c;">
-      <div style="font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#ece6da;">CK Retro Garage</div>
+      <div style="font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#ece6da;">CK’s Retro Garage</div>
       <div style="font-size:10px;letter-spacing:.3em;color:#c8a96a;text-transform:uppercase;margin-top:4px;">Connoisseur Acquisitions</div>
     </div>
     <div style="padding:30px;">
@@ -78,7 +78,7 @@ function buildEmail(
       ${messageHtml}
       <div style="margin-top:26px;font-size:13px;color:#9a948a;line-height:1.5;">Just hit <strong style="color:#ece6da;">Reply</strong> to respond — it goes straight to the customer.</div>
     </div>
-    <div style="padding:18px 30px;border-top:1px solid #2a2a2c;font-size:11px;color:#6f6a61;">CK Retro Garage · A private acquisition house · A copy of every enquiry is kept centrally.</div>
+    <div style="padding:18px 30px;border-top:1px solid #2a2a2c;font-size:11px;color:#6f6a61;">CK’s Retro Garage · A private acquisition house · A copy of every enquiry is kept centrally.</div>
   </div>
 </div>`;
 

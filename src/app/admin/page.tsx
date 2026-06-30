@@ -15,7 +15,7 @@ export default async function AdminDashboard() {
     <div className="mx-auto max-w-5xl px-6 py-12">
       <header className="mb-10 flex items-center justify-between">
         <div>
-          <div className="font-serif text-2xl">CK Retro Garage</div>
+          <div className="font-serif text-2xl">CK’s Retro Garage</div>
           <div className="text-[11px] uppercase tracking-[0.22em] text-brass">Inventory Admin</div>
         </div>
         <div className="flex items-center gap-4">

@@ -66,7 +66,7 @@ export default function QuoteBuilder({
   const [emailStatus, setEmailStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [emailMsg, setEmailMsg] = useState('');
   const [signature, setSignature] = useState(
-    `${agentName}\nCK Retro Garage\n${agentEmail}${agentPhone ? ` · ${agentPhone}` : ''}`,
+    `${agentName}\nCK’s Retro Garage\n${agentEmail}${agentPhone ? ` · ${agentPhone}` : ''}`,
   );
 
   const askingNum = Number(asking.replace(/[^0-9.]/g, ''));
@@ -260,7 +260,7 @@ export default function QuoteBuilder({
                 {/* Editable branded email preview (mirrors what the client receives) */}
                 <div className="overflow-hidden border border-bone/15 bg-[#161617]">
                   <div className="border-b border-bone/10 px-5 py-4">
-                    <div className="font-serif text-lg text-bone">CK Retro Garage</div>
+                    <div className="font-serif text-lg text-bone">CK’s Retro Garage</div>
                     <div className="text-[9px] uppercase tracking-[0.3em] text-brass">Connoisseur Acquisitions</div>
                   </div>
                   {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -54,7 +54,7 @@ export default async function AgentCard({
           )}
         </div>
         <div className="min-w-0">
-          <div className="font-serif text-xl text-bone">{agent?.name || 'CK Retro Garage'}</div>
+          <div className="font-serif text-xl text-bone">{agent?.name || 'CK’s Retro Garage'}</div>
           <div className="mt-0.5 text-sm text-bone-dim">{agent ? agent.scope : t('presentedBy')}</div>
           {agent?.languages?.length ? (
             <div className="mt-1 text-[11px] uppercase tracking-label text-bone-dim">

@@ -15,7 +15,7 @@ const SPEC_LABELS: Record<string, string> = {
 
 // Sender is configurable so we can use a verified domain now (aivacations.com)
 // and switch to leads@cksretrogarage.com once that domain is verified.
-const FROM = process.env.RESEND_FROM || 'CK Retro Garage <onboarding@resend.dev>';
+const FROM = process.env.RESEND_FROM || 'CK’s Retro Garage <onboarding@resend.dev>';
 
 export type SendResult = { ok: boolean; skipped?: boolean; error?: string };
 
@@ -70,11 +70,11 @@ function shell(inner: string): string {
   return `<div style="margin:0;padding:24px;background:#0d0d0e;font-family:Helvetica,Arial,sans-serif;">
   <div style="max-width:560px;margin:0 auto;background:#161617;border:1px solid #2a2a2c;border-radius:4px;overflow:hidden;">
     <div style="padding:26px 30px;border-bottom:1px solid #2a2a2c;">
-      <div style="font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#ece6da;">CK Retro Garage</div>
+      <div style="font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#ece6da;">CK’s Retro Garage</div>
       <div style="font-size:10px;letter-spacing:.3em;color:#c8a96a;text-transform:uppercase;margin-top:4px;">Connoisseur Acquisitions</div>
     </div>
     ${inner}
-    <div style="padding:18px 30px;border-top:1px solid #2a2a2c;font-size:11px;color:#6f6a61;">CK Retro Garage · A private acquisition house</div>
+    <div style="padding:18px 30px;border-top:1px solid #2a2a2c;font-size:11px;color:#6f6a61;">CK’s Retro Garage · A private acquisition house</div>
   </div>
 </div>`;
 }
@@ -84,11 +84,11 @@ const btn = (href: string, label: string) =>
 
 // ---- Welcome email (sent when an agent is created) ----
 export function welcomeEmail(agent: Agent, dashboardUrl: string) {
-  const subject = 'Welcome to CK Retro Garage — your agent account';
+  const subject = 'Welcome to CK’s Retro Garage — your agent account';
   const inner = `<div style="padding:30px;">
     <div style="font-size:11px;letter-spacing:.2em;color:#c8a96a;text-transform:uppercase;margin-bottom:10px;">Your agent account</div>
-    <div style="font-family:Georgia,serif;font-size:26px;line-height:1.2;color:#ece6da;margin-bottom:14px;">Welcome to CK Retro Garage, ${esc(agent.name)}.</div>
-    <div style="font-size:14px;color:#9a948a;line-height:1.6;margin-bottom:24px;">You're now set up to represent CK Retro Garage and earn on every car you place. Here's how it works.</div>
+    <div style="font-family:Georgia,serif;font-size:26px;line-height:1.2;color:#ece6da;margin-bottom:14px;">Welcome to CK’s Retro Garage, ${esc(agent.name)}.</div>
+    <div style="font-size:14px;color:#9a948a;line-height:1.6;margin-bottom:24px;">You're now set up to represent CK’s Retro Garage and earn on every car you place. Here's how it works.</div>
     <table style="width:100%;border-collapse:collapse;font-size:14px;color:#d8d2c6;line-height:1.5;">
       <tr><td style="padding:8px 12px 8px 0;color:#c8a96a;vertical-align:top;">1</td><td style="padding:8px 0;">You get access to the cars we have <strong style="color:#ece6da;">available to sell</strong>.</td></tr>
       <tr><td style="padding:8px 12px 8px 0;color:#c8a96a;vertical-align:top;border-top:1px solid #242426;">2</td><td style="padding:8px 0;border-top:1px solid #242426;">Each car has a confidential <strong style="color:#ece6da;">minimum price</strong> — your floor. Your client never sees it.</td></tr>
@@ -100,7 +100,7 @@ export function welcomeEmail(agent: Agent, dashboardUrl: string) {
     ${btn(dashboardUrl, 'Review agreement & activate →')}
     <div style="margin-top:24px;font-size:13px;color:#9a948a;line-height:1.6;">Once you're in, you'll be ready to quote. Whenever we add a new car, you'll get an email with the details.</div>
   </div>`;
-  const text = `Welcome to CK Retro Garage, ${agent.name}.\n\nHow it works:\n1. You get access to cars we have available to sell.\n2. Each car has a confidential minimum price — your floor. Your client never sees it.\n3. You choose the asking price you quote (at or above the minimum).\n4. You keep 70% of everything above the minimum. At the minimum you earn nothing.\n\nExample: minimum $100,000, sell at $120,000 → you earn $14,000.\n\nTo activate your dashboard, review and accept our Independent Sales Agent Agreement (it confirms you're an independent contractor, and covers confidentiality and the commission terms). This link is also your private login — keep it to yourself:\n${dashboardUrl}\n\n— CK Retro Garage`;
+  const text = `Welcome to CK’s Retro Garage, ${agent.name}.\n\nHow it works:\n1. You get access to cars we have available to sell.\n2. Each car has a confidential minimum price — your floor. Your client never sees it.\n3. You choose the asking price you quote (at or above the minimum).\n4. You keep 70% of everything above the minimum. At the minimum you earn nothing.\n\nExample: minimum $100,000, sell at $120,000 → you earn $14,000.\n\nTo activate your dashboard, review and accept our Independent Sales Agent Agreement (it confirms you're an independent contractor, and covers confidentiality and the commission terms). This link is also your private login — keep it to yourself:\n${dashboardUrl}\n\n— CK’s Retro Garage`;
   return { subject, html: shell(inner), text };
 }
 
@@ -128,7 +128,7 @@ export function newCarEmail(car: Car, dashboardUrl: string) {
     <div style="margin-top:18px;padding:14px 16px;background:#0f0f10;border-left:2px solid #c8a96a;color:#cfc9bd;font-size:13px;line-height:1.5;">Quote your client <strong style="color:#ece6da;">above</strong> the minimum and keep <strong style="color:#ece6da;">70% of the difference</strong>. At the minimum you earn nothing.</div>
     ${btn(dashboardUrl, 'Open your dashboard to send quotes →')}
   </div>`;
-  const text = `New car to sell — ${title}\n\nCK has a new car available for you to offer your clients.\n\nYour minimum (private): ${min}\n${car.location ? `Location: ${car.location}\n` : ''}\nQuote above the minimum and keep 70% of the difference.\n\nOpen your dashboard:\n${dashboardUrl}\n\n— CK Retro Garage`;
+  const text = `New car to sell — ${title}\n\nCK has a new car available for you to offer your clients.\n\nYour minimum (private): ${min}\n${car.location ? `Location: ${car.location}\n` : ''}\nQuote above the minimum and keep 70% of the difference.\n\nOpen your dashboard:\n${dashboardUrl}\n\n— CK’s Retro Garage`;
   return { subject, html: shell(inner), text };
 }
 
@@ -145,7 +145,7 @@ export function quoteEmail(opts: {
 }) {
   const { car, agent, asking, currency, url, message, baseUrl } = opts;
   const title = `${car.year} ${car.make} ${car.model}`;
-  const subject = `${title} — from ${agent.name}, CK Retro Garage`;
+  const subject = `${title} — from ${agent.name}, CK’s Retro Garage`;
   const price = formatMoney(asking, currency);
   const first = car.images[0] || '';
   const cover = first
@@ -158,7 +158,7 @@ export function quoteEmail(opts: {
   const signature =
     opts.signature && opts.signature.trim()
       ? opts.signature.trim()
-      : `${agent.name}\nCK Retro Garage\n${agent.email}${phone ? ` · ${phone}` : ''}`;
+      : `${agent.name}\nCK’s Retro Garage\n${agent.email}${phone ? ` · ${phone}` : ''}`;
 
   const specsHtml = specs.length
     ? `<table style="width:100%;border-collapse:collapse;font-size:13px;color:#ece6da;margin-top:8px;">${specs

@@ -36,7 +36,7 @@ export default async function Home({
       <section className="relative flex min-h-screen items-end overflow-hidden">
         <Image
           src={hero}
-          alt="CK Retro Garage"
+          alt="CK’s Retro Garage"
           fill
           priority
           sizes="100vw"

@@ -31,7 +31,7 @@ export default function AdminLogin() {
   return (
     <div className="flex min-h-screen items-center justify-center px-6">
       <form onSubmit={submit} className="w-full max-w-sm">
-        <div className="mb-2 font-serif text-2xl">CK Retro Garage</div>
+        <div className="mb-2 font-serif text-2xl">CK’s Retro Garage</div>
         <div className="mb-8 text-[11px] uppercase tracking-[0.22em] text-brass">Admin Access</div>
         <label className="mb-2 block text-[11px] uppercase tracking-[0.22em] text-bone-dim">
           Password

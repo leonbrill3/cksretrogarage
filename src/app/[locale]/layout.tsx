@@ -36,7 +36,7 @@ export async function generateMetadata({
     metadataBase: new URL('https://cksretrogarage.com'),
     title: {
       default: t('titleDefault'),
-      template: '%s — CK Retro Garage',
+      template: '%s — CK’s Retro Garage',
     },
     description: t('description'),
     alternates: {
@@ -49,7 +49,7 @@ export async function generateMetadata({
       title: t('titleDefault'),
       description: t('description'),
       type: 'website',
-      siteName: 'CK Retro Garage',
+      siteName: 'CK’s Retro Garage',
     },
   };
 }

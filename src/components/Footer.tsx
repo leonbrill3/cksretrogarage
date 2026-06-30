@@ -13,7 +13,7 @@ export default async function Footer({ locale }: { locale: string }) {
       <div className="container-site py-16">
         <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr]">
           <div>
-            <div className="font-serif text-2xl text-bone">CK Retro Garage</div>
+            <div className="font-serif text-2xl text-bone">CK’s Retro Garage</div>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-bone-dim">
               {t('blurb')}
             </p>
@@ -54,7 +54,7 @@ export default async function Footer({ locale }: { locale: string }) {
 
         <div className="mt-14 flex flex-col gap-4 border-t border-bone/10 pt-8 text-xs text-bone-dim md:flex-row md:items-center md:justify-between">
           <span>
-            © {new Date().getFullYear()} CK Retro Garage. {t('rights')}
+            © {new Date().getFullYear()} CK’s Retro Garage. {t('rights')}
           </span>
           <div className="flex gap-6">
             <Link href="/privacy" className="hover:text-bone-muted">

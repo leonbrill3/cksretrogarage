@@ -9,7 +9,7 @@ export const AGREEMENT_VERSION = '2026-06-20';
 export const AGREEMENT_TITLE = 'Independent Sales Agent Agreement';
 
 export const AGREEMENT_INTRO =
-  'This Independent Sales Agent Agreement (the "Agreement") is entered into between CK Retro Garage (the "Company") and you (the "Agent"). By selecting "I agree" below, you accept and agree to be bound by the following terms.';
+  'This Independent Sales Agent Agreement (the "Agreement") is entered into between CK’s Retro Garage (the "Company") and you (the "Agent"). By selecting "I agree" below, you accept and agree to be bound by the following terms.';
 
 export const AGREEMENT_SECTIONS: { title: string; body: string }[] = [
   {

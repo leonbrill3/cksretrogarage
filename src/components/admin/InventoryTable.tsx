@@ -92,6 +92,7 @@ export default function InventoryTable({ records }: { records: InventoryRecord[]
   function Docs({ r }: { r: InventoryRecord }) {
     const links: { href: string; label: string }[] = [];
     if (r.purchaseInvoice?.url) links.push({ href: r.purchaseInvoice.url, label: 'Purchase' });
+    if (r.purchasePayment?.url) links.push({ href: r.purchasePayment.url, label: 'Wire' });
     (r.costs || []).forEach((c, i) => {
       if (c.invoice?.url) links.push({ href: c.invoice.url, label: c.category || `Cost ${i + 1}` });
     });

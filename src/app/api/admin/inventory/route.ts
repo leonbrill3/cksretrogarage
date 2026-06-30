@@ -71,6 +71,7 @@ export async function POST(req: NextRequest) {
 
   // ----- Persist all file fields -----
   const purchaseInvoice = await persistFile(r.purchaseInvoice);
+  const purchasePayment = await persistFile(r.purchasePayment);
   const saleInvoice = await persistFile(r.sale?.saleInvoice);
   const costs: CostItem[] = [];
   for (const c of r.costs || []) {
@@ -106,6 +107,7 @@ export async function POST(req: NextRequest) {
     purchaseInvoiceNo: String(r.purchaseInvoiceNo || '').trim() || undefined,
     seller: String(r.seller || '').trim() || undefined,
     purchaseInvoice,
+    purchasePayment,
     costs,
     sale: hasSale
       ? {

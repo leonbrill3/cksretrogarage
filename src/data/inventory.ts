@@ -44,6 +44,7 @@ export type InventoryRecord = {
   purchaseInvoiceNo?: string;
   seller?: string;
   purchaseInvoice?: FileRef | null;
+  purchasePayment?: FileRef | null; // wire transfer / proof of payment
 
   // Add-on costs
   costs: CostItem[];

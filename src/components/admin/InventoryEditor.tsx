@@ -161,6 +161,7 @@ export default function InventoryEditor({
   const [purchaseInvoiceNo, setPurchaseInvoiceNo] = useState(record.purchaseInvoiceNo || '');
   const [seller, setSeller] = useState(record.seller || '');
   const [purchaseInvoice, setPurchaseInvoice] = useState<FileRef | null>(record.purchaseInvoice || null);
+  const [purchasePayment, setPurchasePayment] = useState<FileRef | null>(record.purchasePayment || null);
 
   const [costs, setCosts] = useState<CostItem[]>(record.costs || []);
 
@@ -291,7 +292,7 @@ export default function InventoryEditor({
         id: record.id || undefined,
         vin, year: year ? Number(year) : undefined, make, model, trim, color, mileage,
         status, listingSlug: listingSlug || undefined,
-        purchaseCost: num(purchaseCost), purchaseDate, purchaseInvoiceNo, seller, purchaseInvoice,
+        purchaseCost: num(purchaseCost), purchaseDate, purchaseInvoiceNo, seller, purchaseInvoice, purchasePayment,
         costs: costs.map((c) => ({ ...c, amount: num(String(c.amount)) })),
         sale: hasSale
           ? {
@@ -392,6 +393,9 @@ export default function InventoryEditor({
           <div><label className={lbl}>Purchase Date</label><input type="date" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} className={`${field}${hl('purchase')}`} /></div>
           <div><label className={lbl}>Invoice # (optional)</label><input value={purchaseInvoiceNo} onChange={(e) => setPurchaseInvoiceNo(e.target.value)} className={`${field}${hl('purchase')}`} /></div>
           <div><label className={lbl}>Seller / Source (optional)</label><input value={seller} onChange={(e) => setSeller(e.target.value)} className={`${field}${hl('purchase')}`} /></div>
+        </div>
+        <div className="mt-5">
+          <FileField label="Proof of Payment / Wire Transfer (optional)" value={purchasePayment} onChange={setPurchasePayment} />
         </div>
       </section>
 

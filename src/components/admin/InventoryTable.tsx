@@ -25,7 +25,7 @@ export default function InventoryTable({ records }: { records: InventoryRecord[]
 
   const rows = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    return records.filter((r) => {
+    const filtered = records.filter((r) => {
       if (status !== 'all' && r.status !== status) return false;
       if (!needle) return true;
       return [r.vin, r.make, r.model, r.year, r.sale?.buyer, r.seller]
@@ -33,6 +33,18 @@ export default function InventoryTable({ records }: { records: InventoryRecord[]
         .join(' ')
         .toLowerCase()
         .includes(needle);
+    });
+    // Order by purchase date — earliest acquisition first, regardless of when
+    // the row was added. Cars with no purchase date sink to the bottom.
+    const ts = (d?: string) => {
+      if (!d) return Number.POSITIVE_INFINITY;
+      const t = Date.parse(d);
+      return Number.isNaN(t) ? Number.POSITIVE_INFINITY : t;
+    };
+    return filtered.sort((a, b) => {
+      const diff = ts(a.purchaseDate) - ts(b.purchaseDate);
+      if (diff !== 0) return diff;
+      return ts(a.createdAt) - ts(b.createdAt); // stable tiebreak by add order
     });
   }, [records, q, status]);
 
@@ -165,6 +177,7 @@ export default function InventoryTable({ records }: { records: InventoryRecord[]
                 <th className={th}>Make</th>
                 <th className={th}>Model</th>
                 <th className={th}>Status</th>
+                <th className={th}>Purchased</th>
                 <th className={`${th} text-right`}>Purchase</th>
                 <th className={`${th} text-right`}>Add-ons</th>
                 <th className={`${th} text-right`}>Total Cost</th>
@@ -191,6 +204,7 @@ export default function InventoryTable({ records }: { records: InventoryRecord[]
                         {STATUS_LABELS[r.status]}
                       </span>
                     </td>
+                    <td className={td}>{r.purchaseDate || '—'}</td>
                     <td className={`${td} text-right`}>{formatUSD(r.purchaseCost)}</td>
                     <td className={`${td} text-right`}>{formatUSD(addOnsTotal(r))}</td>
                     <td className={`${td} text-right font-semibold text-neutral-900`}>{formatUSD(totalCost(r))}</td>
@@ -205,7 +219,7 @@ export default function InventoryTable({ records }: { records: InventoryRecord[]
             </tbody>
             <tfoot className="border-t-2 border-neutral-300 bg-neutral-50">
               <tr className="font-semibold text-neutral-900">
-                <td className={td} colSpan={5}>Totals ({rows.length})</td>
+                <td className={td} colSpan={6}>Totals ({rows.length})</td>
                 <td className={`${td} text-right`}>{formatUSD(totals.purchase)}</td>
                 <td className={`${td} text-right`}>{formatUSD(totals.addons)}</td>
                 <td className={`${td} text-right`}>{formatUSD(totals.cost)}</td>

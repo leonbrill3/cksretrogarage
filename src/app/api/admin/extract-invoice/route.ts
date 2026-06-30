@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
   const kind = body.kind === 'purchase' ? 'purchase' : body.kind === 'wire' ? 'wire' : 'cost';
   const prompt =
     kind === 'purchase'
-      ? 'This is a bill of sale / purchase invoice for BUYING a car. Extract: the total purchase amount, the date, the seller/vendor name, the invoice number, AND the vehicle details — VIN, year, make, model, trim, exterior color, and mileage/odometer reading if shown. Use the record_invoice tool. If a field is unknown, leave it empty.'
+      ? 'This is a bill of sale / purchase invoice for BUYING a car. Extract: the TOTAL purchase price of the vehicle — the full agreed price, NOT the remaining balance. If the document shows a deposit / down payment already paid and a balance due, the total price is (deposit + balance due); put that full price in `amount`, the deposit already paid in `deposit`, and the remaining balance due in `balanceDue`. Also extract the date, the seller/vendor name, the invoice number, AND the vehicle details — VIN, year, make, model, trim, exterior color, and mileage/odometer reading if shown. Use the record_invoice tool. If a field is unknown, leave it empty.'
       : kind === 'wire'
         ? 'This is a wire transfer / bank payment confirmation related to buying or selling a car. Extract: the amount transferred, the date, the wire reference / confirmation number, and the counterparty name (the beneficiary/recipient for an outgoing payment, or the sender for an incoming one). If a VIN or vehicle is referenced anywhere, include it in the description. Use the record_invoice tool. If a field is unknown, leave it empty.'
         : 'This is an invoice/receipt for a cost spent on a car (parts, repairs, shipping, etc.). Extract the total amount, the date, the best-fit category, a short description of what it was for, and the vendor name. Use the record_invoice tool. If a field is unknown, leave it empty.';
@@ -52,7 +52,9 @@ export async function POST(req: NextRequest) {
     input_schema: {
       type: 'object',
       properties: {
-        amount: { type: 'number', description: 'Total amount as a number, no currency symbol' },
+        amount: { type: 'number', description: 'Total amount as a number, no currency symbol. For a car purchase this is the FULL vehicle price (deposit + balance due), never the balance alone.' },
+        deposit: { type: 'number', description: 'Deposit / down payment already paid toward a car purchase, if shown' },
+        balanceDue: { type: 'number', description: 'Remaining balance still owed after the deposit, if shown' },
         date: { type: 'string', description: 'Invoice date in YYYY-MM-DD format' },
         category: { type: 'string', enum: COST_CATEGORIES as unknown as string[], description: 'Best-fit cost category' },
         description: { type: 'string', description: 'Short description of the goods/services' },

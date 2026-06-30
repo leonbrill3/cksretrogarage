@@ -196,7 +196,7 @@ export default function InventoryEditor({
   async function extractInvoice(
     dataUrl: string,
     kind: 'cost' | 'purchase' | 'wire',
-  ): Promise<{ amount?: number; date?: string; category?: string; description?: string; vendor?: string; invoiceNumber?: string; reference?: string; counterparty?: string; vin?: string; vehicleYear?: number; make?: string; model?: string; trim?: string; color?: string; mileage?: string } | null> {
+  ): Promise<{ amount?: number; deposit?: number; balanceDue?: number; date?: string; category?: string; description?: string; vendor?: string; invoiceNumber?: string; reference?: string; counterparty?: string; vin?: string; vehicleYear?: number; make?: string; model?: string; trim?: string; color?: string; mileage?: string } | null> {
     if (!dataUrl.startsWith('data:')) return null;
     try {
       const res = await fetch('/api/admin/extract-invoice', {
@@ -226,6 +226,15 @@ export default function InventoryEditor({
       if (f.date) setPurchaseDate(f.date);
       if (f.invoiceNumber) setPurchaseInvoiceNo(f.invoiceNumber);
       if (f.vendor) setSeller(f.vendor);
+      // If the bill of sale shows a deposit already paid, record it as a payment
+      // line so reconciliation counts it (deposit + wired balance = purchase cost).
+      if (f.deposit && f.deposit > 0) {
+        setPurchasePayments((l) =>
+          l.some((p) => (p.reference || '').toLowerCase() === 'deposit')
+            ? l
+            : [...l, { id: newCostId(), amount: f.deposit, date: f.date, reference: 'Deposit', counterparty: f.vendor }],
+        );
+      }
       // Vehicle details from the bill of purchase
       if (f.vin) setVin(f.vin);
       if (f.make) setMake(f.make);
@@ -323,7 +332,12 @@ export default function InventoryEditor({
       } else if (Math.abs(diff) < 1) {
         banner = <span className="text-green-700">✓ {formatUSD(sum)} {direction === 'out' ? 'wired' : 'received'} — matches the {expectedLabel}.</span>;
       } else if (diff > 0) {
-        banner = <span className="text-amber-700">⚠ {formatUSD(sum)} of {formatUSD(expectedNum)} — {formatUSD(diff)} still outstanding vs the {expectedLabel}.</span>;
+        banner = (
+          <span className="text-amber-700">
+            ⚠ {formatUSD(sum)} of {formatUSD(expectedNum)} — {formatUSD(diff)} still outstanding vs the {expectedLabel}.
+            {direction === 'out' && ' If a deposit or trade-in already covered part of it, add it with “+ Add wire” so the totals reconcile.'}
+          </span>
+        );
       } else {
         banner = <span className="text-amber-700">⚠ {formatUSD(sum)} — {formatUSD(-diff)} more than the {expectedLabel} ({formatUSD(expectedNum)}). Please check.</span>;
       }

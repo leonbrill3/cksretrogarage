@@ -46,7 +46,10 @@ export default async function EditInventoryPage({
         <h1 className="mt-4 text-2xl font-semibold">
           {isNew ? 'Add a car to the ledger' : `Edit — ${vehicleTitle(record)}`}
         </h1>
-        <InventoryEditor record={record} isNew={isNew} listings={listings} />
+        {/* key forces a clean remount per record — without it, navigating
+            between cars (or to "new") reuses the same client component and
+            keeps the previous car's field/document state. */}
+        <InventoryEditor key={isNew ? 'new' : record.id} record={record} isNew={isNew} listings={listings} />
       </div>
     </div>
   );

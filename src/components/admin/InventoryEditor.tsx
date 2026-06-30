@@ -191,7 +191,7 @@ export default function InventoryEditor({
   async function extractInvoice(
     dataUrl: string,
     kind: 'cost' | 'purchase',
-  ): Promise<{ amount?: number; date?: string; category?: string; description?: string; vendor?: string; invoiceNumber?: string } | null> {
+  ): Promise<{ amount?: number; date?: string; category?: string; description?: string; vendor?: string; invoiceNumber?: string; vin?: string; vehicleYear?: number; make?: string; model?: string; trim?: string; color?: string; mileage?: string } | null> {
     if (!dataUrl.startsWith('data:')) return null;
     try {
       const res = await fetch('/api/admin/extract-invoice', {
@@ -221,6 +221,14 @@ export default function InventoryEditor({
       if (f.date) setPurchaseDate(f.date);
       if (f.invoiceNumber) setPurchaseInvoiceNo(f.invoiceNumber);
       if (f.vendor) setSeller(f.vendor);
+      // Vehicle details from the bill of purchase
+      if (f.vin) setVin(f.vin);
+      if (f.make) setMake(f.make);
+      if (f.model) setModel(f.model);
+      if (f.vehicleYear) setYear(String(f.vehicleYear));
+      if (f.trim) setTrim(f.trim);
+      if (f.color) setColor(f.color);
+      if (f.mileage) setMileage(f.mileage);
       flash('purchase');
     }
     setReading(null);
@@ -352,14 +360,14 @@ export default function InventoryEditor({
         <div className="grid gap-5 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <label className={lbl}>VIN</label>
-            <input value={vin} onChange={(e) => setVin(e.target.value)} className={`${field} font-mono`} placeholder="Vehicle Identification Number" />
+            <input value={vin} onChange={(e) => setVin(e.target.value)} className={`${field} font-mono${hl('purchase')}`} placeholder="Vehicle Identification Number" />
           </div>
-          <div><label className={lbl}>Year</label><input value={year} onChange={(e) => setYear(e.target.value)} className={field} placeholder="2008" /></div>
-          <div><label className={lbl}>Make</label><input value={make} onChange={(e) => setMake(e.target.value)} className={field} placeholder="Ferrari" /></div>
-          <div><label className={lbl}>Model</label><input value={model} onChange={(e) => setModel(e.target.value)} className={field} placeholder="599" /></div>
-          <div><label className={lbl}>Trim (optional)</label><input value={trim} onChange={(e) => setTrim(e.target.value)} className={field} /></div>
-          <div><label className={lbl}>Color (optional)</label><input value={color} onChange={(e) => setColor(e.target.value)} className={field} /></div>
-          <div><label className={lbl}>Mileage (optional)</label><input value={mileage} onChange={(e) => setMileage(e.target.value)} className={field} /></div>
+          <div><label className={lbl}>Year</label><input value={year} onChange={(e) => setYear(e.target.value)} className={`${field}${hl('purchase')}`} placeholder="2008" /></div>
+          <div><label className={lbl}>Make</label><input value={make} onChange={(e) => setMake(e.target.value)} className={`${field}${hl('purchase')}`} placeholder="Ferrari" /></div>
+          <div><label className={lbl}>Model</label><input value={model} onChange={(e) => setModel(e.target.value)} className={`${field}${hl('purchase')}`} placeholder="599" /></div>
+          <div><label className={lbl}>Trim (optional)</label><input value={trim} onChange={(e) => setTrim(e.target.value)} className={`${field}${hl('purchase')}`} /></div>
+          <div><label className={lbl}>Color (optional)</label><input value={color} onChange={(e) => setColor(e.target.value)} className={`${field}${hl('purchase')}`} /></div>
+          <div><label className={lbl}>Mileage (optional)</label><input value={mileage} onChange={(e) => setMileage(e.target.value)} className={`${field}${hl('purchase')}`} /></div>
           <div>
             <label className={lbl}>Status</label>
             <select value={status} onChange={(e) => setStatus(e.target.value as InventoryStatus)} className={field}>
@@ -377,6 +385,7 @@ export default function InventoryEditor({
       {/* Purchase — invoice first */}
       <section className={section}>
         <div className={heading}>Purchase</div>
+        <p className="mb-3 -mt-2 text-sm text-neutral-500">Not on the website yet? Upload the bill of purchase and Claude fills in the car details (VIN, make, model, year) <em>and</em> the price below.</p>
         <InvoiceDropzone value={purchaseInvoice} reading={reading === 'purchase'} filled={justFilled === 'purchase'} onFile={onPurchaseInvoice} />
         <div className="mt-5 grid gap-5 sm:grid-cols-2">
           <div><label className={lbl}>Purchase Cost (USD)</label><input value={purchaseCost} onChange={(e) => setPurchaseCost(e.target.value)} className={`${field}${hl('purchase')}`} placeholder="180000" /></div>

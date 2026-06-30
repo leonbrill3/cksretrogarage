@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
   const kind = body.kind === 'purchase' ? 'purchase' : 'cost';
   const prompt =
     kind === 'purchase'
-      ? 'This is an invoice/receipt for PURCHASING a car. Extract the total purchase amount, the date, the seller/vendor name, and the invoice number. Use the record_invoice tool. If a field is unknown, leave it empty.'
+      ? 'This is a bill of sale / purchase invoice for BUYING a car. Extract: the total purchase amount, the date, the seller/vendor name, the invoice number, AND the vehicle details — VIN, year, make, model, trim, exterior color, and mileage/odometer reading if shown. Use the record_invoice tool. If a field is unknown, leave it empty.'
       : 'This is an invoice/receipt for a cost spent on a car (parts, repairs, shipping, etc.). Extract the total amount, the date, the best-fit category, a short description of what it was for, and the vendor name. Use the record_invoice tool. If a field is unknown, leave it empty.';
 
   const tool = {
@@ -56,6 +56,14 @@ export async function POST(req: NextRequest) {
         description: { type: 'string', description: 'Short description of the goods/services' },
         vendor: { type: 'string', description: 'Vendor / seller / supplier name' },
         invoiceNumber: { type: 'string', description: 'Invoice or receipt number' },
+        // Vehicle details (from a bill of purchase)
+        vin: { type: 'string', description: 'Vehicle Identification Number (VIN)' },
+        vehicleYear: { type: 'number', description: 'Model year of the vehicle' },
+        make: { type: 'string', description: 'Vehicle make / manufacturer, e.g. Ferrari' },
+        model: { type: 'string', description: 'Vehicle model, e.g. 599' },
+        trim: { type: 'string', description: 'Vehicle trim / variant' },
+        color: { type: 'string', description: 'Exterior color' },
+        mileage: { type: 'string', description: 'Mileage / odometer reading' },
       },
       required: [],
     },

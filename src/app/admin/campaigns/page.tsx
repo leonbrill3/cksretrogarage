@@ -32,10 +32,11 @@ export default async function CampaignsPage() {
           </Link>
         </header>
 
-        {!cfg.marketcheck && !cfg.web && (
+        {!cfg.marketcheck && !cfg.web && !cfg.ebay && (
           <div className="mb-6 rounded-md border border-amber-300 bg-amber-50 p-4 text-sm text-amber-800">
             ⚠ No sourcing provider configured. Set <code>ANTHROPIC_API_KEY</code> (web search — likely
-            already set) and/or <code>MARKETCHECK_API_KEY</code> on Render to enable scraping.
+            already set), <code>MARKETCHECK_API_KEY</code>, and/or <code>EBAY_CLIENT_ID</code> +{' '}
+            <code>EBAY_CLIENT_SECRET</code> on Render to enable scraping.
           </div>
         )}
 

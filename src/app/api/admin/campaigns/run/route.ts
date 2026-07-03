@@ -15,9 +15,9 @@ export async function POST(req: NextRequest) {
   }
 
   const cfg = sourcesConfigured();
-  if (!cfg.marketcheck && !cfg.web) {
+  if (!cfg.marketcheck && !cfg.web && !cfg.ebay) {
     return NextResponse.json(
-      { error: 'No sourcing provider configured. Set ANTHROPIC_API_KEY (web search) and/or MARKETCHECK_API_KEY on Render.' },
+      { error: 'No sourcing provider configured. Set ANTHROPIC_API_KEY (web search), MARKETCHECK_API_KEY, and/or EBAY_CLIENT_ID + EBAY_CLIENT_SECRET on Render.' },
       { status: 400 },
     );
   }

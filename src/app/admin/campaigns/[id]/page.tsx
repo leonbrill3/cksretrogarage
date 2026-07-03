@@ -44,8 +44,8 @@ export default async function CampaignPage({ params }: { params: Promise<{ id: s
           isNew={isNew}
           finds={finds}
           lastRun={lastRun}
-          sourcesReady={cfg.marketcheck || cfg.web}
-          sourceLabels={{ marketcheck: cfg.marketcheck, web: cfg.web }}
+          sourcesReady={cfg.marketcheck || cfg.web || cfg.ebay}
+          sourceLabels={{ marketcheck: cfg.marketcheck, web: cfg.web, ebay: cfg.ebay }}
         />
       </div>
     </div>

@@ -25,10 +25,11 @@ export type SourcedListing = {
   title?: string;
 };
 
-export function sourcesConfigured(): { marketcheck: boolean; web: boolean } {
+export function sourcesConfigured(): { marketcheck: boolean; web: boolean; ebay: boolean } {
   return {
     marketcheck: !!process.env.MARKETCHECK_API_KEY,
     web: !!process.env.ANTHROPIC_API_KEY,
+    ebay: !!(process.env.EBAY_CLIENT_ID && process.env.EBAY_CLIENT_SECRET),
   };
 }
 
@@ -63,6 +64,19 @@ export async function runSources(
         })
         .catch((e) => {
           errors.push(`web: ${String(e).slice(0, 200)}`);
+        }),
+    );
+  }
+
+  if (process.env.EBAY_CLIENT_ID && process.env.EBAY_CLIENT_SECRET) {
+    jobs.push(
+      sourceEbay(c)
+        .then((rows) => {
+          if (rows.length) sources.push('ebay');
+          listings.push(...rows);
+        })
+        .catch((e) => {
+          errors.push(`ebay: ${String(e).slice(0, 200)}`);
         }),
     );
   }
@@ -157,7 +171,7 @@ async function sourceClaudeWeb(c: Campaign): Promise<SourcedListing[]> {
     .filter(Boolean)
     .join('\n');
 
-  const prompt = `You are a car-sourcing researcher. Search the live web for cars CURRENTLY FOR SALE that match this brief. Prefer dealer, auction, and enthusiast sites (e.g. Bring a Trailer, Cars & Bids, PCARMARKET, Hemmings, dupontregistry, cars.com, autotrader, exotic dealers). Only include listings that appear active (not sold/expired). For each, capture the exact listing URL, price (USD number), mileage (miles number), year, trim, and location.\n\nBrief:\n${criteria}\n\nWhen done searching, call record_listings ONCE with everything you found. If you find nothing active, call it with an empty array.`;
+  const prompt = `You are a car-sourcing researcher. Search the live web for cars CURRENTLY FOR SALE that match this brief. Search broadly across marketplaces, auctions, and enthusiast sites — including eBay Motors, cars.com, Autotrader, CarGurus, Cars & Bids, Bring a Trailer, PCARMARKET, Hemmings, duPont Registry, AutoTempest, ClassicCars.com, exotic/specialist dealer sites, and marque forums (e.g. FerrariChat classifieds). Run several searches to maximize coverage. Only include listings that appear active (not sold/expired). For each, capture the exact listing URL, price (USD number), mileage (miles number), year, trim, and location.\n\nBrief:\n${criteria}\n\nWhen done searching, call record_listings ONCE with everything you found. If you find nothing active, call it with an empty array.`;
 
   const body = {
     model,
@@ -238,3 +252,71 @@ type WebListing = {
   vin?: string;
   site?: string;
 };
+
+// ---------- C) eBay Browse API ----------
+// Structured live eBay Motors listings. Needs an eBay developer app
+// (EBAY_CLIENT_ID / EBAY_CLIENT_SECRET) — free at developer.ebay.com.
+let ebayTok: { token: string; exp: number } | null = null;
+
+async function ebayAccessToken(): Promise<string> {
+  const id = process.env.EBAY_CLIENT_ID!;
+  const secret = process.env.EBAY_CLIENT_SECRET!;
+  if (ebayTok && ebayTok.exp > Date.now() + 60_000) return ebayTok.token;
+  const basic = Buffer.from(`${id}:${secret}`).toString('base64');
+  const res = await fetch('https://api.ebay.com/identity/v1/oauth2/token', {
+    method: 'POST',
+    headers: { Authorization: `Basic ${basic}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `grant_type=client_credentials&scope=${encodeURIComponent('https://api.ebay.com/oauth/api_scope')}`,
+  });
+  if (!res.ok) throw new Error(`ebay token HTTP ${res.status}`);
+  const data = (await res.json()) as { access_token: string; expires_in?: number };
+  ebayTok = { token: data.access_token, exp: Date.now() + (data.expires_in || 7200) * 1000 };
+  return ebayTok.token;
+}
+
+async function sourceEbay(c: Campaign): Promise<SourcedListing[]> {
+  const token = await ebayAccessToken();
+  const params = new URLSearchParams({ q: `${c.make} ${c.model}`.trim(), limit: '50', category_ids: '6001' });
+  const filters: string[] = [];
+  if (c.priceMin || c.priceMax) {
+    filters.push(`price:[${c.priceMin || 0}..${c.priceMax || 100000000}]`);
+    filters.push('priceCurrency:USD');
+  }
+  if (filters.length) params.set('filter', filters.join(','));
+  // eBay Motors marketplace: US unless the campaign is Canada-only.
+  const marketplace = c.countries.includes('CA') && !c.countries.includes('US') ? 'EBAY_CA' : 'EBAY_US';
+
+  const res = await fetch(`https://api.ebay.com/buy/browse/v1/item_summary/search?${params.toString()}`, {
+    headers: { Authorization: `Bearer ${token}`, 'X-EBAY-C-MARKETPLACE-ID': marketplace, Accept: 'application/json' },
+  });
+  if (!res.ok) throw new Error(`ebay HTTP ${res.status}`);
+  const data = (await res.json()) as { itemSummaries?: EbayItem[] };
+  return (data.itemSummaries || []).map((it) => mapEbay(it, c));
+}
+
+type EbayItem = {
+  title?: string;
+  itemWebUrl?: string;
+  price?: { value?: string; currency?: string };
+  image?: { imageUrl?: string };
+  itemLocation?: { city?: string; stateOrProvince?: string; country?: string };
+};
+
+function mapEbay(it: EbayItem, c: Campaign): SourcedListing {
+  const title = it.title || `${c.make} ${c.model}`;
+  const yr = title.match(/\b(19[5-9]\d|20[0-4]\d)\b/);
+  const miMatch = title.match(/([\d,]{3,})\s*(?:miles|mi)\b/i);
+  const loc = [it.itemLocation?.city, it.itemLocation?.stateOrProvince].filter(Boolean).join(', ') || it.itemLocation?.country;
+  return {
+    source: 'ebay',
+    sourceUrl: it.itemWebUrl || '',
+    year: yr ? Number(yr[1]) : undefined,
+    make: c.make,
+    model: c.model,
+    price: it.price?.value ? Number(it.price.value) : undefined,
+    mileage: miMatch ? Number(miMatch[1].replace(/,/g, '')) : undefined,
+    location: loc,
+    photo: it.image?.imageUrl,
+    title,
+  };
+}

@@ -33,7 +33,7 @@ export default function CampaignEditor({
   finds: CampaignFind[];
   lastRun?: CampaignRun;
   sourcesReady: boolean;
-  sourceLabels: { marketcheck: boolean; web: boolean };
+  sourceLabels: { marketcheck: boolean; web: boolean; ebay: boolean };
 }) {
   const router = useRouter();
   const [name, setName] = useState(campaign.name);
@@ -217,8 +217,14 @@ export default function CampaignEditor({
         </div>
         {msg && <p className="mt-3 text-sm font-medium text-neutral-700">{msg}</p>}
         <p className="mt-3 text-xs text-neutral-400">
-          Sources: {sourceLabels.web ? 'Web search (Claude)' : null}{sourceLabels.web && sourceLabels.marketcheck ? ' + ' : ''}{sourceLabels.marketcheck ? 'Marketcheck' : null}
-          {!sourceLabels.web && !sourceLabels.marketcheck ? 'none configured' : ''}
+          Sources:{' '}
+          {[
+            sourceLabels.web ? 'Web search (Claude)' : null,
+            sourceLabels.ebay ? 'eBay Motors' : null,
+            sourceLabels.marketcheck ? 'Marketcheck' : null,
+          ]
+            .filter(Boolean)
+            .join(' + ') || 'none configured'}
           {lastRun ? ` · last run ${new Date(lastRun.at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/New_York' })}` : ''}
         </p>
       </div>

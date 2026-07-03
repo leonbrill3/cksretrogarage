@@ -29,13 +29,26 @@ const EMPTY: InventoryRecord = {
 
 export default async function EditInventoryPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { id } = await params;
+  const sp = await searchParams;
   const isNew = id === 'new';
   const [list, cars] = await Promise.all([getInventory(), getCars()]);
-  const record = isNew ? EMPTY : list.find((r) => r.id === id);
+  // A new record can be pre-filled from a sourcing-campaign find via query params.
+  const str = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) || '';
+  const prefilled: InventoryRecord = {
+    ...EMPTY,
+    vin: str(sp.vin),
+    make: str(sp.make),
+    model: str(sp.model),
+    year: str(sp.year) ? Number(str(sp.year)) : undefined,
+    mileage: str(sp.mileage) || undefined,
+  };
+  const record = isNew ? prefilled : list.find((r) => r.id === id);
   if (!record) notFound();
 
   const listings = cars.map((c) => ({
@@ -67,7 +80,7 @@ export default async function EditInventoryPage({
         {/* key forces a clean remount per record — without it, navigating
             between cars (or to "new") reuses the same client component and
             keeps the previous car's field/document state. */}
-        <InventoryEditor key={isNew ? 'new' : record.id} record={record} isNew={isNew} listings={listings} />
+        <InventoryEditor key={isNew ? `new:${record.vin || record.make}${record.model}` : record.id} record={record} isNew={isNew} listings={listings} />
       </div>
     </div>
   );

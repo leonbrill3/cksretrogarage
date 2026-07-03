@@ -9,6 +9,7 @@ import bundledAgents from '../../content/agents.json';
 import type { Car } from '@/data/cars';
 import type { Agent } from '@/data/agents';
 import type { InventoryRecord } from '@/data/inventory';
+import type { Campaign, CampaignFind, CampaignRun } from '@/data/campaigns';
 
 function makePool(): Pool | null {
   const cs = process.env.DATABASE_URL;
@@ -82,6 +83,26 @@ export async function getInventory(): Promise<InventoryRecord[]> {
 }
 export async function saveInventory(records: InventoryRecord[]): Promise<void> {
   return setCollection('inventory', records);
+}
+
+// ----- Sourcing campaigns (saved searches that hunt live inventory) -----
+export async function getCampaigns(): Promise<Campaign[]> {
+  return getCollection<Campaign[]>('campaigns', []);
+}
+export async function saveCampaigns(rows: Campaign[]): Promise<void> {
+  return setCollection('campaigns', rows);
+}
+export async function getCampaignFinds(): Promise<CampaignFind[]> {
+  return getCollection<CampaignFind[]>('campaign_finds', []);
+}
+export async function saveCampaignFinds(rows: CampaignFind[]): Promise<void> {
+  return setCollection('campaign_finds', rows);
+}
+export async function getCampaignRuns(): Promise<CampaignRun[]> {
+  return getCollection<CampaignRun[]>('campaign_runs', []);
+}
+export async function saveCampaignRuns(rows: CampaignRun[]): Promise<void> {
+  return setCollection('campaign_runs', rows);
 }
 
 // ----- Media (images) stored in the DB, served via /api/media/[id] -----

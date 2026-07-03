@@ -4,6 +4,7 @@
 
 import { formatMoney, specEntries, type Car } from '@/data/cars';
 import type { Agent } from '@/data/agents';
+import { type Campaign, type CampaignFind, formatMiles } from '@/data/campaigns';
 
 const SPEC_LABELS: Record<string, string> = {
   mileage: 'Mileage',
@@ -186,5 +187,56 @@ export function quoteEmail(opts: {
   </div>`;
 
   const text = `${message.trim() ? message.trim() + '\n\n' : ''}${title}\n${price}${car.location ? `\n${car.location}` : ''}\n\nView full details & photos:\n${url}\n\n${signature}`;
+  return { subject, html: shell(inner), text };
+}
+
+// ---- Sourcing-campaign digest (new matches + price drops) ----
+function usd(n?: number): string {
+  if (typeof n !== 'number' || !Number.isFinite(n)) return '—';
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
+}
+
+function findCard(f: CampaignFind, tag?: string): string {
+  const meta = [f.mileage != null ? formatMiles(f.mileage) : null, f.location, f.dealer].filter(Boolean).join(' · ');
+  return `<div style="border:1px solid #262628;border-radius:4px;overflow:hidden;margin-bottom:14px;">
+    ${f.photo ? `<img src="${esc(f.photo)}" alt="" style="display:block;width:100%;height:auto;" />` : ''}
+    <div style="padding:14px 16px;">
+      ${tag ? `<div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#c8a96a;margin-bottom:6px;">${esc(tag)}</div>` : ''}
+      <div style="font-family:Georgia,serif;font-size:17px;color:#ece6da;">${esc(f.title)}</div>
+      <div style="font-family:Georgia,serif;font-size:16px;color:#c8a96a;margin-top:4px;">${esc(usd(f.price))}</div>
+      ${meta ? `<div style="font-size:12px;color:#9a948a;margin-top:4px;">${esc(meta)}</div>` : ''}
+      <div style="margin-top:10px;"><a href="${esc(f.sourceUrl)}" style="font-size:12px;color:#c8a96a;text-decoration:underline;">View listing ↗</a></div>
+    </div>
+  </div>`;
+}
+
+export function campaignDigestEmail(
+  campaign: Campaign,
+  newFinds: CampaignFind[],
+  priceDrops: CampaignFind[],
+  adminUrl: string,
+) {
+  const nNew = newFinds.length;
+  const nDrop = priceDrops.length;
+  const parts = [nNew ? `${nNew} new` : '', nDrop ? `${nDrop} price drop${nDrop > 1 ? 's' : ''}` : ''].filter(Boolean);
+  const subject = `${parts.join(' + ') || 'Update'} — ${campaign.name}`;
+
+  const newHtml = nNew ? `<div style="font-size:11px;letter-spacing:.2em;color:#c8a96a;text-transform:uppercase;margin:0 0 12px;">${nNew} new listing${nNew > 1 ? 's' : ''}</div>${newFinds.map((f) => findCard(f)).join('')}` : '';
+  const dropHtml = nDrop ? `<div style="font-size:11px;letter-spacing:.2em;color:#c8a96a;text-transform:uppercase;margin:22px 0 12px;">${nDrop} price drop${nDrop > 1 ? 's' : ''}</div>${priceDrops.map((f) => findCard(f, 'price drop')).join('')}` : '';
+
+  const inner = `<div style="padding:30px;">
+    <div style="font-size:11px;letter-spacing:.2em;color:#c8a96a;text-transform:uppercase;margin-bottom:10px;">Sourcing campaign</div>
+    <div style="font-family:Georgia,serif;font-size:24px;line-height:1.2;color:#ece6da;margin-bottom:6px;">${esc(campaign.name)}</div>
+    <div style="font-size:13px;color:#9a948a;margin-bottom:22px;">${esc(campaign.make)} ${esc(campaign.model)} · ${esc(campaign.countries.join('/'))}</div>
+    ${newHtml}
+    ${dropHtml}
+    ${btn(adminUrl, 'Open the campaign →')}
+  </div>`;
+
+  const lines = [
+    ...newFinds.map((f) => `NEW  ${f.title} — ${usd(f.price)} — ${f.sourceUrl}`),
+    ...priceDrops.map((f) => `DROP ${f.title} — ${usd(f.price)} — ${f.sourceUrl}`),
+  ];
+  const text = `${subject}\n\n${lines.join('\n')}\n\nOpen the campaign: ${adminUrl}\n\n— CK’s Retro Garage`;
   return { subject, html: shell(inner), text };
 }

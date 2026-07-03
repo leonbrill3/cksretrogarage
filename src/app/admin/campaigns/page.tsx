@@ -24,12 +24,20 @@ export default async function CampaignsPage() {
               Hunt live inventory across the web · monitored morning &amp; afternoon
             </div>
           </div>
-          <Link
-            href="/admin/campaigns/new"
-            className="rounded-md bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-neutral-700"
-          >
-            + New Campaign
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/admin/campaigns/results"
+              className="rounded-md border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 hover:border-neutral-900"
+            >
+              View all results →
+            </Link>
+            <Link
+              href="/admin/campaigns/new"
+              className="rounded-md bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-neutral-700"
+            >
+              + New Campaign
+            </Link>
+          </div>
         </header>
 
         {!cfg.marketcheck && !cfg.web && !cfg.ebay && (

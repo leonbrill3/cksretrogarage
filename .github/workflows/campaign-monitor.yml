@@ -1,0 +1,40 @@
+name: Campaign Monitor
+
+# Twice-daily sweep of active sourcing campaigns. Hits the app's cron endpoint,
+# which runs each campaign and emails a digest when there are new matches or
+# price drops. Times are UTC (GitHub cron has no DST): 12:00 UTC ≈ morning ET,
+# 19:00 UTC ≈ afternoon ET.
+on:
+  schedule:
+    - cron: '0 12 * * *' # morning
+    - cron: '0 19 * * *' # afternoon
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: 'Which slot to run (morning | afternoon)'
+        default: 'morning'
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger campaign monitor
+        run: |
+          SLOT="${{ github.event.inputs.slot }}"
+          if [ -z "$SLOT" ]; then
+            case "${{ github.event.schedule }}" in
+              '0 12 * * *') SLOT=morning ;;
+              '0 19 * * *') SLOT=afternoon ;;
+              *) SLOT=morning ;;
+            esac
+          fi
+          echo "Running campaign monitor · slot=$SLOT"
+          http_code=$(curl -sS -o /tmp/resp.json -w '%{http_code}' \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://cksretrogarage.onrender.com/api/cron/campaigns?slot=$SLOT")
+          echo "HTTP $http_code"
+          cat /tmp/resp.json || true
+          if [ "$http_code" -ge 300 ]; then
+            echo "::error::Campaign monitor failed (HTTP $http_code)"
+            exit 1
+          fi

@@ -40,7 +40,7 @@ export default function CampaignResults({
   const [view, setView] = useState<'gallery' | 'table'>('gallery');
   const [campaign, setCampaign] = useState('all');
   const [source, setSource] = useState('all');
-  const [status, setStatus] = useState<'all' | 'new' | 'active' | 'price_drop' | 'gone'>('all');
+  const [status, setStatus] = useState<'available' | 'all' | 'new' | 'active' | 'price_drop' | 'gone'>('available');
   const [q, setQ] = useState('');
   const [sort, setSort] = useState<'newest' | 'price_asc' | 'price_desc' | 'drop'>('newest');
 
@@ -52,6 +52,7 @@ export default function CampaignResults({
     let r = finds.filter((f) => {
       if (campaign !== 'all' && f.campaignId !== campaign) return false;
       if (source !== 'all' && sourceLabel(f.source) !== source) return false;
+      if (status === 'available' && f.status === 'gone') return false;
       if (status === 'new' && !(isNew(f) && f.status !== 'gone')) return false;
       if (status === 'active' && f.status !== 'active') return false;
       if (status === 'price_drop' && f.status !== 'price_drop') return false;
@@ -127,6 +128,7 @@ export default function CampaignResults({
           {sources.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
         <select value={status} onChange={(e) => setStatus(e.target.value as typeof status)} className={input}>
+          <option value="available">Available (hide gone)</option>
           <option value="all">All statuses</option>
           <option value="new">🆕 New</option>
           <option value="active">Active</option>

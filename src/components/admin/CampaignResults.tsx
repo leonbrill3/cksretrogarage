@@ -197,7 +197,7 @@ export default function CampaignResults({
                     {f.status === 'hidden' ? (
                       <button onClick={() => setFindStatus(f.id, 'active')} className="font-medium text-neutral-500 hover:text-neutral-900">Unhide</button>
                     ) : (
-                      <button onClick={() => setFindStatus(f.id, 'hidden')} title="Hide — sold or not interested" className="font-medium text-neutral-400 hover:text-red-600">✕ Hide</button>
+                      <button onClick={() => setFindStatus(f.id, 'hidden')} title="Hide — sold or not interested" className="rounded bg-neutral-900 px-2.5 py-1 font-medium text-white hover:bg-red-600">Hide</button>
                     )}
                     <a href={f.sourceUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-blue-700 hover:underline">View listing ↗</a>
                   </div>
@@ -237,7 +237,7 @@ export default function CampaignResults({
                       {f.status === 'hidden' ? (
                         <button onClick={() => setFindStatus(f.id, 'active')} className="text-sm font-medium text-neutral-500 hover:text-neutral-900">Unhide</button>
                       ) : (
-                        <button onClick={() => setFindStatus(f.id, 'hidden')} title="Hide — sold or not interested" className="text-sm font-medium text-neutral-400 hover:text-red-600">Hide</button>
+                        <button onClick={() => setFindStatus(f.id, 'hidden')} title="Hide — sold or not interested" className="rounded bg-neutral-900 px-2.5 py-1 text-sm font-medium text-white hover:bg-red-600">Hide</button>
                       )}
                     </div>
                   </td>

@@ -18,11 +18,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  let body: { id?: string; status?: FindStatus };
+  let body: { id?: string; status?: FindStatus; action?: string };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+  }
+
+  // Bulk cleanup: delete every find that came from the (now-disabled) web-search
+  // source, whose URLs are unreliable. Keeps marketcheck + eBay finds intact.
+  if (body.action === 'purge_web') {
+    const all = await getCampaignFinds();
+    const kept = all.filter((f) => !f.source.startsWith('web'));
+    const removed = all.length - kept.length;
+    await saveCampaignFinds(kept);
+    return NextResponse.json({ ok: true, removed, kept: kept.length });
   }
 
   const { id, status } = body;

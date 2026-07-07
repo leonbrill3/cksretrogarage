@@ -28,7 +28,7 @@ export type SourcedListing = {
 export function sourcesConfigured(): { marketcheck: boolean; web: boolean; ebay: boolean } {
   return {
     marketcheck: !!process.env.MARKETCHECK_API_KEY,
-    web: !!process.env.ANTHROPIC_API_KEY,
+    web: !!process.env.ANTHROPIC_API_KEY && process.env.ENABLE_WEB_SEARCH === '1',
     ebay: !!(process.env.EBAY_CLIENT_ID && process.env.EBAY_CLIENT_SECRET),
   };
 }
@@ -55,7 +55,11 @@ export async function runSources(
     );
   }
 
-  if (process.env.ANTHROPIC_API_KEY) {
+  // Web-search source (Claude) is OFF by default: it guesses listing URLs, which
+  // land on broken pages / model / search results, and it can't fetch photos.
+  // Marketcheck + the eBay Browse API return real, exact listings with images.
+  // Set ENABLE_WEB_SEARCH=1 on the server to re-enable it.
+  if (process.env.ANTHROPIC_API_KEY && process.env.ENABLE_WEB_SEARCH === '1') {
     jobs.push(
       sourceClaudeWeb(c)
         .then((rows) => {

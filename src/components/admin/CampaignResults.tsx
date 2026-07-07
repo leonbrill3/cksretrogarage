@@ -29,7 +29,7 @@ function isNew(f: CampaignFind): boolean {
 }
 
 export default function CampaignResults({
-  finds,
+  finds: initialFinds,
   campaigns,
   runs,
 }: {
@@ -37,12 +37,28 @@ export default function CampaignResults({
   campaigns: { id: string; name: string }[];
   runs: CampaignRun[];
 }) {
+  const [finds, setFinds] = useState<CampaignFind[]>(initialFinds);
   const [view, setView] = useState<'gallery' | 'table'>('gallery');
   const [campaign, setCampaign] = useState('all');
   const [source, setSource] = useState('all');
-  const [status, setStatus] = useState<'available' | 'all' | 'new' | 'active' | 'price_drop' | 'gone'>('available');
+  const [status, setStatus] = useState<'available' | 'all' | 'new' | 'active' | 'price_drop' | 'gone' | 'hidden'>('available');
   const [q, setQ] = useState('');
   const [sort, setSort] = useState<'newest' | 'price_asc' | 'price_desc' | 'drop'>('newest');
+
+  // Hide (e.g. a sold car) or unhide a listing. Optimistic; persisted so the
+  // scanner won't re-add it.
+  async function setFindStatus(id: string, next: 'hidden' | 'active') {
+    setFinds((prev) => prev.map((f) => (f.id === id ? { ...f, status: next } : f)));
+    try {
+      await fetch('/api/admin/campaigns/finds', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status: next }),
+      });
+    } catch {
+      /* optimistic — a failed call just means it re-appears on next page load */
+    }
+  }
 
   const campaignName = (id: string) => campaigns.find((c) => c.id === id)?.name || '—';
   const sources = useMemo(() => Array.from(new Set(finds.map((f) => sourceLabel(f.source)))).sort(), [finds]);
@@ -52,11 +68,12 @@ export default function CampaignResults({
     let r = finds.filter((f) => {
       if (campaign !== 'all' && f.campaignId !== campaign) return false;
       if (source !== 'all' && sourceLabel(f.source) !== source) return false;
-      if (status === 'available' && f.status === 'gone') return false;
-      if (status === 'new' && !(isNew(f) && f.status !== 'gone')) return false;
+      if (status === 'available' && (f.status === 'gone' || f.status === 'hidden')) return false;
+      if (status === 'new' && !(isNew(f) && f.status !== 'gone' && f.status !== 'hidden')) return false;
       if (status === 'active' && f.status !== 'active') return false;
       if (status === 'price_drop' && f.status !== 'price_drop') return false;
       if (status === 'gone' && f.status !== 'gone') return false;
+      if (status === 'hidden' && f.status !== 'hidden') return false;
       if (needle && ![f.title, f.dealer, f.location, f.make, f.model].filter(Boolean).join(' ').toLowerCase().includes(needle)) return false;
       return true;
     });
@@ -70,7 +87,7 @@ export default function CampaignResults({
   }, [finds, campaign, source, status, q, sort]);
 
   const stats = useMemo(() => {
-    const active = finds.filter((f) => f.status !== 'gone');
+    const active = finds.filter((f) => f.status !== 'gone' && f.status !== 'hidden');
     const newThisWeek = active.filter(isNew).length;
     const withFinds = new Set(finds.map((f) => f.campaignId)).size;
     return { active: active.length, newThisWeek, campaigns: withFinds, total: finds.length };
@@ -93,6 +110,7 @@ export default function CampaignResults({
   const input = 'rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900';
 
   function StatusPill({ f }: { f: CampaignFind }) {
+    if (f.status === 'hidden') return <span className="rounded-full bg-neutral-200 px-2 py-0.5 text-[10px] font-semibold uppercase text-neutral-500">Hidden</span>;
     if (f.status === 'gone') return <span className="rounded-full bg-neutral-200 px-2 py-0.5 text-[10px] font-semibold uppercase text-neutral-600">Gone</span>;
     if (f.status === 'price_drop') return <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase text-amber-800">↓ Price drop</span>;
     if (isNew(f)) return <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold uppercase text-blue-700">🆕 New</span>;
@@ -134,6 +152,7 @@ export default function CampaignResults({
           <option value="active">Active</option>
           <option value="price_drop">↓ Price drop</option>
           <option value="gone">Gone</option>
+          <option value="hidden">Hidden (dismissed)</option>
         </select>
         <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)} className={input}>
           <option value="newest">Newest</option>
@@ -156,7 +175,7 @@ export default function CampaignResults({
       ) : view === 'gallery' ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {rows.map((f) => (
-            <div key={f.id} className={`overflow-hidden rounded-lg border ${f.status === 'gone' ? 'border-neutral-200 opacity-60' : f.status === 'price_drop' ? 'border-amber-300' : 'border-neutral-200'}`}>
+            <div key={f.id} className={`overflow-hidden rounded-lg border ${f.status === 'gone' || f.status === 'hidden' ? 'border-neutral-200 opacity-60' : f.status === 'price_drop' ? 'border-amber-300' : 'border-neutral-200'}`}>
               {f.photo ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={f.photo} alt="" className="h-40 w-full object-cover" />
@@ -174,7 +193,14 @@ export default function CampaignResults({
                 <div className="mt-1 text-sm text-neutral-500">{[miles(f.mileage), f.location, f.dealer].filter(Boolean).join(' · ')}</div>
                 <div className="mt-3 flex items-center justify-between text-xs">
                   <span className="rounded bg-neutral-100 px-2 py-0.5 text-neutral-600">{sourceLabel(f.source)} · {campaignName(f.campaignId)}</span>
-                  <a href={f.sourceUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-blue-700 hover:underline">View listing ↗</a>
+                  <div className="flex items-center gap-3">
+                    {f.status === 'hidden' ? (
+                      <button onClick={() => setFindStatus(f.id, 'active')} className="font-medium text-neutral-500 hover:text-neutral-900">Unhide</button>
+                    ) : (
+                      <button onClick={() => setFindStatus(f.id, 'hidden')} title="Hide — sold or not interested" className="font-medium text-neutral-400 hover:text-red-600">✕ Hide</button>
+                    )}
+                    <a href={f.sourceUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-blue-700 hover:underline">View listing ↗</a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -205,7 +231,16 @@ export default function CampaignResults({
                   <td className="px-3 py-2 whitespace-nowrap"><StatusPill f={f} /></td>
                   <td className="px-3 py-2 text-sm text-neutral-700 whitespace-nowrap">{campaignName(f.campaignId)}</td>
                   <td className="px-3 py-2 text-sm text-neutral-500 whitespace-nowrap">{f.firstSeenAt?.slice(0, 10)}</td>
-                  <td className="px-3 py-2 whitespace-nowrap"><a href={f.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-blue-700 hover:underline">Open ↗</a></td>
+                  <td className="px-3 py-2 whitespace-nowrap">
+                    <div className="flex items-center gap-3">
+                      <a href={f.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-blue-700 hover:underline">Open ↗</a>
+                      {f.status === 'hidden' ? (
+                        <button onClick={() => setFindStatus(f.id, 'active')} className="text-sm font-medium text-neutral-500 hover:text-neutral-900">Unhide</button>
+                      ) : (
+                        <button onClick={() => setFindStatus(f.id, 'hidden')} title="Hide — sold or not interested" className="text-sm font-medium text-neutral-400 hover:text-red-600">Hide</button>
+                      )}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>

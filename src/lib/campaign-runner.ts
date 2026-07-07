@@ -87,6 +87,7 @@ export async function runCampaign(c: Campaign, slot: RunSlot): Promise<RunResult
       byKey.set(key, f);
       newFinds.push(f);
     } else {
+      if (prev.status === 'hidden') continue; // sticky: user dismissed it; never resurrect across runs
       prev.lastSeenAt = now;
       // Refresh volatile fields.
       if (l.photo && !prev.photo) prev.photo = l.photo;
@@ -111,7 +112,7 @@ export async function runCampaign(c: Campaign, slot: RunSlot): Promise<RunResult
   // Anything we had before but didn't see this run → mark gone.
   let removed = 0;
   for (const f of mine) {
-    if (!seen.has(findKey(f)) && f.status !== 'gone') {
+    if (!seen.has(findKey(f)) && f.status !== 'gone' && f.status !== 'hidden') {
       f.status = 'gone';
       f.lastSeenAt = f.lastSeenAt; // keep last-seen as-is
       removed++;

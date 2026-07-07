@@ -30,7 +30,9 @@ export type Campaign = {
 
 // One unique vehicle surfaced by a campaign. Deduped by VIN when present,
 // else by normalized source URL.
-export type FindStatus = 'active' | 'price_drop' | 'gone';
+// 'hidden' is user-dismissed (e.g. sold on the dealer's site) — it stays out of
+// the active list and is never resurrected by a scan (see campaign-runner).
+export type FindStatus = 'active' | 'price_drop' | 'gone' | 'hidden';
 
 export type CampaignFind = {
   id: string;

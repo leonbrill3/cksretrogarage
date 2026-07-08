@@ -451,21 +451,34 @@ async function sourceEbay(c: Campaign): Promise<SourcedListing[]> {
 
   // The search response has NO mileage — it lives in each item's localizedAspects
   // (getItem). Fetch mileage/year per item so the odometer shows on every result
-  // and the max-mileage filter actually works. Capped + fault-tolerant.
+  // and the max-mileage filter actually works. eBay throttles bursts, so run the
+  // detail calls in small concurrent batches with a light retry (firing all ~50
+  // at once silently drops most).
   const withIds = rows
     .map((r, i) => ({ r, id: (data.itemSummaries || [])[i]?.itemId }))
     .filter((x): x is { r: SourcedListing; id: string } => !!x.id);
-  await Promise.all(
-    withIds.map(async ({ r, id }) => {
-      try {
-        const asp = await ebayItemAspects(id, token, marketplace);
-        if (asp.mileage != null && r.mileage == null) r.mileage = asp.mileage;
-        if (asp.year != null && r.year == null) r.year = asp.year;
-      } catch {
-        /* leave mileage undefined; strict filter will handle it */
-      }
-    }),
-  );
+
+  const BATCH = 6;
+  for (let i = 0; i < withIds.length; i += BATCH) {
+    const slice = withIds.slice(i, i + BATCH);
+    await Promise.all(
+      slice.map(async ({ r, id }) => {
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            const asp = await ebayItemAspects(id, token, marketplace);
+            if (asp.mileage != null || asp.year != null) {
+              if (asp.mileage != null && r.mileage == null) r.mileage = asp.mileage;
+              if (asp.year != null && r.year == null) r.year = asp.year;
+              return;
+            }
+          } catch {
+            /* retry once */
+          }
+          await new Promise((res) => setTimeout(res, 250));
+        }
+      }),
+    );
+  }
   return rows;
 }
 

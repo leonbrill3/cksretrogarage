@@ -372,10 +372,41 @@ async function verifyListing(l: SourcedListing): Promise<SourcedListing | null> 
       }
     }
 
-    return { ...l, sourceUrl: finalUrl, photo, price };
+    // Harvest mileage from the page so every result shows an odometer and the
+    // max-mileage filter can apply. Try schema fields first, then visible text.
+    let mileage = l.mileage;
+    if (typeof mileage !== 'number') {
+      mileage = extractMileage(html);
+    }
+
+    return { ...l, sourceUrl: finalUrl, photo, price, mileage };
   } catch {
     return null; // any failure → not proven → not shown
   }
+}
+
+// Pull an odometer reading out of listing-page HTML. Handles schema fields
+// (mileageFromOdometer) and common visible forms ("34,152 miles", "34k mi").
+function extractMileage(html: string): number | undefined {
+  const schema =
+    html.match(/"mileagefromodometer"[^0-9]*([0-9][0-9,]{2,})/i) ||
+    html.match(/"mileage"\s*:\s*"?([0-9][0-9,]{2,})"?/i) ||
+    html.match(/"odometer"\s*:\s*"?([0-9][0-9,]{2,})"?/i);
+  if (schema) {
+    const n = Number(schema[1].replace(/[^0-9]/g, ''));
+    if (Number.isFinite(n) && n > 0 && n < 1_000_000) return n;
+  }
+  // Visible text: "34,152 miles", "34,152 mi", "12k miles".
+  const text =
+    html.match(/([0-9]{1,3}(?:,[0-9]{3})+)\s*(?:miles|mi\b)/i) ||
+    html.match(/\b([0-9]{2,6})\s*(?:miles|mi)\b/i) ||
+    html.match(/\b([0-9]{1,3})\s*k\s*(?:miles|mi)\b/i);
+  if (text) {
+    let n = Number(text[1].replace(/[^0-9]/g, ''));
+    if (/k\s*(?:miles|mi)/i.test(text[0])) n *= 1000;
+    if (Number.isFinite(n) && n > 0 && n < 1_000_000) return n;
+  }
+  return undefined;
 }
 
 // ---------- C) eBay Browse API ----------
@@ -416,10 +447,53 @@ async function sourceEbay(c: Campaign): Promise<SourcedListing[]> {
   });
   if (!res.ok) throw new Error(`ebay HTTP ${res.status}`);
   const data = (await res.json()) as { itemSummaries?: EbayItem[] };
-  return (data.itemSummaries || []).map((it) => mapEbay(it, c));
+  const rows = (data.itemSummaries || []).map((it) => mapEbay(it, c));
+
+  // The search response has NO mileage — it lives in each item's localizedAspects
+  // (getItem). Fetch mileage/year per item so the odometer shows on every result
+  // and the max-mileage filter actually works. Capped + fault-tolerant.
+  const withIds = rows
+    .map((r, i) => ({ r, id: (data.itemSummaries || [])[i]?.itemId }))
+    .filter((x): x is { r: SourcedListing; id: string } => !!x.id);
+  await Promise.all(
+    withIds.map(async ({ r, id }) => {
+      try {
+        const asp = await ebayItemAspects(id, token, marketplace);
+        if (asp.mileage != null && r.mileage == null) r.mileage = asp.mileage;
+        if (asp.year != null && r.year == null) r.year = asp.year;
+      } catch {
+        /* leave mileage undefined; strict filter will handle it */
+      }
+    }),
+  );
+  return rows;
+}
+
+// Fetch an eBay item's Mileage / Year from localizedAspects (getItem).
+async function ebayItemAspects(
+  itemId: string,
+  token: string,
+  marketplace: string,
+): Promise<{ mileage?: number; year?: number }> {
+  const res = await fetch(
+    `https://api.ebay.com/buy/browse/v1/item/${encodeURIComponent(itemId)}`,
+    { headers: { Authorization: `Bearer ${token}`, 'X-EBAY-C-MARKETPLACE-ID': marketplace, Accept: 'application/json' } },
+  );
+  if (!res.ok) return {};
+  const data = (await res.json()) as { localizedAspects?: { name?: string; value?: string }[] };
+  const out: { mileage?: number; year?: number } = {};
+  for (const a of data.localizedAspects || []) {
+    const name = (a.name || '').toLowerCase();
+    const num = Number(String(a.value || '').replace(/[^0-9]/g, ''));
+    if (!Number.isFinite(num)) continue;
+    if ((name.includes('mile') || name.includes('odometer')) && out.mileage == null) out.mileage = num;
+    if (name === 'year' && out.year == null && num >= 1950 && num <= 2100) out.year = num;
+  }
+  return out;
 }
 
 type EbayItem = {
+  itemId?: string;
   title?: string;
   itemWebUrl?: string;
   price?: { value?: string; currency?: string };

@@ -9,9 +9,6 @@ function usd(n?: number): string {
   if (typeof n !== 'number' || !Number.isFinite(n)) return '—';
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
 }
-function miles(n?: number): string {
-  return typeof n === 'number' ? `${n.toLocaleString('en-US')} mi` : '';
-}
 function sourceLabel(s: string): string {
   if (!s) return 'Web';
   if (s === 'marketcheck') return 'Marketcheck';
@@ -190,7 +187,12 @@ export default function CampaignResults({
                 <div className="mt-1 text-lg font-semibold text-neutral-900">
                   {usd(f.price)} {dropAmount(f) > 0 && <span className="text-sm font-medium text-amber-700">↓ {usd(dropAmount(f))}</span>}
                 </div>
-                <div className="mt-1 text-sm text-neutral-500">{[miles(f.mileage), f.location, f.dealer].filter(Boolean).join(' · ')}</div>
+                <div className="mt-1 text-sm font-medium text-neutral-900">
+                  {typeof f.mileage === 'number'
+                    ? `${f.mileage.toLocaleString('en-US')} miles`
+                    : <span className="text-neutral-400">Mileage n/a</span>}
+                </div>
+                <div className="mt-0.5 text-sm text-neutral-500">{[f.location, f.dealer].filter(Boolean).join(' · ')}</div>
                 <div className="mt-3 flex items-center justify-between text-xs">
                   <span className="rounded bg-neutral-100 px-2 py-0.5 text-neutral-600">{sourceLabel(f.source)} · {campaignName(f.campaignId)}</span>
                   <div className="flex items-center gap-3">
@@ -225,7 +227,7 @@ export default function CampaignResults({
                   </td>
                   <td className="px-3 py-2 text-sm font-medium text-neutral-900 whitespace-nowrap">{f.title}</td>
                   <td className="px-3 py-2 text-sm text-neutral-700 whitespace-nowrap">{usd(f.price)}{dropAmount(f) > 0 && <span className="text-amber-700"> ↓{usd(dropAmount(f))}</span>}</td>
-                  <td className="px-3 py-2 text-sm text-neutral-700 whitespace-nowrap">{miles(f.mileage) || '—'}</td>
+                  <td className="px-3 py-2 text-sm font-medium text-neutral-900 whitespace-nowrap">{typeof f.mileage === 'number' ? `${f.mileage.toLocaleString('en-US')} mi` : <span className="text-neutral-400">n/a</span>}</td>
                   <td className="px-3 py-2 text-sm text-neutral-700 whitespace-nowrap">{[f.dealer, f.location].filter(Boolean).join(' · ') || '—'}</td>
                   <td className="px-3 py-2 text-sm text-neutral-700 whitespace-nowrap">{sourceLabel(f.source)}</td>
                   <td className="px-3 py-2 whitespace-nowrap"><StatusPill f={f} /></td>

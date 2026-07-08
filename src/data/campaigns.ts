@@ -121,7 +121,13 @@ export function matchesCampaign(
 ): boolean {
   if (c.yearMin && l.year && l.year < c.yearMin) return false;
   if (c.yearMax && l.year && l.year > c.yearMax) return false;
-  if (c.maxMileage && typeof l.mileage === 'number' && l.mileage > c.maxMileage) return false;
+  // Max-mileage is strict: when a cap is set, a listing must have a KNOWN
+  // mileage at or under it. Unknown mileage is excluded so high-/unknown-mileage
+  // cars can't slip through (they previously passed because mileage was blank).
+  if (c.maxMileage) {
+    if (typeof l.mileage !== 'number') return false;
+    if (l.mileage > c.maxMileage) return false;
+  }
   if (c.priceMin && typeof l.price === 'number' && l.price < c.priceMin) return false;
   if (c.priceMax && typeof l.price === 'number' && l.price > c.priceMax) return false;
   // Model sanity check against the title/model when provided.

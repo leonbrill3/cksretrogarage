@@ -28,7 +28,9 @@ export type SourcedListing = {
 export function sourcesConfigured(): { marketcheck: boolean; web: boolean; ebay: boolean } {
   return {
     marketcheck: !!process.env.MARKETCHECK_API_KEY,
-    web: !!process.env.ANTHROPIC_API_KEY && process.env.ENABLE_WEB_SEARCH === '1',
+    // Web discovery is validated now (every link is fetched & proven live before
+    // it's shown), so it's on by default. Set DISABLE_WEB_SEARCH=1 to turn off.
+    web: !!process.env.ANTHROPIC_API_KEY && process.env.DISABLE_WEB_SEARCH !== '1',
     ebay: !!(process.env.EBAY_CLIENT_ID && process.env.EBAY_CLIENT_SECRET),
   };
 }
@@ -55,11 +57,11 @@ export async function runSources(
     );
   }
 
-  // Web-search source (Claude) is OFF by default: it guesses listing URLs, which
-  // land on broken pages / model / search results, and it can't fetch photos.
-  // Marketcheck + the eBay Browse API return real, exact listings with images.
-  // Set ENABLE_WEB_SEARCH=1 on the server to re-enable it.
-  if (process.env.ANTHROPIC_API_KEY && process.env.ENABLE_WEB_SEARCH === '1') {
+  // Web-search source (Claude): broad discovery across auctions/enthusiast/
+  // specialty-dealer channels. Every candidate is run through verifyListing()
+  // before it's returned, so only proven-live detail pages (with photos) show
+  // up — no broken links. Set DISABLE_WEB_SEARCH=1 to turn it off.
+  if (process.env.ANTHROPIC_API_KEY && process.env.DISABLE_WEB_SEARCH !== '1') {
     jobs.push(
       sourceClaudeWeb(c)
         .then((rows) => {
@@ -228,7 +230,7 @@ async function sourceClaudeWeb(c: Campaign): Promise<SourcedListing[]> {
   const call = (data.content || []).find((b) => b.type === 'tool_use' && b.name === 'record_listings');
   const raw = (call?.input as { listings?: WebListing[] } | undefined)?.listings || [];
 
-  return raw
+  const candidates = raw
     .filter((l) => l && typeof l.url === 'string' && /^https?:\/\//.test(l.url))
     .map((l) => ({
       source: l.site ? `web:${l.site}` : 'web',
@@ -242,7 +244,13 @@ async function sourceClaudeWeb(c: Campaign): Promise<SourcedListing[]> {
       mileage: typeof l.mileage === 'number' ? l.mileage : undefined,
       location: typeof l.location === 'string' ? l.location : undefined,
       title: typeof l.title === 'string' ? l.title : `${c.make} ${c.model}`,
-    }));
+    })) as SourcedListing[];
+
+  // VALIDATION GATE: never surface a link we haven't proven resolves to a live,
+  // single-vehicle detail page. This is what guarantees "no broken links" while
+  // still allowing broad discovery across every channel.
+  const checked = await Promise.all(candidates.map((l) => verifyListing(l)));
+  return checked.filter((l): l is SourcedListing => l !== null);
 }
 
 type WebListing = {
@@ -256,6 +264,119 @@ type WebListing = {
   vin?: string;
   site?: string;
 };
+
+// ---------- Listing verifier (shared gate for the web source) ----------
+// Reject junk URL shapes instantly, then actually fetch the page and confirm it
+// is a live, single-car detail page (not a search/category/home page, not sold/
+// expired). Also harvests the real photo (og:image) and price when present, so
+// verified web finds get images too. Returns null if it can't be proven live.
+
+// Known non-detail URL patterns per site. If a candidate matches, it's a
+// search/category/model page — drop it without even fetching.
+const JUNK_URL_PATTERNS: RegExp[] = [
+  /ebay\.com\/(b|sch|shop)\//i, // eBay category/search/shop, not /itm/<id>
+  /ebay\.com\/itm\/(?!\d{6,})/i, // eBay /itm/ without a numeric id
+  /cargurus\.com\/Cars\/(t-|l-|lp\/)/i, // CarGurus model/trim/list pages
+  /cars\.com\/shopping\//i, // Cars.com search, not /vehicledetail/
+  /autotrader\.com\/cars-for-sale\//i, // Autotrader search results
+  /carfax\.com\/Used-[^/]+_[a-z]\d+/i, // Carfax model landing (…_w723, …_z11749)
+  /\/(search|inventory|listings|results|for-sale|shopping)\/?(\?|$)/i, // generic listing indexes
+  /autotempest\.com\/(results|trends)\//i,
+  /(facebook\.com\/marketplace\/category|craigslist\.org\/search)/i,
+];
+
+// Site-specific proof that a fetched page is a real detail page (usually a
+// listing id / VIN segment in the URL). If present, we trust the URL shape.
+const DETAIL_URL_HINTS: RegExp[] = [
+  /ebay\.com\/itm\/\d{6,}/i,
+  /cars\.com\/vehicledetail\//i,
+  /edmunds\.com\/[a-z-]+\/[a-z0-9-]+\/\d{4}\/vin\//i,
+  /bringatrailer\.com\/listing\//i,
+  /carsandbids\.com\/auctions\//i,
+  /collectingcars\.com\/for-sale\//i,
+  /pcarmarket\.com\/auction\//i,
+  /hemmings\.com\/(classifieds\/)?(dealer\/|listing\/)/i,
+  /dupontregistry\.com\/autos\/listing\//i,
+  /(\/vehicle|\/inventory|\/listing|\/vdp|\/detail)[-/][a-z0-9-]*\d/i, // dealer VDPs with an id
+];
+
+function looksLikeDetailUrl(url: string): boolean {
+  return DETAIL_URL_HINTS.some((re) => re.test(url));
+}
+
+async function verifyListing(l: SourcedListing): Promise<SourcedListing | null> {
+  const url = l.sourceUrl;
+  if (!url || JUNK_URL_PATTERNS.some((re) => re.test(url))) return null;
+
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
+    const res = await fetch(url, {
+      redirect: 'follow',
+      signal: ctrl.signal,
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36',
+        Accept: 'text/html,application/xhtml+xml',
+      },
+    }).catch(() => null);
+    clearTimeout(timer);
+
+    // Can't prove it's live (network error or site blocks us) → drop it.
+    if (!res || !res.ok) return null;
+
+    // A redirect to a search/home page means the original listing is gone.
+    const finalUrl = res.url || url;
+    if (JUNK_URL_PATTERNS.some((re) => re.test(finalUrl))) return null;
+
+    const html = (await res.text()).slice(0, 400_000);
+    const lower = html.toLowerCase();
+
+    // Sold / expired / not-found signals → drop.
+    const deadSignals = [
+      'no longer available',
+      'this listing has ended',
+      'listing not found',
+      'page not found',
+      '404 error',
+      'vehicle sold',
+      'has been sold',
+      'sold out',
+      'auction ended',
+      'no results found',
+    ];
+    if (deadSignals.some((s) => lower.includes(s))) return null;
+
+    // Must look like a single-car detail page. Accept if the URL itself is a
+    // known detail shape, OR the page exposes a single-product/vehicle schema.
+    const hasDetailSchema =
+      /"@type"\s*:\s*"(car|vehicle|product|individualproduct)"/i.test(html) ||
+      /og:type"[^>]*content="(product|article|website)"/i.test(html);
+    if (!looksLikeDetailUrl(finalUrl) && !hasDetailSchema) return null;
+
+    // Harvest a real photo (og:image / twitter:image) so web finds get images.
+    const photoMatch =
+      html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
+      html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
+    const photo = photoMatch ? photoMatch[1] : l.photo;
+
+    // Harvest a price if we didn't get one, from schema/meta.
+    let price = l.price;
+    if (typeof price !== 'number') {
+      const pm =
+        html.match(/"price"\s*:\s*"?([0-9][0-9,]{3,})"?/i) ||
+        html.match(/property=["']product:price:amount["'][^>]+content=["']([0-9.,]+)["']/i);
+      if (pm) {
+        const n = Number(pm[1].replace(/[^0-9.]/g, ''));
+        if (Number.isFinite(n) && n > 1000) price = n;
+      }
+    }
+
+    return { ...l, sourceUrl: finalUrl, photo, price };
+  } catch {
+    return null; // any failure → not proven → not shown
+  }
+}
 
 // ---------- C) eBay Browse API ----------
 // Structured live eBay Motors listings. Needs an eBay developer app

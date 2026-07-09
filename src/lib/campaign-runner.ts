@@ -93,6 +93,9 @@ export async function runCampaign(c: Campaign, slot: RunSlot): Promise<RunResult
       if (l.photo && !prev.photo) prev.photo = l.photo;
       if (l.location) prev.location = l.location;
       if (l.mileage != null) prev.mileage = l.mileage;
+      // Correct a previously-stored bad odometer (0 / placeholder) when the
+      // fresh source has none, so "0 miles" doesn't linger.
+      else if (typeof prev.mileage === 'number' && prev.mileage < 100) prev.mileage = undefined;
       if (typeof l.price === 'number') {
         const dropped = typeof prev.price === 'number' && l.price < prev.price;
         if (l.price !== prev.price) prev.priceHistory.push({ price: l.price, at: now });

@@ -394,7 +394,7 @@ function extractMileage(html: string): number | undefined {
     html.match(/"odometer"\s*:\s*"?([0-9][0-9,]{2,})"?/i);
   if (schema) {
     const n = Number(schema[1].replace(/[^0-9]/g, ''));
-    if (Number.isFinite(n) && n > 0 && n < 1_000_000) return n;
+    if (Number.isFinite(n) && n >= 100 && n < 1_000_000) return n;
   }
   // Visible text: "34,152 miles", "34,152 mi", "12k miles".
   const text =
@@ -404,7 +404,8 @@ function extractMileage(html: string): number | undefined {
   if (text) {
     let n = Number(text[1].replace(/[^0-9]/g, ''));
     if (/k\s*(?:miles|mi)/i.test(text[0])) n *= 1000;
-    if (Number.isFinite(n) && n > 0 && n < 1_000_000) return n;
+    // Ignore a 0/near-0 reading — placeholder, not a real odometer.
+    if (Number.isFinite(n) && n >= 100 && n < 1_000_000) return n;
   }
   return undefined;
 }
@@ -499,7 +500,10 @@ async function ebayItemAspects(
     const name = (a.name || '').toLowerCase();
     const num = Number(String(a.value || '').replace(/[^0-9]/g, ''));
     if (!Number.isFinite(num)) continue;
-    if ((name.includes('mile') || name.includes('odometer')) && out.mileage == null) out.mileage = num;
+    // A used car reading of 0 (or a token placeholder) means the seller left the
+    // odometer blank — treat as unknown rather than showing "0 miles".
+    if ((name.includes('mile') || name.includes('odometer')) && out.mileage == null && num >= 100)
+      out.mileage = num;
     if (name === 'year' && out.year == null && num >= 1950 && num <= 2100) out.year = num;
   }
   return out;
@@ -518,6 +522,7 @@ function mapEbay(it: EbayItem, c: Campaign): SourcedListing {
   const title = it.title || `${c.make} ${c.model}`;
   const yr = title.match(/\b(19[5-9]\d|20[0-4]\d)\b/);
   const miMatch = title.match(/([\d,]{3,})\s*(?:miles|mi)\b/i);
+  const miFromTitle = miMatch ? Number(miMatch[1].replace(/,/g, '')) : undefined;
   const loc = [it.itemLocation?.city, it.itemLocation?.stateOrProvince].filter(Boolean).join(', ') || it.itemLocation?.country;
   return {
     source: 'ebay',
@@ -526,7 +531,7 @@ function mapEbay(it: EbayItem, c: Campaign): SourcedListing {
     make: c.make,
     model: c.model,
     price: it.price?.value ? Number(it.price.value) : undefined,
-    mileage: miMatch ? Number(miMatch[1].replace(/,/g, '')) : undefined,
+    mileage: typeof miFromTitle === 'number' && miFromTitle >= 100 ? miFromTitle : undefined,
     location: loc,
     photo: it.image?.imageUrl,
     title,

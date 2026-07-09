@@ -27,6 +27,37 @@ export type RunResult = {
   priceDrops: CampaignFind[];
 };
 
+// Prefer the source with the cleanest structured data when the same car shows
+// up more than once (lower number = kept).
+function sourceRank(source: string): number {
+  if (source === 'marketcheck') return 0;
+  if (source === 'ebay') return 1;
+  return 2; // web:*
+}
+
+// Collapse duplicates of the same physical car across sources. Two listings are
+// "the same car" if they share a valid VIN, or (no VIN) the same year + exact
+// mileage. Since a campaign hunts one specific model, identical year + odometer
+// (to the mile) is a strong signature for one vehicle — even when sources label
+// the model differently (e.g. Marketcheck "430" vs eBay "F430").
+function dedupeAcrossSources(listings: SourcedListing[]): SourcedListing[] {
+  const sigs = (l: SourcedListing): string[] => {
+    const keys: string[] = [];
+    if (l.vin) keys.push(`vin:${l.vin.toUpperCase()}`);
+    if (l.year && typeof l.mileage === 'number') keys.push(`ym:${l.year}:${l.mileage}`);
+    return keys;
+  };
+  const winnerBySig = new Map<string, SourcedListing>();
+  const kept: SourcedListing[] = [];
+  for (const l of [...listings].sort((a, b) => sourceRank(a.source) - sourceRank(b.source))) {
+    const keys = sigs(l);
+    if (keys.length && keys.some((k) => winnerBySig.has(k))) continue; // dup of a kept car
+    kept.push(l);
+    for (const k of keys) winnerBySig.set(k, l);
+  }
+  return kept;
+}
+
 export async function runCampaign(c: Campaign, slot: RunSlot): Promise<RunResult> {
   const now = new Date().toISOString();
   const runId = randomUUID().replace(/-/g, '');
@@ -44,7 +75,10 @@ export async function runCampaign(c: Campaign, slot: RunSlot): Promise<RunResult
   }
 
   // Keep only listings that satisfy the hard filters and have a usable URL.
-  const matched = sourced.filter((l) => l.sourceUrl && matchesCampaign(c, l));
+  const filtered = sourced.filter((l) => l.sourceUrl && matchesCampaign(c, l));
+  // Collapse the SAME physical car surfaced by more than one source (e.g. a
+  // dealer car on both Marketcheck and eBay), keeping the richest record.
+  const matched = dedupeAcrossSources(filtered);
 
   // Load all finds; work on this campaign's slice, leave others untouched.
   const allFinds = await getCampaignFinds();

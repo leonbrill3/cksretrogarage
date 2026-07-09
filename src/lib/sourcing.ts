@@ -467,9 +467,11 @@ async function sourceEbay(c: Campaign): Promise<SourcedListing[]> {
         for (let attempt = 0; attempt < 2; attempt++) {
           try {
             const asp = await ebayItemAspects(id, token, marketplace);
-            if (asp.mileage != null || asp.year != null) {
+            if (asp.mileage != null || asp.year != null || asp.vin || asp.location) {
               if (asp.mileage != null && r.mileage == null) r.mileage = asp.mileage;
               if (asp.year != null && r.year == null) r.year = asp.year;
+              if (asp.vin && !r.vin) r.vin = asp.vin;
+              if (asp.location) r.location = asp.location; // city, state — better than "US"
               return;
             }
           } catch {
@@ -488,7 +490,7 @@ async function ebayItemAspects(
   itemId: string,
   token: string,
   marketplace: string,
-): Promise<{ mileage?: number; year?: number }> {
+): Promise<{ mileage?: number; year?: number; vin?: string; location?: string }> {
   const res = await fetch(
     `https://api.ebay.com/buy/browse/v1/item/${encodeURIComponent(itemId)}`,
     { headers: { Authorization: `Bearer ${token}`, 'X-EBAY-C-MARKETPLACE-ID': marketplace, Accept: 'application/json' } },
@@ -498,24 +500,41 @@ async function ebayItemAspects(
     localizedAspects?: { name?: string; value?: string }[];
     shortDescription?: string;
     description?: string;
+    itemLocation?: { city?: string; stateOrProvince?: string; country?: string };
   };
-  const out: { mileage?: number; year?: number } = {};
+  const out: { mileage?: number; year?: number; vin?: string; location?: string } = {};
   for (const a of data.localizedAspects || []) {
     const name = (a.name || '').toLowerCase();
-    const num = Number(String(a.value || '').replace(/[^0-9]/g, ''));
-    if (!Number.isFinite(num)) continue;
+    const raw = String(a.value || '');
+    const num = Number(raw.replace(/[^0-9]/g, ''));
     // Structured Mileage aspect. Dealers sometimes set it to 0 (blank) and put
     // the real odometer in the description — handled below.
-    if ((name.includes('mile') || name.includes('odometer')) && out.mileage == null && num >= 100)
+    if ((name.includes('mile') || name.includes('odometer')) && out.mileage == null && Number.isFinite(num) && num >= 100)
       out.mileage = num;
-    if (name === 'year' && out.year == null && num >= 1950 && num <= 2100) out.year = num;
+    if (name === 'year' && out.year == null && Number.isFinite(num) && num >= 1950 && num <= 2100) out.year = num;
+    if (name.includes('vin') && !out.vin) {
+      const v = normalizeVin(raw);
+      if (v) out.vin = v;
+    }
   }
   // Fallback: the Mileage aspect was blank/0 — read the odometer out of the
   // listing's own text (e.g. "10,641 miles on the odometer").
   if (out.mileage == null) {
     out.mileage = mileageFromText(`${data.shortDescription || ''}\n${data.description || ''}`);
   }
+  // Full city/state location (search summary only gives a masked ZIP + country).
+  const loc = data.itemLocation;
+  const cityState = [loc?.city, loc?.stateOrProvince].filter(Boolean).join(', ');
+  if (cityState) out.location = cityState;
   return out;
+}
+
+// A VIN is 17 alphanumeric chars; reject dealer placeholders like all-zeros.
+function normalizeVin(raw: string): string | undefined {
+  const v = raw.trim().toUpperCase();
+  if (!/^[A-HJ-NPR-Z0-9]{17}$/.test(v)) return undefined;
+  if (/^0+$/.test(v) || /^(.)\1{16}$/.test(v)) return undefined; // 000…0 / repeated char
+  return v;
 }
 
 // Pull an odometer reading out of free listing text. Prefers odometer-context

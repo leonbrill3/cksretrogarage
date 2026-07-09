@@ -494,19 +494,49 @@ async function ebayItemAspects(
     { headers: { Authorization: `Bearer ${token}`, 'X-EBAY-C-MARKETPLACE-ID': marketplace, Accept: 'application/json' } },
   );
   if (!res.ok) return {};
-  const data = (await res.json()) as { localizedAspects?: { name?: string; value?: string }[] };
+  const data = (await res.json()) as {
+    localizedAspects?: { name?: string; value?: string }[];
+    shortDescription?: string;
+    description?: string;
+  };
   const out: { mileage?: number; year?: number } = {};
   for (const a of data.localizedAspects || []) {
     const name = (a.name || '').toLowerCase();
     const num = Number(String(a.value || '').replace(/[^0-9]/g, ''));
     if (!Number.isFinite(num)) continue;
-    // A used car reading of 0 (or a token placeholder) means the seller left the
-    // odometer blank — treat as unknown rather than showing "0 miles".
+    // Structured Mileage aspect. Dealers sometimes set it to 0 (blank) and put
+    // the real odometer in the description — handled below.
     if ((name.includes('mile') || name.includes('odometer')) && out.mileage == null && num >= 100)
       out.mileage = num;
     if (name === 'year' && out.year == null && num >= 1950 && num <= 2100) out.year = num;
   }
+  // Fallback: the Mileage aspect was blank/0 — read the odometer out of the
+  // listing's own text (e.g. "10,641 miles on the odometer").
+  if (out.mileage == null) {
+    out.mileage = mileageFromText(`${data.shortDescription || ''}\n${data.description || ''}`);
+  }
   return out;
+}
+
+// Pull an odometer reading out of free listing text. Prefers odometer-context
+// and comma-formatted figures so it never mistakes "24 miles per gallon" or an
+// EPA rating for the car's mileage.
+function mileageFromText(text: string): number | undefined {
+  if (!text) return undefined;
+  const plain = text.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+  const patterns: RegExp[] = [
+    /([0-9]{1,3}(?:,[0-9]{3})+)\s*miles?\s+on\s+the\s+odometer/i, // "10,641 miles on the odometer"
+    /(?:showing|with|just|only|merely)\s+([0-9]{1,3}(?:,[0-9]{3})+)\s*miles?/i, // "showing 19,127 miles"
+    /([0-9]{1,3}(?:,[0-9]{3})+)\s*miles?\b(?!\s*(?:per|\/)\s*gallon|\s*per\s*hour)/i, // any comma-formatted "10,641 miles"
+  ];
+  for (const re of patterns) {
+    const m = plain.match(re);
+    if (m) {
+      const n = Number(m[1].replace(/[^0-9]/g, ''));
+      if (Number.isFinite(n) && n >= 100 && n < 1_000_000) return n;
+    }
+  }
+  return undefined;
 }
 
 type EbayItem = {

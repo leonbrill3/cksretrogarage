@@ -283,6 +283,9 @@ const JUNK_URL_PATTERNS: RegExp[] = [
   /\/(search|inventory|listings|results|for-sale|shopping)\/?(\?|$)/i, // generic listing indexes
   /autotempest\.com\/(results|trends)\//i,
   /(facebook\.com\/marketplace\/category|craigslist\.org\/search)/i,
+  /autolist\.com\/[a-z]+-[a-z0-9]+\/?(\?|$)/i, // Autolist model landing (/ferrari-f430), not a listing
+  /autolist\.com\/(?![^/?]*\d)[^/?]+\/?(\?|$)/i, // any Autolist path with no id/digits = model/search page
+  /(cars\.com|cargurus\.com|autotrader\.com|truecar\.com|carmax\.com)\/[a-z-]+\/?(\?|$)/i, // bare make/model landings
 ];
 
 // Site-specific proof that a fetched page is a real detail page (usually a
@@ -348,17 +351,24 @@ async function verifyListing(l: SourcedListing): Promise<SourcedListing | null> 
     if (deadSignals.some((s) => lower.includes(s))) return null;
 
     // Must look like a single-car detail page. Accept if the URL itself is a
-    // known detail shape, OR the page exposes a single-product/vehicle schema.
+    // known detail shape, OR the page exposes a single vehicle/product schema.
+    // NOTE: a bare og:type of "website"/"article" is NOT accepted — model and
+    // search landing pages carry those, and that's how the aggregator pages
+    // (e.g. autolist.com/ferrari-f430) slipped through before.
     const hasDetailSchema =
       /"@type"\s*:\s*"(car|vehicle|product|individualproduct)"/i.test(html) ||
-      /og:type"[^>]*content="(product|article|website)"/i.test(html);
+      /og:type"[^>]*content="product"/i.test(html);
     if (!looksLikeDetailUrl(finalUrl) && !hasDetailSchema) return null;
 
-    // Harvest a real photo (og:image / twitter:image) so web finds get images.
+    // Harvest a real photo (og:image / twitter:image). REQUIRE one: a genuine
+    // vehicle detail page has a hero image; aggregator/model pages usually
+    // don't. No photo → not a real listing → drop (also enforces "must have a
+    // picture").
     const photoMatch =
       html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
       html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
     const photo = photoMatch ? photoMatch[1] : l.photo;
+    if (!photo || !/^https?:\/\//.test(photo)) return null;
 
     // Harvest a price if we didn't get one, from schema/meta.
     let price = l.price;

@@ -92,18 +92,19 @@ export async function runSources(
 }
 
 // ---------- A) Marketcheck ----------
-// Marketcheck exposes the same structured schema across three inventory
-// streams; we pull all three because the last two are exactly the long tail
-// that plain dealer-search misses:
-//   • active  — franchise/independent DEALER stock
+// Marketcheck exposes the same structured schema across several inventory
+// streams. We pull the two we can trust to be CURRENTLY for sale:
+//   • active  — franchise/independent DEALER stock (dealers pull sold cars;
+//               vehicle_status is tracked, so it's reliable)
 //   • fsbo    — PRIVATE-PARTY (for-sale-by-owner) listings   [US + CA]
-//   • auction — classic/collector AUCTION-HOUSE inventory     [US only]
-// Base host is overridable via MARKETCHECK_BASE. Every row is post-filtered by
-// matchesCampaign() upstream, so the wide streams don't loosen the criteria.
+// The `auction` stream is deliberately OMITTED: it has no reliable
+// availability signal and is dominated by PAST-auction cars that houses keep
+// published (e.g. a whole GAA batch all ~169 days on market, un-verifiable
+// behind a bot wall) — it surfaced sold cars. Base host overridable via
+// MARKETCHECK_BASE. Every row is still post-filtered by matchesCampaign().
 const MC_STREAMS: { path: string; label: string; usOnly?: boolean; fresh?: boolean }[] = [
   { path: 'search/car/active', label: 'marketcheck' },
   { path: 'search/car/fsbo/active', label: 'marketcheck:private', fresh: true },
-  { path: 'search/car/auction/active', label: 'marketcheck:auction', usOnly: true, fresh: true },
 ];
 
 async function sourceMarketcheck(c: Campaign): Promise<{ rows: SourcedListing[]; labels: string[] }> {

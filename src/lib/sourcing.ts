@@ -177,7 +177,7 @@ async function sourceClaudeWeb(c: Campaign): Promise<SourcedListing[]> {
     .filter(Boolean)
     .join('\n');
 
-  const prompt = `You are a car-sourcing researcher. Search the live web for cars CURRENTLY FOR SALE that match this brief. Search broadly across marketplaces, auctions, and enthusiast sites — including eBay Motors, cars.com, Autotrader, CarGurus, Cars & Bids, Bring a Trailer, Classic.com, PCARMARKET, Hemmings, duPont Registry, AutoTempest, ClassicCars.com, exotic/specialist dealer sites, and marque forums (e.g. FerrariChat and other classic-car classifieds). Pay special attention to SMALL INDEPENDENT and SPECIALTY dealers nationwide — not only the big marketplaces — including dealers' own websites and regional/one-off classic & exotic dealers that may not appear on the major aggregators. Run several searches to maximize coverage. Only include a listing if you have its EXACT, currently-working detail-page URL that you actually found — never guess, shorten, or construct a URL, and never include search-result or category pages. Skip anything you cannot verify is live right now (not sold, ended, or expired). For each, capture the exact listing URL, price (USD number), mileage (miles number), year, trim, and location.\n\nBrief:\n${criteria}\n\nWhen done searching, call record_listings ONCE with everything you found. If you find nothing active, call it with an empty array.`;
+  const prompt = `You are a car-sourcing researcher hunting the AUCTION and ENTHUSIAST long tail — the cars big aggregators miss. Find vehicles CURRENTLY for sale (live auctions or dealer inventory) that match this brief.\n\nBrief:\n${criteria}\n\nCRITICAL RULES:\n1. Run several TARGETED searches. PRIORITIZE sites where every car has its own dedicated listing/lot page: Bring a Trailer (bringatrailer.com/listing/…), Cars & Bids (carsandbids.com/auctions/…), PCARMARKET (pcarmarket.com/auction/…), Collecting Cars (collectingcars.com/for-sale/…), Hemmings listing/dealer pages, duPont Registry individual car pages (dupontregistry.com/car/…), Classic.com (classic.com/veh/…), and individual specialty/exotic DEALER inventory pages (their own VDPs). Use patterns like "site:bringatrailer.com ${c.make} ${c.model}", "site:carsandbids.com ${c.make} ${c.model}", "site:pcarmarket.com ${c.make} ${c.model}", plus a couple of "${c.make} ${c.model} for sale" searches aimed at specialty exotic dealers.\n2. Return ONLY exact URLs that point to a SINGLE specific car (one VIN / one lot / one stock number). A URL is INVALID if it is a search, results, category, /shopping/, /cars-for-sale/, /b/ (an eBay browse page), /results/, or a bare make/model landing page. If the only URL you have for a car is a category/search page, DO NOT include it — skip that car. Never guess, shorten, or construct a URL.\n3. Only include cars whose listing is LIVE right now (not sold, ended, or expired).\n4. For each, capture the exact detail-page URL, price (USD number), mileage (miles number), year, trim, and location.\n\nWhen done searching, call record_listings ONCE with everything you found. If you find nothing that qualifies, call it with an empty array.`;
 
   const body = {
     model,
@@ -299,7 +299,8 @@ const DETAIL_URL_HINTS: RegExp[] = [
   /collectingcars\.com\/for-sale\//i,
   /pcarmarket\.com\/auction\//i,
   /hemmings\.com\/(classifieds\/)?(dealer\/|listing\/)/i,
-  /dupontregistry\.com\/autos\/listing\//i,
+  /dupontregistry\.com\/(autos\/listing|car)\//i, // /autos/listing/ (old) and /car/<make>/<model>/<year>/<vin>/<id> (current)
+  /classic\.com\/veh\//i, // Classic.com individual vehicle page
   /(\/vehicle|\/inventory|\/listing|\/vdp|\/detail)[-/][a-z0-9-]*\d/i, // dealer VDPs with an id
 ];
 
@@ -333,9 +334,16 @@ async function verifyListing(l: SourcedListing): Promise<SourcedListing | null> 
     if (JUNK_URL_PATTERNS.some((re) => re.test(finalUrl))) return null;
 
     const html = (await res.text()).slice(0, 400_000);
-    const lower = html.toLowerCase();
 
-    // Sold / expired / not-found signals → drop.
+    // Sold / expired / not-found signals → drop. Check only the VISIBLE text:
+    // strip <script>/<style>/<template> first, because SPAs (e.g. duPont
+    // Registry) embed a "page not found" 404-route template inside a JSON blob
+    // in a <script>, which would otherwise false-positive a live listing.
+    const visible = html
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<template[\s\S]*?<\/template>/gi, ' ')
+      .toLowerCase();
     const deadSignals = [
       'no longer available',
       'this listing has ended',
@@ -348,27 +356,28 @@ async function verifyListing(l: SourcedListing): Promise<SourcedListing | null> 
       'auction ended',
       'no results found',
     ];
-    if (deadSignals.some((s) => lower.includes(s))) return null;
+    if (deadSignals.some((s) => visible.includes(s))) return null;
 
     // Must look like a single-car detail page. Accept if the URL itself is a
     // known detail shape, OR the page exposes a single vehicle/product schema.
     // NOTE: a bare og:type of "website"/"article" is NOT accepted — model and
     // search landing pages carry those, and that's how the aggregator pages
     // (e.g. autolist.com/ferrari-f430) slipped through before.
+    const isTrustedUrl = looksLikeDetailUrl(finalUrl);
     const hasDetailSchema =
       /"@type"\s*:\s*"(car|vehicle|product|individualproduct)"/i.test(html) ||
       /og:type"[^>]*content="product"/i.test(html);
-    if (!looksLikeDetailUrl(finalUrl) && !hasDetailSchema) return null;
+    if (!isTrustedUrl && !hasDetailSchema) return null;
 
-    // Harvest a real photo (og:image / twitter:image). REQUIRE one: a genuine
-    // vehicle detail page has a hero image; aggregator/model pages usually
-    // don't. No photo → not a real listing → drop (also enforces "must have a
-    // picture").
-    const photoMatch =
-      html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
-      html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
-    const photo = photoMatch ? photoMatch[1] : l.photo;
-    if (!photo || !/^https?:\/\//.test(photo)) return null;
+    // Harvest a real photo (og:image / twitter:image), matching the meta tag
+    // regardless of attribute order (some sites put content= before property=).
+    const photo = extractOgImage(html) || l.photo;
+    const hasPhoto = !!photo && /^https?:\/\//.test(photo);
+    // A photo is REQUIRED for schema-only pages (keeps aggregator/model pages
+    // out). But a URL that already matches a TRUSTED detail shape (e.g. a
+    // pcarmarket.com/auction/ lot) is proven — some such sites hide og:image,
+    // so we accept it photo-less rather than lose a real long-tail listing.
+    if (!hasPhoto && !isTrustedUrl) return null;
 
     // Harvest a price if we didn't get one, from schema/meta.
     let price = l.price;
@@ -389,10 +398,22 @@ async function verifyListing(l: SourcedListing): Promise<SourcedListing | null> 
       mileage = extractMileage(html);
     }
 
-    return { ...l, sourceUrl: finalUrl, photo, price, mileage };
+    return { ...l, sourceUrl: finalUrl, photo: hasPhoto ? photo : undefined, price, mileage };
   } catch {
     return null; // any failure → not proven → not shown
   }
+}
+
+// Pull the hero image URL from og:image / twitter:image, tolerating either
+// attribute order (content=… property=… as well as property=… content=…).
+function extractOgImage(html: string): string | undefined {
+  const tags = html.match(/<meta[^>]+>/gi) || [];
+  for (const tag of tags) {
+    if (!/(property|name)=["'](og:image(?::url)?|twitter:image)["']/i.test(tag)) continue;
+    const c = tag.match(/content=["']([^"']+)["']/i);
+    if (c && /^https?:\/\//.test(c[1])) return c[1];
+  }
+  return undefined;
 }
 
 // Pull an odometer reading out of listing-page HTML. Handles schema fields

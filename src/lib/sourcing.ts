@@ -231,10 +231,8 @@ async function sourceClaudeWeb(c: Campaign): Promise<SourcedListing[]> {
     stop_reason?: string;
   };
   if (process.env.WEB_DIAG === '1') {
-    const blocks = data.content || [];
-    const types = blocks.map((b) => b.type + (b.name ? `:${b.name}` : ''));
-    const searches = blocks.filter((b) => b.type === 'server_tool_use').length;
-    console.log(`[web:diag] ${c.make} ${c.model}: anthropic stop=${data.stop_reason} searches=${searches} blocks=[${types.join(',')}]`);
+    const searches = (data.content || []).filter((b) => b.type === 'server_tool_use').length;
+    console.log(`[web:diag] ${c.make} ${c.model}: anthropic stop=${data.stop_reason} searches=${searches}`);
   }
   const call = (data.content || []).find((b) => b.type === 'tool_use' && b.name === 'record_listings');
   const raw = (call?.input as { listings?: WebListing[] } | undefined)?.listings || [];

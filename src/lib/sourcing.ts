@@ -249,8 +249,16 @@ async function sourceClaudeWeb(c: Campaign): Promise<SourcedListing[]> {
   // VALIDATION GATE: never surface a link we haven't proven resolves to a live,
   // single-vehicle detail page. This is what guarantees "no broken links" while
   // still allowing broad discovery across every channel.
+  if (process.env.WEB_DIAG === '1') {
+    console.log(`[web:diag] ${c.make} ${c.model}: model returned ${raw.length} raw, ${candidates.length} well-formed URLs`);
+    for (const l of candidates) console.log(`[web:diag]   candidate ${l.sourceUrl}`);
+  }
   const checked = await Promise.all(candidates.map((l) => verifyListing(l)));
-  return checked.filter((l): l is SourcedListing => l !== null);
+  const kept = checked.filter((l): l is SourcedListing => l !== null);
+  if (process.env.WEB_DIAG === '1') {
+    console.log(`[web:diag] ${c.make} ${c.model}: ${kept.length}/${candidates.length} passed verification`);
+  }
+  return kept;
 }
 
 type WebListing = {
@@ -310,7 +318,12 @@ function looksLikeDetailUrl(url: string): boolean {
 
 async function verifyListing(l: SourcedListing): Promise<SourcedListing | null> {
   const url = l.sourceUrl;
-  if (!url || JUNK_URL_PATTERNS.some((re) => re.test(url))) return null;
+  const diag = process.env.WEB_DIAG === '1';
+  const drop = (reason: string): null => {
+    if (diag) console.log(`[web:diag]   DROP (${reason}) ${url}`);
+    return null;
+  };
+  if (!url || JUNK_URL_PATTERNS.some((re) => re.test(url))) return drop('junk-url');
 
   try {
     const ctrl = new AbortController();
@@ -327,11 +340,11 @@ async function verifyListing(l: SourcedListing): Promise<SourcedListing | null> 
     clearTimeout(timer);
 
     // Can't prove it's live (network error or site blocks us) → drop it.
-    if (!res || !res.ok) return null;
+    if (!res || !res.ok) return drop(`fetch-${res ? res.status : 'neterr'}`);
 
     // A redirect to a search/home page means the original listing is gone.
     const finalUrl = res.url || url;
-    if (JUNK_URL_PATTERNS.some((re) => re.test(finalUrl))) return null;
+    if (JUNK_URL_PATTERNS.some((re) => re.test(finalUrl))) return drop('junk-final-url');
 
     const html = (await res.text()).slice(0, 400_000);
 
@@ -356,7 +369,7 @@ async function verifyListing(l: SourcedListing): Promise<SourcedListing | null> 
       'auction ended',
       'no results found',
     ];
-    if (deadSignals.some((s) => visible.includes(s))) return null;
+    if (deadSignals.some((s) => visible.includes(s))) return drop('dead-signal');
 
     // Must look like a single-car detail page. Accept if the URL itself is a
     // known detail shape, OR the page exposes a single vehicle/product schema.
@@ -367,7 +380,7 @@ async function verifyListing(l: SourcedListing): Promise<SourcedListing | null> 
     const hasDetailSchema =
       /"@type"\s*:\s*"(car|vehicle|product|individualproduct)"/i.test(html) ||
       /og:type"[^>]*content="product"/i.test(html);
-    if (!isTrustedUrl && !hasDetailSchema) return null;
+    if (!isTrustedUrl && !hasDetailSchema) return drop('not-detail-page');
 
     // Harvest a real photo (og:image / twitter:image), matching the meta tag
     // regardless of attribute order (some sites put content= before property=).
@@ -377,7 +390,7 @@ async function verifyListing(l: SourcedListing): Promise<SourcedListing | null> 
     // out). But a URL that already matches a TRUSTED detail shape (e.g. a
     // pcarmarket.com/auction/ lot) is proven — some such sites hide og:image,
     // so we accept it photo-less rather than lose a real long-tail listing.
-    if (!hasPhoto && !isTrustedUrl) return null;
+    if (!hasPhoto && !isTrustedUrl) return drop('no-photo');
 
     // Harvest a price if we didn't get one, from schema/meta.
     let price = l.price;
@@ -398,9 +411,10 @@ async function verifyListing(l: SourcedListing): Promise<SourcedListing | null> 
       mileage = extractMileage(html);
     }
 
+    if (diag) console.log(`[web:diag]   KEEP ${finalUrl}`);
     return { ...l, sourceUrl: finalUrl, photo: hasPhoto ? photo : undefined, price, mileage };
-  } catch {
-    return null; // any failure → not proven → not shown
+  } catch (e) {
+    return drop(`exception-${String(e).slice(0, 40)}`); // any failure → not proven → not shown
   }
 }
 

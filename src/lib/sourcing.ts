@@ -351,17 +351,11 @@ async function verifyListing(l: SourcedListing): Promise<SourcedListing | null> 
 
     if (!res) return drop('neterr');
     if (!res.ok) {
-      // Anti-bot block (Cloudflare/Akamai/eBay) from our datacenter IP. A
-      // 403/429/503 means the server answered but refused the fetch — the
-      // listing itself is almost certainly live (the model just found it via a
-      // fresh web search). If the URL is a TRUSTED single-car detail shape
-      // (auction lot, known marketplace, dealer VDP), keep it using the
-      // model-provided data rather than losing a real long-tail find. Any other
-      // status (404/410/redirect) still drops.
-      if ((res.status === 403 || res.status === 429 || res.status === 503) && looksLikeDetailUrl(url)) {
-        if (diag) console.log(`[web:diag]   KEEP (bot-block ${res.status}, trusted url) ${url}`);
-        return l;
-      }
+      // Can't load the page → can't prove it's a LIVE, still-for-sale listing.
+      // We used to keep 403s from trusted auction URLs, but auction lots live at
+      // the same URL forever and just flip to "SOLD" — and when the site blocks
+      // our datacenter IP (403) we can't read that sold state, so we'd surface
+      // stale/sold cars. Correctness beats coverage: any non-OK status drops.
       return drop(`fetch-${res.status}`);
     }
 
@@ -391,6 +385,15 @@ async function verifyListing(l: SourcedListing): Promise<SourcedListing | null> 
       'sold out',
       'auction ended',
       'no results found',
+      // Auction-specific "this lot is over" signals (BaT / PCARMARKET / Cars &
+      // Bids / auction houses keep sold lots live at the same URL).
+      'this auction has ended',
+      'bidding has ended',
+      'sold for $',
+      'winning bid',
+      'final bid',
+      'sale has ended',
+      'lot sold',
     ];
     if (deadSignals.some((s) => visible.includes(s))) return drop('dead-signal');
 

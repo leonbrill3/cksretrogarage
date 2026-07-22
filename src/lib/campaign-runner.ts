@@ -30,7 +30,7 @@ export type RunResult = {
 // Prefer the source with the cleanest structured data when the same car shows
 // up more than once (lower number = kept).
 function sourceRank(source: string): number {
-  if (source === 'marketcheck') return 0;
+  if (source.startsWith('marketcheck')) return 0; // active / private / auction
   if (source === 'ebay') return 1;
   return 2; // web:*
 }

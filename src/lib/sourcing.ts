@@ -47,8 +47,8 @@ export async function runSources(
   if (process.env.MARKETCHECK_API_KEY) {
     jobs.push(
       sourceMarketcheck(c)
-        .then((rows) => {
-          if (rows.length) sources.push('marketcheck');
+        .then(({ rows, labels }) => {
+          sources.push(...labels);
           listings.push(...rows);
         })
         .catch((e) => {
@@ -92,16 +92,60 @@ export async function runSources(
 }
 
 // ---------- A) Marketcheck ----------
-// Base host is overridable so US / Canada endpoints can be pointed without a
-// code change. Results are also post-filtered by matchesCampaign() upstream.
-async function sourceMarketcheck(c: Campaign): Promise<SourcedListing[]> {
+// Marketcheck exposes the same structured schema across three inventory
+// streams; we pull all three because the last two are exactly the long tail
+// that plain dealer-search misses:
+//   • active  — franchise/independent DEALER stock
+//   • fsbo    — PRIVATE-PARTY (for-sale-by-owner) listings   [US + CA]
+//   • auction — classic/collector AUCTION-HOUSE inventory     [US only]
+// Base host is overridable via MARKETCHECK_BASE. Every row is post-filtered by
+// matchesCampaign() upstream, so the wide streams don't loosen the criteria.
+const MC_STREAMS: { path: string; label: string; usOnly?: boolean; fresh?: boolean }[] = [
+  { path: 'search/car/active', label: 'marketcheck' },
+  { path: 'search/car/fsbo/active', label: 'marketcheck:private', fresh: true },
+  { path: 'search/car/auction/active', label: 'marketcheck:auction', usOnly: true, fresh: true },
+];
+
+async function sourceMarketcheck(c: Campaign): Promise<{ rows: SourcedListing[]; labels: string[] }> {
   const key = process.env.MARKETCHECK_API_KEY!;
   const base = process.env.MARKETCHECK_BASE || 'https://mc-api.marketcheck.com/v2';
   const countries: Country[] = c.countries.length ? c.countries : ['US'];
   const out: SourcedListing[] = [];
+  const labels = new Set<string>();
 
-  for (const country of countries) {
-    const params = new URLSearchParams({ api_key: key, car_type: 'used', rows: '50', start: '0' });
+  for (const s of MC_STREAMS) {
+    for (const country of countries) {
+      if (s.usOnly && country !== 'US') continue;
+      const rows = await marketcheckPage(base, key, s, c, country);
+      if (rows.length) {
+        labels.add(s.label);
+        out.push(...rows);
+      }
+    }
+  }
+  return { rows: out, labels: [...labels] };
+}
+
+// Pull a full stream (paginating past the 50-row page cap) for one country.
+// Previously we only ever fetched the first 50 rows of dealer-active, silently
+// dropping the rest (e.g. 113 F430s existed but only 50 were seen).
+async function marketcheckPage(
+  base: string,
+  key: string,
+  stream: { path: string; label: string; fresh?: boolean },
+  c: Campaign,
+  country: Country,
+): Promise<SourcedListing[]> {
+  const PAGE = 50;
+  const CAP = 200; // at most 4 pages per stream — plenty for a single model
+  // Long-tail streams (fsbo/auction) can carry the odd stale row; only surface
+  // ones Marketcheck has re-seen in the last 45 days.
+  const minSeen = stream.fresh ? Math.floor(Date.now() / 1000) - 45 * 86400 : 0;
+  const out: SourcedListing[] = [];
+
+  for (let start = 0; start < CAP; start += PAGE) {
+    const params = new URLSearchParams({ api_key: key, rows: String(PAGE), start: String(start) });
+    if (stream.path === 'search/car/active') params.set('car_type', 'used');
     if (c.make) params.set('make', c.make);
     if (c.model) params.set('model', c.model);
     if (c.yearMin || c.yearMax)
@@ -110,12 +154,18 @@ async function sourceMarketcheck(c: Campaign): Promise<SourcedListing[]> {
     if (c.priceMin || c.priceMax) params.set('price_range', `${c.priceMin || 0}-${c.priceMax || 100000000}`);
     params.set('country', country);
 
-    const res = await fetch(`${base}/search/car/active?${params.toString()}`, {
+    const res = await fetch(`${base}/${stream.path}?${params.toString()}`, {
       headers: { Accept: 'application/json' },
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = (await res.json()) as { listings?: MarketcheckListing[] };
-    for (const l of data.listings || []) out.push(mapMarketcheck(l, country));
+    const data = (await res.json()) as { num_found?: number; listings?: MarketcheckListing[] };
+    const page = data.listings || [];
+    for (const l of page) {
+      if (minSeen && typeof l.last_seen_at === 'number' && l.last_seen_at < minSeen) continue;
+      out.push(mapMarketcheck(l, country, stream.label));
+    }
+    const total = data.num_found ?? 0;
+    if (page.length < PAGE || start + PAGE >= total) break;
   }
   return out;
 }
@@ -127,16 +177,18 @@ type MarketcheckListing = {
   miles?: number;
   vdp_url?: string;
   heading?: string;
+  last_seen_at?: number;
+  seller_type?: string;
   build?: { year?: number; make?: string; model?: string; trim?: string };
   dealer?: { name?: string; city?: string; state?: string };
   media?: { photo_links?: string[] };
 };
 
-function mapMarketcheck(l: MarketcheckListing, country: Country): SourcedListing {
+function mapMarketcheck(l: MarketcheckListing, country: Country, source = 'marketcheck'): SourcedListing {
   const b = l.build || {};
   const loc = [l.dealer?.city, l.dealer?.state].filter(Boolean).join(', ');
   return {
-    source: 'marketcheck',
+    source,
     sourceUrl: l.vdp_url || '',
     vin: l.vin,
     year: b.year,

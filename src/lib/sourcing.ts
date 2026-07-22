@@ -177,7 +177,7 @@ async function sourceClaudeWeb(c: Campaign): Promise<SourcedListing[]> {
     .filter(Boolean)
     .join('\n');
 
-  const prompt = `You are a car-sourcing researcher hunting the AUCTION and ENTHUSIAST long tail — the cars big aggregators miss. Find vehicles CURRENTLY for sale (live auctions or dealer inventory) that match this brief.\n\nBrief:\n${criteria}\n\nCRITICAL RULES:\n1. Run several TARGETED searches. PRIORITIZE sites where every car has its own dedicated listing/lot page: Bring a Trailer (bringatrailer.com/listing/…), Cars & Bids (carsandbids.com/auctions/…), PCARMARKET (pcarmarket.com/auction/…), Collecting Cars (collectingcars.com/for-sale/…), Hemmings listing/dealer pages, duPont Registry individual car pages (dupontregistry.com/car/…), Classic.com (classic.com/veh/…), and individual specialty/exotic DEALER inventory pages (their own VDPs). Use patterns like "site:bringatrailer.com ${c.make} ${c.model}", "site:carsandbids.com ${c.make} ${c.model}", "site:pcarmarket.com ${c.make} ${c.model}", plus a couple of "${c.make} ${c.model} for sale" searches aimed at specialty exotic dealers.\n2. Return ONLY exact URLs that point to a SINGLE specific car (one VIN / one lot / one stock number). A URL is INVALID if it is a search, results, category, /shopping/, /cars-for-sale/, /b/ (an eBay browse page), /results/, or a bare make/model landing page. If the only URL you have for a car is a category/search page, DO NOT include it — skip that car. Never guess, shorten, or construct a URL.\n3. Only include cars whose listing is LIVE right now (not sold, ended, or expired).\n4. For each, capture the exact detail-page URL, price (USD number), mileage (miles number), year, trim, and location.\n\nWhen done searching, call record_listings ONCE with everything you found. If you find nothing that qualifies, call it with an empty array.`;
+  const prompt = `You are a car-sourcing researcher hunting the AUCTION and ENTHUSIAST long tail — the cars big aggregators miss. Find vehicles CURRENTLY for sale (live auctions or dealer inventory) that match this brief.\n\nBrief:\n${criteria}\n\nCRITICAL RULES:\n1. Run several TARGETED searches. PRIORITIZE sites where every car has its own dedicated listing/lot page: Bring a Trailer (bringatrailer.com/listing/…), Cars & Bids (carsandbids.com/auctions/…), PCARMARKET (pcarmarket.com/auction/…), Collecting Cars (collectingcars.com/for-sale/…), Hemmings listing/dealer pages, duPont Registry individual car pages (dupontregistry.com/car/…), Classic.com (classic.com/veh/…), and individual specialty/exotic DEALER inventory pages (their own VDPs). Use patterns like "site:bringatrailer.com ${c.make} ${c.model}", "site:carsandbids.com ${c.make} ${c.model}", "site:pcarmarket.com ${c.make} ${c.model}", plus a couple of "${c.make} ${c.model} for sale" searches aimed at specialty exotic dealers.\n2. Return ONLY exact URLs that point to a SINGLE specific car (one VIN / one lot / one stock number). A URL is INVALID if it is a search, results, category, /shopping/, /cars-for-sale/, /b/ (an eBay browse page), /results/, or a bare make/model landing page. If the only URL you have for a car is a category/search page, DO NOT include it — skip that car. Never guess, shorten, or construct a URL.\nDO NOT return eBay, Cars.com, Autotrader, CarGurus, TrueCar, CarMax, Carfax, or CarsForSale URLs — those big marketplaces are already covered by other data feeds. Spend your searches on the auction houses, enthusiast marketplaces, and individual specialty/exotic DEALER sites listed above, which those feeds miss.\n3. Only include cars whose listing is LIVE right now (not sold, ended, or expired).\n4. For each, capture the exact detail-page URL, price (USD number), mileage (miles number), year, trim, and location.\n\nWhen done searching, call record_listings ONCE with everything you found. If you find nothing that qualifies, call it with an empty array.`;
 
   const body = {
     model,
@@ -240,7 +240,9 @@ async function sourceClaudeWeb(c: Campaign): Promise<SourcedListing[]> {
   const raw = (call?.input as { listings?: WebListing[] } | undefined)?.listings || [];
 
   const candidates = raw
-    .filter((l) => l && typeof l.url === 'string' && /^https?:\/\//.test(l.url))
+    // Skip eBay: it's already covered by the dedicated eBay Browse API source
+    // (and eBay 403s our server-side verification fetch anyway).
+    .filter((l) => l && typeof l.url === 'string' && /^https?:\/\//.test(l.url) && !/ebay\.com/i.test(l.url))
     .map((l) => ({
       source: l.site ? `web:${l.site}` : 'web',
       sourceUrl: l.url,
@@ -349,8 +351,21 @@ async function verifyListing(l: SourcedListing): Promise<SourcedListing | null> 
     }).catch(() => null);
     clearTimeout(timer);
 
-    // Can't prove it's live (network error or site blocks us) → drop it.
-    if (!res || !res.ok) return drop(`fetch-${res ? res.status : 'neterr'}`);
+    if (!res) return drop('neterr');
+    if (!res.ok) {
+      // Anti-bot block (Cloudflare/Akamai/eBay) from our datacenter IP. A
+      // 403/429/503 means the server answered but refused the fetch — the
+      // listing itself is almost certainly live (the model just found it via a
+      // fresh web search). If the URL is a TRUSTED single-car detail shape
+      // (auction lot, known marketplace, dealer VDP), keep it using the
+      // model-provided data rather than losing a real long-tail find. Any other
+      // status (404/410/redirect) still drops.
+      if ((res.status === 403 || res.status === 429 || res.status === 503) && looksLikeDetailUrl(url)) {
+        if (diag) console.log(`[web:diag]   KEEP (bot-block ${res.status}, trusted url) ${url}`);
+        return l;
+      }
+      return drop(`fetch-${res.status}`);
+    }
 
     // A redirect to a search/home page means the original listing is gone.
     const finalUrl = res.url || url;

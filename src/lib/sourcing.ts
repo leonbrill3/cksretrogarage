@@ -181,9 +181,9 @@ async function sourceClaudeWeb(c: Campaign): Promise<SourcedListing[]> {
 
   const body = {
     model,
-    max_tokens: 4096,
+    max_tokens: 8192,
     tools: [
-      { type: 'web_search_20250305', name: 'web_search', max_uses: 6 },
+      { type: 'web_search_20250305', name: 'web_search', max_uses: 10 },
       {
         name: 'record_listings',
         description: 'Record the active for-sale listings found.',
@@ -318,7 +318,8 @@ const DETAIL_URL_HINTS: RegExp[] = [
   /hemmings\.com\/(classifieds\/)?(dealer\/|listing\/)/i,
   /dupontregistry\.com\/(autos\/listing|car)\//i, // /autos/listing/ (old) and /car/<make>/<model>/<year>/<vin>/<id> (current)
   /classic\.com\/veh\//i, // Classic.com individual vehicle page
-  /(\/vehicle|\/inventory|\/listing|\/vdp|\/detail)[-/][a-z0-9-]*\d/i, // dealer VDPs with an id
+  /\/lots?\/[a-z0-9][a-z0-9-]*\d/i, // auction-house lot pages: RM Sotheby's, Mecum, Bonhams, Gooding, Broad Arrow (…/lots/r0038-… , …/lot/1234)
+  /(\/vehicle|\/inventory|\/listing|\/vdp|\/detail|\/stock)[-/][a-z0-9-]*\d/i, // dealer VDPs with an id/stock number
 ];
 
 function looksLikeDetailUrl(url: string): boolean {

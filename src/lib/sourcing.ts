@@ -162,6 +162,7 @@ async function marketcheckPage(
     const page = data.listings || [];
     for (const l of page) {
       if (minSeen && typeof l.last_seen_at === 'number' && l.last_seen_at < minSeen) continue;
+      if (!marketcheckUsable(l, !!stream.fresh)) continue;
       out.push(mapMarketcheck(l, country, stream.label));
     }
     const total = data.num_found ?? 0;
@@ -179,10 +180,37 @@ type MarketcheckListing = {
   heading?: string;
   last_seen_at?: number;
   seller_type?: string;
+  source?: string;
+  dom?: number;
+  dom_active?: number;
+  vehicle_status?: string;
   build?: { year?: number; make?: string; model?: string; trim?: string };
   dealer?: { name?: string; city?: string; state?: string };
   media?: { photo_links?: string[] };
 };
+
+// Marketcheck's fsbo/auction feeds carry a lot of stale rows: dead pages that
+// the source site keeps published (so Marketcheck keeps re-seeing them). Filter
+// them out so we never surface a sold/unavailable car.
+const MC_DEAD_STATUS = new Set(['unavailable', 'sold', 'not available', 'removed', 'inactive', 'expired', 'gone']);
+// Low-quality aggregators that republish long-dead listings (every listedbuy
+// Ferrari 360 came back status=Unavailable, 800–1400 days on market).
+const MC_JUNK_SOURCES = new Set(['listedbuy.com']);
+
+function marketcheckUsable(l: MarketcheckListing, fresh: boolean): boolean {
+  const status = (l.vehicle_status || '').trim().toLowerCase();
+  if (MC_DEAD_STATUS.has(status)) return false;
+  if (MC_JUNK_SOURCES.has((l.source || '').toLowerCase())) return false;
+  if (!l.vdp_url) return false;
+  // Days actively on market — a genuinely-current fsbo/private or auction
+  // listing shouldn't have been live for half a year. (Dealer stock legitimately
+  // sits longer, so this only applies to the fresh streams.)
+  if (fresh) {
+    const daysOnMarket = l.dom_active ?? l.dom ?? 0;
+    if (daysOnMarket > 180) return false;
+  }
+  return true;
+}
 
 function mapMarketcheck(l: MarketcheckListing, country: Country, source = 'marketcheck'): SourcedListing {
   const b = l.build || {};

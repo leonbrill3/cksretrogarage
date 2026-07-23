@@ -32,7 +32,8 @@ export type RunResult = {
 function sourceRank(source: string): number {
   if (source.startsWith('marketcheck')) return 0; // active / private / auction
   if (source === 'ebay') return 1;
-  return 2; // web:*
+  if (source === 'bringatrailer') return 2;
+  return 3; // web:*
 }
 
 // Collapse a find's source label to its provider family, matching the
@@ -40,6 +41,7 @@ function sourceRank(source: string): number {
 function sourceFamily(source: string): string {
   if (source.startsWith('marketcheck')) return 'marketcheck';
   if (source === 'ebay') return 'ebay';
+  if (source === 'bringatrailer') return 'bringatrailer';
   return 'web';
 }
 

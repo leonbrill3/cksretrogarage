@@ -95,6 +95,23 @@ export async function runSources(
     );
   }
 
+  // Bring a Trailer — live auctions only, via the unblocker proxy. Deterministic
+  // supply (we fetch BaT's own model page) with a live/sold flag, so it's both
+  // broad and reliable, unlike the LLM web-search layer.
+  if (process.env.SCRAPER_API_KEY) {
+    jobs.push(
+      sourceBringATrailer(c)
+        .then((rows) => {
+          okFamilies.add('bringatrailer');
+          if (rows.length) sources.push('bringatrailer');
+          listings.push(...rows);
+        })
+        .catch((e) => {
+          errors.push(`bat: ${String(e).slice(0, 200)}`);
+        }),
+    );
+  }
+
   await Promise.all(jobs);
   return { listings, sources, errors, okFamilies };
 }
@@ -782,4 +799,107 @@ function mapEbay(it: EbayItem, c: Campaign): SourcedListing {
     photo: it.image?.imageUrl,
     title,
   };
+}
+
+// ---------- D) Bring a Trailer (via the unblocker proxy) ----------
+// BaT has no API and 403s our datacenter IP, but through the ScraperAPI
+// unblocker its marque/model pages load, and each embeds a JSON `items` array
+// of listings carrying an `active` flag. We keep ONLY active (currently-running)
+// auctions, so results are live by construction — a sold BaT lot flips active to
+// false and drops out on its own. One proxy fetch per campaign (cheap).
+type BatItem = {
+  active?: boolean;
+  title?: string;
+  url?: string;
+  year?: number | string;
+  current_bid?: number;
+  thumbnail_url?: string;
+  country?: string;
+  country_code?: string;
+};
+
+async function sourceBringATrailer(c: Campaign): Promise<SourcedListing[]> {
+  if (!process.env.SCRAPER_API_KEY) return []; // needs the proxy to reach BaT
+  if (!c.make || !c.model) return [];
+  // BaT's keyword search works for any make/model (no fragile slug guessing) and
+  // embeds the same items JSON. We keep only active (live) auctions whose title
+  // actually names the model, so a loose search match can't be mislabeled.
+  const q = encodeURIComponent(`${c.make} ${c.model}`.trim());
+  const res = await proxiedFetch(`https://bringatrailer.com/search/?s=${q}`);
+  if (!res || !res.ok) return [];
+  const items = parseBatItems(await res.text());
+  if (!items) return [];
+  const modelKey = c.model.toLowerCase().replace(/[^a-z0-9]/g, '');
+  return items
+    .filter((it) => it.active === true && it.url && (it.title || '').toLowerCase().replace(/[^a-z0-9]/g, '').includes(modelKey))
+    .map((it) => mapBat(it, c));
+}
+
+// Pull the embedded listings array out of a BaT page. The data lives in a
+// "items":[ ... ] block; we locate it and balance-scan to the matching ] so a
+// "}]" inside an item can't truncate the parse.
+function parseBatItems(html: string): BatItem[] | null {
+  const key = '"items":[';
+  const at = html.indexOf(key);
+  if (at < 0) return null;
+  let i = at + key.length - 1; // point at the opening [
+  let depth = 0;
+  let inStr = false;
+  let esc = false;
+  const start = i;
+  for (; i < html.length; i++) {
+    const ch = html[i];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (ch === '\\') esc = true;
+      else if (ch === '"') inStr = false;
+      continue;
+    }
+    if (ch === '"') inStr = true;
+    else if (ch === '[') depth++;
+    else if (ch === ']') {
+      depth--;
+      if (depth === 0) {
+        try {
+          return JSON.parse(html.slice(start, i + 1)) as BatItem[];
+        } catch {
+          return null;
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function mapBat(it: BatItem, c: Campaign): SourcedListing {
+  const year = typeof it.year === 'number' ? it.year : Number(it.year) || undefined;
+  const loc = it.country_code && it.country_code !== 'US' ? it.country : undefined;
+  return {
+    source: 'bringatrailer',
+    sourceUrl: it.url || '',
+    year,
+    make: c.make,
+    model: c.model,
+    price: typeof it.current_bid === 'number' && it.current_bid > 0 ? it.current_bid : undefined,
+    mileage: mileageFromBatTitle(it.title || ''),
+    location: loc,
+    photo: it.thumbnail_url,
+    title: it.title || `${c.make} ${c.model}`,
+  };
+}
+
+// BaT titles lead with mileage like "30k-Mile 2006 Ferrari F430" or
+// "43,000-Mile …". Pull it so the max-mileage filter applies.
+function mileageFromBatTitle(title: string): number | undefined {
+  const k = title.match(/([\d.]+)\s*k-?\s*mile/i);
+  if (k) {
+    const n = Math.round(parseFloat(k[1]) * 1000);
+    if (n >= 100 && n < 1_000_000) return n;
+  }
+  const full = title.match(/([\d,]{3,})\s*-?\s*mile/i);
+  if (full) {
+    const n = Number(full[1].replace(/[^0-9]/g, ''));
+    if (n >= 100 && n < 1_000_000) return n;
+  }
+  return undefined;
 }

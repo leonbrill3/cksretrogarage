@@ -146,7 +146,11 @@ async function marketcheckPage(
   country: Country,
 ): Promise<SourcedListing[]> {
   const PAGE = 50;
-  const CAP = 200; // at most 4 pages per stream — plenty for a single model
+  // Marketcheck bills per API CALL against a monthly quota, so pagination depth
+  // trades directly against quota. One page covers most single-model searches;
+  // cap at 2 (100 rows) so a high-count model (e.g. 113 F430s) still gets broad
+  // coverage without burning 4× the quota per scan.
+  const CAP = 100;
   // Long-tail streams (fsbo/auction) can carry the odd stale row; only surface
   // ones Marketcheck has re-seen in the last 45 days.
   const minSeen = stream.fresh ? Math.floor(Date.now() / 1000) - 45 * 86400 : 0;

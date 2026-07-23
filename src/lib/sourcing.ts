@@ -95,6 +95,22 @@ export async function runSources(
     );
   }
 
+  // PCARMARKET live auctions — clean JSON API via the proxy, filtered to active
+  // cars matching the campaign. Deterministic + live-by-construction.
+  if (process.env.SCRAPER_API_KEY) {
+    jobs.push(
+      sourcePcarmarket(c)
+        .then((rows) => {
+          okFamilies.add('pcarmarket');
+          if (rows.length) sources.push('pcarmarket');
+          listings.push(...rows);
+        })
+        .catch((e) => {
+          errors.push(`pcarmarket: ${String(e).slice(0, 200)}`);
+        }),
+    );
+  }
+
   await Promise.all(jobs);
   return { listings, sources, errors, okFamilies };
 }
@@ -781,5 +797,84 @@ function mapEbay(it: EbayItem, c: Campaign): SourcedListing {
     location: loc,
     photo: it.image?.imageUrl,
     title,
+  };
+}
+
+// ---------- E) PCARMARKET live auctions (via the unblocker proxy) ----------
+// PCARMARKET (auction/marketplace for exotics) 403s our datacenter IP, but its
+// live-auctions JSON API loads through the proxy. The API has no working
+// make/model filter (search is ignored), so we pull the whole live set once per
+// scan (small, cached across campaigns) and filter client-side to Active cars
+// whose vehicle make+model match the campaign. status=Active ⇒ live by
+// construction, so a sold/ended lot can never appear.
+type PcmVehicle = { year?: number; make?: string; model?: string };
+type PcmAuction = {
+  slug?: string;
+  title?: string;
+  status?: string;
+  current_bid?: number | null;
+  high_bid?: number | null;
+  mileage_body?: number | null;
+  featured_image_large_url?: string;
+  featured_image_url?: string;
+  vehicle?: PcmVehicle | null;
+  is_marketplace?: boolean;
+  marketplace_listing_slug?: string | null;
+  country?: string;
+};
+
+// Shared per-process cache so all campaigns in one scan reuse a single fetch of
+// the live-auction list (it's the same set for everyone).
+let pcmCache: { at: number; auctions: PcmAuction[] } | null = null;
+
+async function pcmLiveAuctions(): Promise<PcmAuction[]> {
+  if (pcmCache && Date.now() - pcmCache.at < 5 * 60_000) return pcmCache.auctions;
+  const all: PcmAuction[] = [];
+  let url: string | null = 'https://www.pcarmarket.com/api/auctions/?status=live';
+  for (let page = 0; page < 6 && url; page++) {
+    const res = await proxiedFetch(url);
+    if (!res || !res.ok) break;
+    const data = (await res.json()) as { next?: string | null; results?: PcmAuction[] };
+    all.push(...(data.results || []));
+    url = data.next ? data.next.replace(/^http:/, 'https:') : null;
+  }
+  pcmCache = { at: Date.now(), auctions: all };
+  return all;
+}
+
+async function sourcePcarmarket(c: Campaign): Promise<SourcedListing[]> {
+  if (!process.env.SCRAPER_API_KEY) return []; // needs the proxy to reach PCARMARKET
+  if (!c.make || !c.model) return [];
+  const makeKey = c.make.trim().toLowerCase();
+  const modelKey = c.model.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const auctions = await pcmLiveAuctions();
+  return auctions
+    .filter((a) => {
+      if ((a.status || '').toLowerCase() !== 'active') return false;
+      const v = a.vehicle;
+      if (!v || (v.make || '').toLowerCase() !== makeKey) return false;
+      return (v.model || '').toLowerCase().replace(/[^a-z0-9]/g, '').includes(modelKey);
+    })
+    .map((a) => mapPcm(a, c));
+}
+
+function mapPcm(a: PcmAuction, c: Campaign): SourcedListing {
+  const v = a.vehicle || {};
+  const sourceUrl =
+    a.is_marketplace && a.marketplace_listing_slug
+      ? `https://www.pcarmarket.com/marketplace/${a.marketplace_listing_slug}/`
+      : `https://www.pcarmarket.com/auction/${a.slug || ''}/`;
+  const price = typeof a.high_bid === 'number' ? a.high_bid : typeof a.current_bid === 'number' ? a.current_bid : undefined;
+  return {
+    source: 'pcarmarket',
+    sourceUrl,
+    year: v.year,
+    make: c.make,
+    model: c.model,
+    price,
+    mileage: typeof a.mileage_body === 'number' && a.mileage_body >= 100 ? a.mileage_body : undefined,
+    location: a.country && a.country !== 'US' ? a.country : undefined,
+    photo: a.featured_image_large_url || a.featured_image_url,
+    title: a.title || [v.year, c.make, c.model].filter(Boolean).join(' '),
   };
 }

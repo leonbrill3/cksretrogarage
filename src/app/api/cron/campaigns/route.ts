@@ -22,13 +22,7 @@ function authorized(req: NextRequest): boolean {
   return bearer === secret || qp === secret;
 }
 
-async function handle(req: NextRequest) {
-  if (!authorized(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-  const slotParam = (req.nextUrl.searchParams.get('slot') || '').toLowerCase();
-  const slot: RunSlot = slotParam === 'afternoon' ? 'afternoon' : slotParam === 'morning' ? 'morning' : 'manual';
-
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || req.nextUrl.origin;
+async function processCampaigns(slot: RunSlot, origin: string) {
   const fallbackTo = process.env.CAMPAIGN_ALERT_EMAIL || process.env.ADMIN_EMAIL;
 
   const campaigns = (await getCampaigns()).filter((c) => {
@@ -56,8 +50,31 @@ async function handle(req: NextRequest) {
       results.push({ campaign: c.name, added: 0, priceDrops: 0, emailed: false, error: String(e).slice(0, 200) });
     }
   }
+  return results;
+}
 
-  return NextResponse.json({ ok: true, slot, ran: results.length, results });
+async function handle(req: NextRequest) {
+  if (!authorized(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const slotParam = (req.nextUrl.searchParams.get('slot') || '').toLowerCase();
+  const slot: RunSlot = slotParam === 'afternoon' ? 'afternoon' : slotParam === 'morning' ? 'morning' : 'manual';
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || req.nextUrl.origin;
+
+  // The web-search layer + proxy verification make a full 5-campaign scan take
+  // minutes — longer than the HTTP proxy will hold the connection (it 502s
+  // ~100s). Since this runs on a persistent Render server (not serverless), kick
+  // the scan off in the background and return immediately; results are written
+  // to the DB (visible on /admin/campaigns/results) and digest emails go out as
+  // each campaign finishes. Pass ?wait=1 to block for the results instead.
+  if (req.nextUrl.searchParams.get('wait') === '1') {
+    const results = await processCampaigns(slot, origin);
+    return NextResponse.json({ ok: true, slot, ran: results.length, results });
+  }
+
+  void processCampaigns(slot, origin).catch(() => {
+    /* background scan — errors are recorded per-run in the DB */
+  });
+  return NextResponse.json({ ok: true, slot, started: true }, { status: 202 });
 }
 
 export async function GET(req: NextRequest) {

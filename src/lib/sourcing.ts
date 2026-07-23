@@ -424,8 +424,40 @@ function looksLikeDetailUrl(url: string): boolean {
   return DETAIL_URL_HINTS.some((re) => re.test(url));
 }
 
+const BROWSER_UA =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36';
+
+// Fetch a page, routing through the ScraperAPI web-unblocker when SCRAPER_API_KEY
+// is set. This is what makes verification RELIABLE: premium/auction sites (BaT,
+// Cars & Bids, PCARMARKET, Classic.com, Hemmings) 403 our datacenter IP, so a
+// direct fetch can never confirm a listing is live/sold. Through the proxy we
+// load the real page from a residential IP, past Cloudflare, and can apply the
+// sold/dead-signal checks. Falls back to a direct fetch when no key is set.
+// `render` spends more credits but defeats hard-JS Cloudflare challenges.
+async function proxiedFetch(url: string, render = false): Promise<Response | null> {
+  const key = process.env.SCRAPER_API_KEY;
+  const ctrl = new AbortController();
+  // The proxy adds real latency (residential fetch + optional JS render).
+  const timer = setTimeout(() => ctrl.abort(), key ? 60_000 : 8_000);
+  try {
+    const target = key
+      ? `https://api.scraperapi.com/?api_key=${key}&url=${encodeURIComponent(url)}&country_code=us${render ? '&render=true' : ''}`
+      : url;
+    return await fetch(target, {
+      redirect: 'follow',
+      signal: ctrl.signal,
+      headers: { 'User-Agent': BROWSER_UA, Accept: 'text/html,application/xhtml+xml' },
+    });
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function verifyListing(l: SourcedListing): Promise<SourcedListing | null> {
   const url = l.sourceUrl;
+  const proxied = !!process.env.SCRAPER_API_KEY;
   const diag = process.env.WEB_DIAG === '1';
   const drop = (reason: string): null => {
     if (diag) console.log(`[web:diag]   DROP (${reason}) ${url}`);
@@ -434,31 +466,27 @@ async function verifyListing(l: SourcedListing): Promise<SourcedListing | null> 
   if (!url || JUNK_URL_PATTERNS.some((re) => re.test(url))) return drop('junk-url');
 
   try {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 8000);
-    const res = await fetch(url, {
-      redirect: 'follow',
-      signal: ctrl.signal,
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36',
-        Accept: 'text/html,application/xhtml+xml',
-      },
-    }).catch(() => null);
-    clearTimeout(timer);
+    let res = await proxiedFetch(url);
+    // Some sites still throw a Cloudflare interstitial on the cheap fetch; retry
+    // once with JS rendering (costs more proxy credits) before giving up.
+    if (proxied && res && res.ok) {
+      const peek = await res.clone().text();
+      if (/just a moment|cf-browser-verification|challenge-platform/i.test(peek.slice(0, 2000))) {
+        res = (await proxiedFetch(url, true)) || res;
+      }
+    }
 
     if (!res) return drop('neterr');
     if (!res.ok) {
       // Can't load the page → can't prove it's a LIVE, still-for-sale listing.
-      // We used to keep 403s from trusted auction URLs, but auction lots live at
-      // the same URL forever and just flip to "SOLD" — and when the site blocks
-      // our datacenter IP (403) we can't read that sold state, so we'd surface
-      // stale/sold cars. Correctness beats coverage: any non-OK status drops.
+      // (With the proxy on, a non-OK here means genuinely gone/blocked, not just
+      // our datacenter IP being filtered.) Correctness beats coverage: drop.
       return drop(`fetch-${res.status}`);
     }
 
-    // A redirect to a search/home page means the original listing is gone.
-    const finalUrl = res.url || url;
+    // A redirect to a search/home page means the original listing is gone. Under
+    // the proxy, res.url is the proxy endpoint, so fall back to the original URL.
+    const finalUrl = proxied ? url : res.url || url;
     if (JUNK_URL_PATTERNS.some((re) => re.test(finalUrl))) return drop('junk-final-url');
 
     const html = (await res.text()).slice(0, 400_000);

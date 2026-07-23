@@ -37,10 +37,15 @@ export function sourcesConfigured(): { marketcheck: boolean; web: boolean; ebay:
 
 export async function runSources(
   c: Campaign,
-): Promise<{ listings: SourcedListing[]; sources: string[]; errors: string[] }> {
+): Promise<{ listings: SourcedListing[]; sources: string[]; errors: string[]; okFamilies: Set<string> }> {
   const listings: SourcedListing[] = [];
   const sources: string[] = [];
   const errors: string[] = [];
+  // Source families (marketcheck / ebay / web) that completed WITHOUT throwing
+  // this run — even if they returned 0 rows. Used upstream so a transient API
+  // failure (e.g. Marketcheck HTTP 429) can't be mistaken for "every listing is
+  // gone" and wipe the campaign's inventory.
+  const okFamilies = new Set<string>();
 
   const jobs: Promise<void>[] = [];
 
@@ -48,6 +53,7 @@ export async function runSources(
     jobs.push(
       sourceMarketcheck(c)
         .then(({ rows, labels }) => {
+          okFamilies.add('marketcheck');
           sources.push(...labels);
           listings.push(...rows);
         })
@@ -65,6 +71,7 @@ export async function runSources(
     jobs.push(
       sourceClaudeWeb(c)
         .then((rows) => {
+          okFamilies.add('web');
           if (rows.length) sources.push('web');
           listings.push(...rows);
         })
@@ -78,6 +85,7 @@ export async function runSources(
     jobs.push(
       sourceEbay(c)
         .then((rows) => {
+          okFamilies.add('ebay');
           if (rows.length) sources.push('ebay');
           listings.push(...rows);
         })
@@ -88,7 +96,7 @@ export async function runSources(
   }
 
   await Promise.all(jobs);
-  return { listings, sources, errors };
+  return { listings, sources, errors, okFamilies };
 }
 
 // ---------- A) Marketcheck ----------
@@ -155,9 +163,14 @@ async function marketcheckPage(
     if (c.priceMin || c.priceMax) params.set('price_range', `${c.priceMin || 0}-${c.priceMax || 100000000}`);
     params.set('country', country);
 
-    const res = await fetch(`${base}/${stream.path}?${params.toString()}`, {
+    let res = await fetch(`${base}/${stream.path}?${params.toString()}`, {
       headers: { Accept: 'application/json' },
     });
+    // Marketcheck rate-limits bursts with 429; back off once before giving up.
+    if (res.status === 429) {
+      await new Promise((r) => setTimeout(r, 1500));
+      res = await fetch(`${base}/${stream.path}?${params.toString()}`, { headers: { Accept: 'application/json' } });
+    }
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = (await res.json()) as { num_found?: number; listings?: MarketcheckListing[] };
     const page = data.listings || [];

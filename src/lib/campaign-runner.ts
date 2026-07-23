@@ -35,6 +35,14 @@ function sourceRank(source: string): number {
   return 2; // web:*
 }
 
+// Collapse a find's source label to its provider family, matching the
+// okFamilies set from runSources (marketcheck:private → marketcheck, web:BaT → web).
+function sourceFamily(source: string): string {
+  if (source.startsWith('marketcheck')) return 'marketcheck';
+  if (source === 'ebay') return 'ebay';
+  return 'web';
+}
+
 // Collapse duplicates of the same physical car across sources. Two listings are
 // "the same car" if they share a valid VIN, or (no VIN) the same year + exact
 // mileage. Since a campaign hunts one specific model, identical year + odometer
@@ -64,11 +72,13 @@ export async function runCampaign(c: Campaign, slot: RunSlot): Promise<RunResult
 
   let sourced: SourcedListing[] = [];
   let sources: string[] = [];
+  let okFamilies = new Set<string>();
   let errorMsg: string | undefined;
   try {
     const r = await runSources(c);
     sourced = r.listings;
     sources = r.sources;
+    okFamilies = r.okFamilies;
     if (r.errors.length) errorMsg = r.errors.join(' | ');
   } catch (e) {
     errorMsg = String(e).slice(0, 300);
@@ -146,10 +156,14 @@ export async function runCampaign(c: Campaign, slot: RunSlot): Promise<RunResult
     }
   }
 
-  // Anything we had before but didn't see this run → mark gone.
+  // Anything we had before but didn't see this run → mark gone — BUT only if the
+  // source family that produced it actually ran OK this time. If Marketcheck (or
+  // eBay) errored/rate-limited, its listings are simply absent, not sold, so we
+  // must not retire the whole inventory on a transient failure.
   let removed = 0;
   for (const f of mine) {
     if (!seen.has(findKey(f)) && f.status !== 'gone' && f.status !== 'hidden') {
+      if (!okFamilies.has(sourceFamily(f.source))) continue; // source failed → leave as-is
       f.status = 'gone';
       f.lastSeenAt = f.lastSeenAt; // keep last-seen as-is
       removed++;

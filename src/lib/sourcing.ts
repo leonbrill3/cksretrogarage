@@ -7,7 +7,7 @@
 // Every source degrades gracefully: a missing key or an API error yields [],
 // never a crash, so the feature works with whatever is configured.
 
-import type { Campaign, Country } from '@/data/campaigns';
+import type { Campaign, Country, RunSlot } from '@/data/campaigns';
 
 export type SourcedListing = {
   source: string;
@@ -37,19 +37,24 @@ export function sourcesConfigured(): { marketcheck: boolean; web: boolean; ebay:
 
 export async function runSources(
   c: Campaign,
+  slot: RunSlot = 'manual',
 ): Promise<{ listings: SourcedListing[]; sources: string[]; errors: string[]; okFamilies: Set<string> }> {
   const listings: SourcedListing[] = [];
   const sources: string[] = [];
   const errors: string[] = [];
   // Source families (marketcheck / ebay / web) that completed WITHOUT throwing
   // this run — even if they returned 0 rows. Used upstream so a transient API
-  // failure (e.g. Marketcheck HTTP 429) can't be mistaken for "every listing is
-  // gone" and wipe the campaign's inventory.
+  // failure (e.g. Marketcheck HTTP 429), OR a deliberately-skipped source, can't
+  // be mistaken for "every listing is gone" and wipe the campaign's inventory.
   const okFamilies = new Set<string>();
 
   const jobs: Promise<void>[] = [];
 
-  if (process.env.MARKETCHECK_API_KEY) {
+  // Marketcheck bills per call against a tiny 500/month quota, so we query it at
+  // most ONCE a day: on the morning (and manual) slot only, never the afternoon.
+  // Because it's simply not queried on the afternoon run, 'marketcheck' won't be
+  // in okFamilies, so those finds are left untouched (kept), not marked gone.
+  if (process.env.MARKETCHECK_API_KEY && slot !== 'afternoon') {
     jobs.push(
       sourceMarketcheck(c)
         .then(({ rows, labels }) => {
@@ -162,11 +167,11 @@ async function marketcheckPage(
   country: Country,
 ): Promise<SourcedListing[]> {
   const PAGE = 50;
-  // Marketcheck bills per API CALL against a monthly quota, so pagination depth
-  // trades directly against quota. One page covers most single-model searches;
-  // cap at 2 (100 rows) so a high-count model (e.g. 113 F430s) still gets broad
-  // coverage without burning 4× the quota per scan.
-  const CAP = 100;
+  // Marketcheck bills per API CALL against a tiny 500/month quota, so we take
+  // just the first page (50 rows) per stream — one call. Covers the vast
+  // majority of single-model searches; a rare high-count model is capped at 50
+  // rather than burning multiple calls per scan.
+  const CAP = 50;
   // Long-tail streams (fsbo/auction) can carry the odd stale row; only surface
   // ones Marketcheck has re-seen in the last 45 days.
   const minSeen = stream.fresh ? Math.floor(Date.now() / 1000) - 45 * 86400 : 0;

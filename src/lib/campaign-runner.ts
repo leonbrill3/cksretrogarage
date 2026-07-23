@@ -77,7 +77,7 @@ export async function runCampaign(c: Campaign, slot: RunSlot): Promise<RunResult
   let okFamilies = new Set<string>();
   let errorMsg: string | undefined;
   try {
-    const r = await runSources(c);
+    const r = await runSources(c, slot);
     sourced = r.listings;
     sources = r.sources;
     okFamilies = r.okFamilies;

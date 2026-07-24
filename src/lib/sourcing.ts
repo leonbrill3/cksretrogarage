@@ -817,6 +817,8 @@ type PcmAuction = {
   slug?: string;
   title?: string;
   status?: string;
+  end_date?: string | null;
+  time_remaining?: number | null;
   current_bid?: number | null;
   high_bid?: number | null;
   mileage_body?: number | null;
@@ -852,10 +854,18 @@ async function sourcePcarmarket(c: Campaign): Promise<SourcedListing[]> {
   if (!c.make || !c.model) return [];
   const makeKey = c.make.trim().toLowerCase();
   const modelKey = c.model.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const now = Date.now();
   const auctions = await pcmLiveAuctions();
   return auctions
     .filter((a) => {
       if ((a.status || '').toLowerCase() !== 'active') return false;
+      // PCARMARKET's status=live feed lingers on ENDED lots (this is what showed
+      // "Listing Expired" cards — esp. marketplace listings). The reliable signal
+      // is the clock, not the status field: drop anything already over. (The
+      // expired banner itself is JS-rendered, so a page fetch can't see it.)
+      if (typeof a.time_remaining === 'number' && a.time_remaining <= 0) return false;
+      const end = a.end_date ? Date.parse(a.end_date) : NaN;
+      if (Number.isFinite(end) && end < now) return false;
       const v = a.vehicle;
       if (!v || (v.make || '').toLowerCase() !== makeKey) return false;
       return (v.model || '').toLowerCase().replace(/[^a-z0-9]/g, '').includes(modelKey);

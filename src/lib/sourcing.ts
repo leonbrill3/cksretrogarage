@@ -50,11 +50,15 @@ export async function runSources(
 
   const jobs: Promise<void>[] = [];
 
-  // Marketcheck bills per call against a tiny 500/month quota, so we query it at
-  // most ONCE a day: on the morning (and manual) slot only, never the afternoon.
-  // Because it's simply not queried on the afternoon run, 'marketcheck' won't be
-  // in okFamilies, so those finds are left untouched (kept), not marked gone.
-  if (process.env.MARKETCHECK_API_KEY && slot !== 'afternoon') {
+  // Marketcheck bills per call against a tiny 500/month quota. With 6 campaigns
+  // × 2 streams × up-to-2 countries, a daily morning scan is ~558/mo (over). So
+  // query it every OTHER day (even UTC date) on the morning slot — ~270/mo —
+  // plus always on a manual run. On the skipped runs 'marketcheck' isn't in
+  // okFamilies, so those finds are kept (not marked gone). eBay/PCARMARKET still
+  // run every slot, so live freshness is unaffected.
+  const marketcheckToday =
+    slot === 'manual' || (slot === 'morning' && new Date().getUTCDate() % 2 === 0);
+  if (process.env.MARKETCHECK_API_KEY && marketcheckToday) {
     jobs.push(
       sourceMarketcheck(c)
         .then(({ rows, labels }) => {

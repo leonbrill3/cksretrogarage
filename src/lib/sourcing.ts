@@ -157,7 +157,44 @@ async function sourceMarketcheck(c: Campaign): Promise<{ rows: SourcedListing[];
       }
     }
   }
-  return { rows: out, labels: [...labels] };
+  // Marketcheck's vehicle_status LAGS the dealer's real sold-status (a car can be
+  // marked SOLD on the dealer's own page while Marketcheck still lists it active
+  // with vehicle_status=null). Proxy-fetch each VDP and drop it only if the page
+  // POSITIVELY signals sold/out-of-stock — keep it on any uncertainty so we never
+  // false-drop a live car.
+  const verified = process.env.SCRAPER_API_KEY ? await dropSoldDealerListings(out) : out;
+  return { rows: verified, labels: [...labels] };
+}
+
+// Fetch each dealer VDP (via proxy) and drop the ones the page says are sold.
+async function dropSoldDealerListings(listings: SourcedListing[]): Promise<SourcedListing[]> {
+  const kept: SourcedListing[] = [];
+  const BATCH = 4; // respect the proxy's small concurrency budget
+  for (let i = 0; i < listings.length; i += BATCH) {
+    const checked = await Promise.all(
+      listings.slice(i, i + BATCH).map(async (l) => {
+        if (!l.sourceUrl) return l;
+        const res = await proxiedFetch(l.sourceUrl);
+        if (!res || !res.ok) return l; // can't verify → trust Marketcheck, keep
+        const html = (await res.text()).slice(0, 120_000);
+        return dealerPageSold(html) ? null : l;
+      }),
+    );
+    kept.push(...checked.filter((l): l is SourcedListing => l !== null));
+  }
+  return kept;
+}
+
+// A dealer VDP positively says sold when its structured availability is
+// out-of-stock. This is precise (unlike a bare "sold" substring, which also
+// matches "Sold Inventory" nav and other cars): the OG product:availability and
+// schema.org availability fields reflect THIS vehicle's real state.
+function dealerPageSold(html: string): boolean {
+  const m =
+    html.match(/(?:product:availability|og:availability)["'][^>]*content=["']([^"']+)["']/i) ||
+    html.match(/["']?availability["']?\s*:\s*["']([^"']+)["']/i);
+  if (!m) return false;
+  return /out\s*of\s*stock|sold\s*out|soldout|discontinued|unavailable/i.test(m[1]);
 }
 
 // Pull a full stream (paginating past the 50-row page cap) for one country.

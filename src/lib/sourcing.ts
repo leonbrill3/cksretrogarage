@@ -105,8 +105,11 @@ export async function runSources(
   }
 
   // PCARMARKET live auctions — clean JSON API via the proxy, filtered to active
-  // cars matching the campaign. Deterministic + live-by-construction.
-  if (process.env.SCRAPER_API_KEY) {
+  // cars matching the campaign. Deterministic + live-by-construction. Runs once
+  // a day (morning + manual, not afternoon) to conserve proxy credits — auctions
+  // last days, so a second daily check isn't needed. Skipped runs keep its finds
+  // (not in okFamilies → not retired).
+  if (process.env.SCRAPER_API_KEY && slot !== 'afternoon') {
     jobs.push(
       sourcePcarmarket(c)
         .then((rows) => {

@@ -166,18 +166,29 @@ async function sourceMarketcheck(c: Campaign): Promise<{ rows: SourcedListing[];
   return { rows: verified, labels: [...labels] };
 }
 
+// Cache of per-URL sold-check results so we don't re-fetch the SAME dealer page
+// every scan (dealers hold cars for weeks). A car verified live 3 days ago
+// almost never needs re-checking — this cuts proxy usage ~5-10× at steady state.
+// In-memory (per process); cleared on redeploy, which just re-verifies once.
+const soldCheckCache = new Map<string, { sold: boolean; at: number }>();
+const SOLD_CHECK_TTL = 3 * 86_400_000; // 3 days
+
 // Fetch each dealer VDP (via proxy) and drop the ones the page says are sold.
 async function dropSoldDealerListings(listings: SourcedListing[]): Promise<SourcedListing[]> {
+  const now = Date.now();
   const kept: SourcedListing[] = [];
   const BATCH = 4; // respect the proxy's small concurrency budget
   for (let i = 0; i < listings.length; i += BATCH) {
     const checked = await Promise.all(
       listings.slice(i, i + BATCH).map(async (l) => {
         if (!l.sourceUrl) return l;
+        const cached = soldCheckCache.get(l.sourceUrl);
+        if (cached && now - cached.at < SOLD_CHECK_TTL) return cached.sold ? null : l;
         const res = await proxiedFetch(l.sourceUrl);
-        if (!res || !res.ok) return l; // can't verify → trust Marketcheck, keep
-        const html = (await res.text()).slice(0, 120_000);
-        return dealerPageSold(html) ? null : l;
+        if (!res || !res.ok) return l; // can't verify → trust Marketcheck, keep (don't cache)
+        const sold = dealerPageSold((await res.text()).slice(0, 120_000));
+        soldCheckCache.set(l.sourceUrl, { sold, at: now });
+        return sold ? null : l;
       }),
     );
     kept.push(...checked.filter((l): l is SourcedListing => l !== null));
